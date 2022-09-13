@@ -1,14 +1,14 @@
 {
-  "name": "arbitrage-bot-bookkeeper",
+  "name": "@stove-labs/arbitrage-bot-bookkeeper",
   "version": "0.0.0",
   "description": "reporter on trades and provides oversight on balances",
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "src/arbitrage-bot-bookkeeper.js",
+  "main": "lib/arbitrage-bot-bookkeeper.js",
   "directories": {
     "src": "src",
-    "test": "__tests__"
+    "test": "test"
   },
   "files": [
     "src"
@@ -18,9 +18,26 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "node ./__tests__/arbitrage-bot-bookkeeper.test.js"
+    "test": "mocha -r ts-node/register test/*.ts",
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1"
+  },
+  "keywords": [
+    "reporter",
+    "balance",
+    "account",
+    "bookkeeper"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

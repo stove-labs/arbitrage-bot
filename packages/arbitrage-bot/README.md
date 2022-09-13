@@ -1,11 +1,11 @@
-# `arbitrage-bot`
+# `@stove-labs/arbitrage-bot`
 
 > TODO: description
 
 ## Usage
 
 ```
-const arbitrageBot = require('arbitrage-bot');
+const arbitrageBot = require('@stove-labs/arbitrage-bot');
 
 // TODO: DEMONSTRATE API
 ```

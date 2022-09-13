@@ -1,5 +1,5 @@
 {
-  "name": "arbitrage-bot-trade-execution",
+  "name": "@stove-labs/arbitrage-bot-trade-execution",
   "version": "0.0.0",
   "description": "plugin for trade execution",
   "keywords": [
@@ -25,9 +25,20 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "node ./__tests__/arbitrage-bot-trade-execution.test.js"
+    "test": "mocha -r ts-node/register test/*.ts",
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

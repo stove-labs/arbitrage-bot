@@ -1,11 +1,11 @@
-# `arbitrage-bot-decentralized-exchanges-library`
+# `@stove-labs/arbitrage-bot-decentralized-exchanges-library`
 
 > TODO: description
 
 ## Usage
 
 ```
-const arbitrageBotDecentralizedExchangesLibrary = require('arbitrage-bot-decentralized-exchanges-library');
+const arbitrageBotDecentralizedExchangesLibrary = require('@stove-labs/arbitrage-bot-decentralized-exchanges-library');
 
 // TODO: DEMONSTRATE API
 ```

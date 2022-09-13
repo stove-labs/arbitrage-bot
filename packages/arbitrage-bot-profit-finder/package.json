@@ -1,5 +1,5 @@
 {
-  "name": "arbitrage-bot-profit-finder",
+  "name": "@stove-labs/arbitrage-bot-profit-finder",
   "version": "0.0.0",
   "description": "discovers arbitrage opportunities and calculates profit",
   "keywords": [
@@ -26,9 +26,20 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "node ./__tests__/arbitrage-bot-profit-finder.test.js"
+    "test": "mocha -r ts-node/register test/*.ts",
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

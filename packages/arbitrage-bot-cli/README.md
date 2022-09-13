@@ -1,11 +1,11 @@
-# `arbitrage-bot-cli`
+# `@stove-labs/arbitrage-bot-cli`
 
 > TODO: description
 
 ## Usage
 
 ```
-const arbitrageBotCli = require('arbitrage-bot-cli');
+const arbitrageBotCli = require('@stove-labs/arbitrage-bot-cli');
 
 // TODO: DEMONSTRATE API
 ```

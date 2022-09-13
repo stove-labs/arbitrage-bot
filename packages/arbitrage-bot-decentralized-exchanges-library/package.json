@@ -1,5 +1,5 @@
 {
-  "name": "arbitrage-bot-decentralized-exchanges-library",
+  "name": "@stove-labs/arbitrage-bot-decentralized-exchanges-library",
   "version": "0.0.0",
   "description": "library for the various decentralized exchanges",
   "keywords": [
@@ -24,9 +24,20 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "node ./__tests__/arbitrage-bot-decentralized-exchanges-library.test.js"
+    "test": "mocha -r ts-node/register test/*.ts",
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "arbitrage-bot",
+  "name": "@stove-labs/arbitrage-bot",
   "version": "0.0.0",
   "description": "core plugin of the arbitrage bot",
   "keywords": [
@@ -12,10 +12,10 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "src/arbitrage-bot.ts",
+  "main": "lib/arbitrage-bot.js",
   "directories": {
     "lib": "lib",
-    "test": "__tests__"
+    "test": "test"
   },
   "files": [
     "lib"
@@ -25,9 +25,20 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "node ./__tests__/arbitrage-bot.test.js"
+    "test": "mocha -r ts-node/register test/*.ts",
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
