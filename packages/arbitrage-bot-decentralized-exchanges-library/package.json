@@ -1,0 +1,32 @@
+{
+  "name": "arbitrage-bot-decentralized-exchanges-library",
+  "version": "0.0.0",
+  "description": "library for the various decentralized exchanges",
+  "keywords": [
+    "DEX",
+    "CFMM",
+    "uniswap",
+    "Tezos"
+  ],
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "src/arbitrage-bot-decentralized-exchanges-library.js",
+  "directories": {
+    "lib": "src",
+    "test": "__tests__"
+  },
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/arbitrage-bot-decentralized-exchanges-library.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  }
+}

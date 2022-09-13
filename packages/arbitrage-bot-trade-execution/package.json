@@ -1,0 +1,33 @@
+{
+  "name": "arbitrage-bot-trade-execution",
+  "version": "0.0.0",
+  "description": "plugin for trade execution",
+  "keywords": [
+    "signer",
+    "DEX",
+    "trades",
+    "swap",
+    "exchange"
+  ],
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "src/arbitrage-bot-trade-execution.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/arbitrage-bot-trade-execution.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  }
+}

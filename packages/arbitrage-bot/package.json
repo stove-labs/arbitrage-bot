@@ -1,0 +1,33 @@
+{
+  "name": "arbitrage-bot",
+  "version": "0.0.0",
+  "description": "core plugin of the arbitrage bot",
+  "keywords": [
+    "arbitrage",
+    "bot",
+    "core",
+    "plugin",
+    "package"
+  ],
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "src/arbitrage-bot.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/arbitrage-bot.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  }
+}

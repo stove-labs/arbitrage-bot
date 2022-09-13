@@ -1,0 +1,34 @@
+{
+  "name": "arbitrage-bot-profit-finder",
+  "version": "0.0.0",
+  "description": "discovers arbitrage opportunities and calculates profit",
+  "keywords": [
+    "arbitrage",
+    "CFMM",
+    "DEX",
+    "Uniswap",
+    "profit",
+    "finder"
+  ],
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "src/arbitrage-bot-profit-finder.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/arbitrage-bot-profit-finder.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  }
+}
