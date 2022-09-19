@@ -13,7 +13,7 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/exchangeQuipuSwapPlugin.js",
+  "main": "./dist/lib/exchangeQuipuswapPlugin.js",
   "typings": "./dist/types/exchangeQuipuswapPlugin.d.ts",
   "files": [
     "dist"
