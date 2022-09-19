@@ -1,21 +1,26 @@
 {
-  "name": "@stove-labs/arbitrage-bot",
+  "name": "@stove-labs/arbitrage-bot-profit-finder-lite",
   "version": "0.0.0",
-  "description": "core plugin of the arbitrage bot",
+  "description": "discovers arbitrage opportunities and calculates profit",
   "keywords": [
     "arbitrage",
-    "bot",
-    "core",
-    "plugin",
-    "package"
+    "CFMM",
+    "DEX",
+    "Uniswap",
+    "profit",
+    "finder"
   ],
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/arbitrageBotCore.js",
+  "main": "./dist/lib/profitFinderLite.js",
   "files": [
     "dist"
   ],
+  "typings": "./dist/types/profitFinderLite.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
@@ -24,21 +29,10 @@
     "test": "mocha -r ts-node/register test/*.ts",
     "build": "tsc"
   },
-  "typings": "./dist/types/arbitrageBotCore.d.ts",
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
-  "devDependencies": {
-    "@types/mocha": "^9.1.1",
-    "mocha": "^10.0.0"
-  },
   "dependencies": {
-    "@stove-labs/arbitrage-bot-swap-execution": "^0.0.0",
-    "@types/lodash": "^4.14.185",
-    "lodash": "^4.17.21",
-    "ts-node": "^10.9.1"
-  },
-  "publishConfig": {
-    "access": "public"
+    "@stove-labs/arbitrage-bot": "^0.0.0"
   }
 }

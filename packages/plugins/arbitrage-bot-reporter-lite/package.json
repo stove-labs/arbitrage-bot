@@ -1,24 +1,24 @@
 {
-  "name": "@stove-labs/arbitrage-bot-decentralized-exchanges-library",
+  "name": "@stove-labs/arbitrage-bot-reporter-lite",
   "version": "0.0.0",
-  "description": "library for the various decentralized exchanges",
+  "description": "console reporter for the arbitrage bot",
   "keywords": [
-    "DEX",
-    "CFMM",
-    "uniswap",
-    "Tezos"
+    "console",
+    "reporter",
+    "arbitrage",
+    "bot"
   ],
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "src/arbitrage-bot-decentralized-exchanges-library.js",
-  "directories": {
-    "lib": "src",
-    "test": "__tests__"
-  },
+  "main": "./dist/lib/arbitrage-bot-reporter-lite.js",
   "files": [
-    "src"
+    "dist"
   ],
+  "typings": "./dist/types/reporterLite.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
@@ -30,14 +30,7 @@
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
-  "devDependencies": {
-    "@types/mocha": "^9.1.1",
-    "mocha": "^10.0.0"
-  },
   "dependencies": {
-    "ts-node": "^10.9.1"
-  },
-  "publishConfig": {
-    "access": "public"
+    "@stove-labs/arbitrage-bot": "^0.0.0"
   }
 }

@@ -10,13 +10,9 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "lib/arbitrage-bot-cli.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
+  "main": "./dist/lib/cli.js",
   "files": [
-    "lib"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -26,15 +22,24 @@
     "test": "mocha -r ts-node/register test/*.ts",
     "build": "tsc"
   },
+  "typings": "./dist/types/types.d.ts",
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "devDependencies": {
     "@types/mocha": "^9.1.1",
+    "@types/yargs": "^17.0.12",
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "ts-node": "^10.9.1"
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@stove-labs/arbitrage-bot-profit-finder-lite": "^0.0.0",
+    "@stove-labs/arbitrage-bot-reporter-lite": "^0.0.0",
+    "@stove-labs/arbitrage-bot-trigger-lite": "^0.0.0",
+    "@stove-labs/tezos-dex-quipuswap": "^0.0.0",
+    "@stove-labs/tezos-dex-spicyswap": "^0.0.0",
+    "ts-node": "^10.9.1",
+    "yargs": "^17.5.1"
   },
   "publishConfig": {
     "access": "public"

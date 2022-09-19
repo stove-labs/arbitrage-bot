@@ -1,25 +1,25 @@
 {
-  "name": "@stove-labs/arbitrage-bot-trade-execution",
+  "name": "@stove-labs/tezos-dex-quipuswap",
   "version": "0.0.0",
-  "description": "plugin for trade execution",
+  "description": "plugin for the tezos DEX quipuswap",
   "keywords": [
-    "signer",
     "DEX",
-    "trades",
-    "swap",
-    "exchange"
+    "tezos",
+    "quipuswap",
+    "decentralized",
+    "exchange",
+    "CFMM"
   ],
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "src/arbitrage-bot-trade-execution.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
-  },
+  "main": "./dist/lib/exchangeQuipuSwapPlugin.js",
   "files": [
-    "lib"
+    "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
@@ -31,14 +31,8 @@
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
-  "devDependencies": {
-    "@types/mocha": "^9.1.1",
-    "mocha": "^10.0.0"
-  },
   "dependencies": {
-    "ts-node": "^10.9.1"
-  },
-  "publishConfig": {
-    "access": "public"
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@stove-labs/arbitrage-bot-exchanges": "^0.0.0"
   }
 }
