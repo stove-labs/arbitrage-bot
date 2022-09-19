@@ -6,6 +6,7 @@
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
   "main": "./dist/lib/triggerPlugin.js",
+  "typings": "./dist/types/triggerPlugin.d.ts",
   "files": [
     "dist"
   ],

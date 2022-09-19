@@ -1,11 +1,11 @@
 {
-  "name": "@stove-labs/tezos-dex-spicyswap",
+  "name": "@stove-labs/tezos-dex-quipuswap",
   "version": "0.0.0",
-  "description": "plugin for the Tezos DEX SpicySwap",
+  "description": "plugin for the tezos DEX quipuswap",
   "keywords": [
     "DEX",
-    "Tezos",
-    "SpicySwap",
+    "tezos",
+    "quipuswap",
     "decentralized",
     "exchange",
     "CFMM"
@@ -13,11 +13,11 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/exchangeSpicyswapPlugin.js",
+  "main": "./dist/lib/exchangeQuipuSwapPlugin.js",
+  "typings": "./dist/types/exchangeQuipuswapPlugin.d.ts",
   "files": [
     "dist"
   ],
-  "typings": "./dist/types/exchangeSpicySwapPlugin.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -33,6 +33,7 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^0.0.0"
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@stove-labs/arbitrage-bot-exchanges": "^0.0.0"
   }
 }
