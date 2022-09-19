@@ -48,5 +48,5 @@ export interface SwapResult {
 
 export interface ISwapExecutionManager {
   getExchangePluginBySwap(swap: Swap): ExchangePlugin
-  executeSwaps(swaps: Swap[]): SwapResult
+  executeSwaps(swaps: Swap[]): Promise<SwapResult[]>
 }
