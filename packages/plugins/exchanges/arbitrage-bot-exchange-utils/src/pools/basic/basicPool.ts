@@ -24,6 +24,23 @@ export const getAmountInGivenOut = (
     return numerator.idiv(denominator);
 };
 
-export const calculateAmountOutExactIn = () => {
-    return;
+/**
+ * Example for fee = 0.03% which is 3 BPS out of 1000 BPS
+ * amountOut = (amountIn * 997 * reserveOut) / (reserveIn * 1000 + amountIn * 997)
+ */
+export const getAmountOutGivenIn = (
+    amountIn: string,
+    reserveIn: string,
+    reserveOut: string,
+    fee: number
+) => {
+    const amountInBN = new BigNumber(amountIn);
+    const amountInWithFee = amountInBN.multipliedBy(basisPoints - fee);
+
+    const numerator = amountInWithFee.multipliedBy(reserveOut);
+    const denominator = new BigNumber(reserveIn)
+        .multipliedBy(basisPoints)
+        .plus(amountInWithFee);
+
+    return numerator.idiv(denominator);
 };
