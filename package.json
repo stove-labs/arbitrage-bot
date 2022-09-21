@@ -3,7 +3,7 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "packages/plugins/**/*"
+    "packages/plugins/exchanges/*"
   ],
   "devDependencies": {
     "@types/node": "^18.7.17",

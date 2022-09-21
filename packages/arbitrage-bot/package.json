@@ -29,13 +29,19 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.3",
+    "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.1",
-    "mocha": "^10.0.0"
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot-swap-execution": "^0.0.0",
     "@types/lodash": "^4.14.185",
     "lodash": "^4.17.21",
+    "mocha": "^10.0.0",
     "ts-node": "^10.9.1"
   },
   "publishConfig": {

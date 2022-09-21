@@ -26,7 +26,7 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register test/*.ts",
+    "test": "mocha -r ts-node/register test/**.test.ts",
     "build": "tsc"
   },
   "bugs": {
@@ -34,6 +34,16 @@
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot": "^0.0.0",
-    "@stove-labs/arbitrage-bot-exchanges": "^0.0.0"
+    "@stove-labs/arbitrage-bot-exchange-utils": "^0.0.0",
+    "@taquito/taquito": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.3",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/mocha": "^9.1.1",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.9.1"
   }
 }

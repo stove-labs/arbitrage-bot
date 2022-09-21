@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "CommonJS",
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
     "noLib": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es6",
+    "target": "ESNext",
     "sourceMap": true,
     "lib": [
       "es6"
-    ]
+    ],
+    "esModuleInterop": true
   },
   "exclude": [
     "node_modules",
