@@ -14,10 +14,7 @@ export class ExchangeSpicySwapPlugin implements ExchangePlugin {
 
   constructor(public config: ExchangePluginConfig) {}
 
-  fetchPrice(baseToken: Token, quoteToken: Token): ExchangePrice {
+  async fetchPrice(baseToken: Token, quoteToken: Token): Promise<ExchangePrice> {
     return {} as ExchangePrice;
-  }
-  getFee(baseToken: Token, quoteToken: Token): ExchangeFee {
-    return "";
   }
 }
