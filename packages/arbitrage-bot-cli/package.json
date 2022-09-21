@@ -43,6 +43,7 @@
     "@stove-labs/arbitrage-bot-trigger-lite": "^0.0.0",
     "@stove-labs/tezos-dex-quipuswap": "^0.0.0",
     "@stove-labs/tezos-dex-spicyswap": "^0.0.0",
+    "@stove-labs/tezos-dex-vortex": "^0.0.0",
     "mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "yargs": "^17.5.1"
