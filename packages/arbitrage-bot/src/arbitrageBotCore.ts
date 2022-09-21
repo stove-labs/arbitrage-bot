@@ -1,12 +1,9 @@
 import { ExchangePlugin } from "./exchange/interface";
 import { ExchangePrice } from "./exchange/types";
 import { ReporterPlugin } from "./reporter/interface";
-import {
-  Config,
-  Token,
-} from "./types";
+import { Config, Token } from "./types";
 
-import { SwapExecutionManager } from "@stove-labs/arbitrage-bot-swap-execution";
+import { BatchSwapExecutionManager } from "@stove-labs/arbitrage-bot-swap-execution";
 
 export * from "./types";
 
@@ -28,7 +25,7 @@ class ExchangeManager {
 
 export class ArbitrageBotCore {
   public exchangeManager: ExchangeManager;
-  public swapExecutionManager: SwapExecutionManager;
+  public swapExecutionManager: BatchSwapExecutionManager;
 
   constructor(public config: Config) {}
 
@@ -71,7 +68,7 @@ export class ArbitrageBotCore {
 
   start() {
     this.exchangeManager = new ExchangeManager(this.config.plugins.exchanges);
-    this.swapExecutionManager = new SwapExecutionManager(
+    this.swapExecutionManager = new BatchSwapExecutionManager(
       this.config.plugins.exchanges,
       this.config.plugins.keychains
     );

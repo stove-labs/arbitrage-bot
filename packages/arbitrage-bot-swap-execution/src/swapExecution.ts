@@ -2,11 +2,11 @@ import {
   ExchangePlugin,
   Swap,
   SwapResult,
-  ISwapExecutionManager,
+  SwapExecutionManager,
 } from "@stove-labs/arbitrage-bot";
 import * as _ from "lodash";
 
-export class SwapExecutionManager implements ISwapExecutionManager {
+export class BatchSwapExecutionManager implements SwapExecutionManager {
   constructor(public exchanges: ExchangePlugin[], public keychains: any) {}
 
   getExchangePluginBySwap(swap: Swap): ExchangePlugin {
