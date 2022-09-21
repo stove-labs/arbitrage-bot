@@ -2,8 +2,7 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "packages/plugins/exchanges/*"
+    "packages/**/*"
   ],
   "devDependencies": {
     "@types/node": "^18.7.17",
