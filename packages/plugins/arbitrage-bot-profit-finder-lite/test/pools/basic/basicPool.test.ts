@@ -7,9 +7,9 @@ import {
 describe('basicPool', () => {
     it('can calculate amountIn for exact amountOut', () => {
         const amountIn = getAmountInGivenOut(
-            '174839', // delta_a amountOut
+            '174839', // delta_b amountOut
             '12470264', // a1 reserveIn
-            '19328447', // b2 reserverOut
+            '19328447', // b2 reserveOut
             3
         );
         expect(amountIn.toString()).to.equal('113828');
@@ -17,8 +17,8 @@ describe('basicPool', () => {
 
     it('can calculate amountOut for exact amountIn', () => {
         const amountOut = getAmountOutGivenIn(
-            '174839', // delta_a amountIn
-            '75942969', // b2  reserveIn
+            '174839', // delta_b amountIn
+            '75942969', // b2 reserveIn
             '50125177', // a2 reserveOut
             3
         );
