@@ -1,0 +1,30 @@
+{
+  "name": "@stove-labs/arbitrage-bot-token-registry",
+  "version": "0.0.0",
+  "description": "token address provider",
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "./dist/lib/tokenRegistry.js",
+  "typings": "./dist/types/tokenRegistry.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register test/*.ts",
+    "build": "tsc"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "dependencies": {
+    "@stove-labs/arbitrage-bot": "^0.0.0"
+  }
+}
