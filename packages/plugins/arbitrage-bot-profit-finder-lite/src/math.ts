@@ -1,4 +1,4 @@
-import { ExchangePrice } from '@stove-labs/arbitrage-bot';
+import { ExchangePrice, Token, TokenDecimals } from '@stove-labs/arbitrage-bot';
 import {
     getAmountInGivenOut,
     getAmountOutGivenIn,
@@ -12,13 +12,23 @@ import _ from 'lodash';
  * pay 0.65 XTZ
  * receive 1 USD
  */
-export const addSpotPrice = (prices: ExchangePrice[]): ExchangePrice[] => {
+export const addSpotPrice = (
+    prices: ExchangePrice[],
+    tokenDecimals: TokenDecimals
+): ExchangePrice[] => {
     prices.map((exchangePrice) => {
-        exchangePrice.spotPrice = new BigNumber(
+        const baseTokenReserve = new BigNumber(
             exchangePrice.baseTokenBalance.amount
-        )
-            .dividedBy(exchangePrice.quoteTokenBalance.amount)
-            .toNumber();
+        ).dividedBy(10 ** tokenDecimals.baseToken);
+
+        const quoteTokenReserve = new BigNumber(
+            exchangePrice.quoteTokenBalance.amount
+        ).dividedBy(10 ** tokenDecimals.quoteToken);
+
+        exchangePrice.spotPrice = baseTokenReserve
+            .dividedBy(quoteTokenReserve)
+            .multipliedBy(10 ** tokenDecimals.baseToken)
+            .toFixed(0, 1);
 
         return exchangePrice;
     });
@@ -33,14 +43,37 @@ export const addSpotPrice = (prices: ExchangePrice[]): ExchangePrice[] => {
  * quoteToken balance = 2 USD
  * Spot price: 1USD = 0.5 XTZ
  */
-export const orderLowToHigh = (prices: ExchangePrice[]): ExchangePrice[] => {
-    prices = addSpotPrice(prices);
+export const orderLowToHigh = (
+    prices: ExchangePrice[],
+    tokenDecimals: TokenDecimals
+): ExchangePrice[] => {
+    //const tokenInfo = getTokenInfo(prices);
+    prices = addSpotPrice(prices, tokenDecimals);
 
-    return _.orderBy(prices, ['spotPrice'], 'asc');
+    return _.orderBy(
+        prices,
+        [
+            // need to transform string to number so it can be ordered
+            (exchangePrice) => {
+                return new BigNumber(exchangePrice.spotPrice).toNumber();
+            },
+        ],
+        'asc'
+    );
 };
 
-type SwapBuy = { reserveIn: string; reserveOut: string };
-type SwapSell = { reserveIn: string; reserveOut: string };
+type SwapBuy = {
+    reserveIn: string;
+    reserveOut: string;
+    tokenIn: Token;
+    tokenOut: Token;
+};
+type SwapSell = {
+    reserveIn: string;
+    reserveOut: string;
+    tokenIn: Token;
+    tokenOut: Token;
+};
 export type TradingStrategy = {
     swapBuy: SwapBuy;
     swapSell: SwapSell;
@@ -51,32 +84,35 @@ export type TradingStrategy = {
  * SpotPrice 0.2 quoteToken/baseToken USD/XTZ
  */
 export const splitIntoBuySell = (prices: ExchangePrice[]): TradingStrategy => {
-    // get where spot price lower => amountInGivenOut => BUY
+    // spot price lower => amountInGivenOut => BUY
     const exchangeBuy = {
         reserveIn: prices[0].baseTokenBalance.amount,
         reserveOut: prices[0].quoteTokenBalance.amount,
+        tokenIn: prices[0].baseToken,
+        tokenOut: prices[0].quoteToken,
     } as SwapBuy;
-    // get where spot price higher => amountOutGivenIn => SELL
+    // spot price higher => amountOutGivenIn => SELL
     const exchangeSell = {
         // notice that quote and base token are flipped here!
         reserveIn: prices[1].quoteTokenBalance.amount,
         reserveOut: prices[1].baseTokenBalance.amount,
+        tokenIn: prices[1].quoteToken,
+        tokenOut: prices[1].baseToken,
     } as SwapSell;
     return { swapBuy: exchangeBuy, swapSell: exchangeSell };
 };
 
-// https://www.notion.so/stove-labs/Profit-Finder-d5844bc7e4ec4db48b2bfe395d42c256#7c18595d89fd4e5c9c7c122e47c2a22b
 /**
  * Units:
- * reserveInBuy = reserveOutSell = token
+ * buy.tokenOut = sell.tokenIn [token amount]
  */
-export const findOptimalAmount = (dex: TradingStrategy) => {
+export const findOptimalAmount = (dex: TradingStrategy): BigNumber => {
     // Univariate quadratic function with coefficients a,b,c f(x)=a*x^2+b*x+c=0
     const { a, b, c } = extractCoefficientsOfUnivariateQuadraticFunction(dex);
 
     // Solving the quadratic function yields x1 and x2
     // x1 = (- b + sqrt(b² - 4*a*c))/(2*a)
-    // x2 = - b - sqrt(b² - 4*a*c)/(2*a)
+    // x2 = (- b - sqrt(b² - 4*a*c))/(2*a)
     const valueInSquareRoot = b
         .pow(2)
         .minus(new BigNumber(4).multipliedBy(a).multipliedBy(c));
@@ -107,6 +143,10 @@ export const findOptimalAmount = (dex: TradingStrategy) => {
 };
 
 // https://www.notion.so/stove-labs/Profit-Finder-d5844bc7e4ec4db48b2bfe395d42c256#a13825caae334a9299d86ef06801709d
+/**
+ * Profit is in baseToken
+ * OptimalAmount is quoteToken
+ */
 export const expectedProfitWithFees = (
     optimalAmount: string,
     reserveInSell: string,
@@ -125,9 +165,11 @@ export const expectedProfitWithFees = (
     );
     return profit;
 };
+
 function extractCoefficientsOfUnivariateQuadraticFunction(
     dex: TradingStrategy
 ) {
+    // calculate a
     const productBuyReserves = new BigNumber(
         dex.swapBuy.reserveIn
     ).multipliedBy(dex.swapBuy.reserveOut);
@@ -135,7 +177,7 @@ function extractCoefficientsOfUnivariateQuadraticFunction(
         dex.swapSell.reserveIn
     ).multipliedBy(dex.swapSell.reserveOut);
     const a = productBuyReserves.minus(productSellReserves);
-    console.log('a', a.toString());
+
     // calculate b
     const b = new BigNumber(2)
         .multipliedBy(dex.swapBuy.reserveOut)
@@ -143,7 +185,7 @@ function extractCoefficientsOfUnivariateQuadraticFunction(
         .multipliedBy(
             new BigNumber(dex.swapBuy.reserveIn).plus(dex.swapSell.reserveIn)
         );
-    console.log('b', b.toString());
+
     // calculate c
     const c = new BigNumber(dex.swapBuy.reserveOut)
         .multipliedBy(dex.swapSell.reserveOut)
@@ -156,6 +198,6 @@ function extractCoefficientsOfUnivariateQuadraticFunction(
                     )
                 )
         );
-    console.log('c', c.toString());
+
     return { a, b, c };
 }
