@@ -13,11 +13,11 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/profitFinderLite.js",
+  "main": "./dist/lib/profitFinder.js",
+ "typings": "./dist/types/profitFinder.d.ts",
   "files": [
     "dist"
   ],
-  "typings": "./dist/types/profitFinderLite.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -26,13 +26,11 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register test/*.ts",
+    "test": "mocha -r ts-node/register test/**/**.ts",
+    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'",
     "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
-  },
-  "dependencies": {
-    "@stove-labs/arbitrage-bot": "^0.0.0"
   }
 }
