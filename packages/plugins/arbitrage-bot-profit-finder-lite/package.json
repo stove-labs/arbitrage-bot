@@ -27,6 +27,7 @@
   },
   "scripts": {
     "test": "mocha -r ts-node/register test/**/**.ts",
+    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'",
     "build": "tsc"
   },
   "bugs": {
