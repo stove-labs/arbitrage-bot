@@ -1,2 +1,2 @@
 export const exchangeNotFound =
-    'Could not find exchange instance for provided tokens';
+  'Could not find exchange instance for provided tokens';

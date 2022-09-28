@@ -1,5 +1,5 @@
-import { TriggerCallback, TriggerPlugin } from "@stove-labs/arbitrage-bot";
-import { TriggerIntervalPluginConfig } from "./types";
+import { TriggerCallback, TriggerPlugin } from '@stove-labs/arbitrage-bot';
+import { TriggerIntervalPluginConfig } from './types';
 
 export class TriggerIntervalPlugin implements TriggerPlugin {
   public timer: NodeJS.Timer;

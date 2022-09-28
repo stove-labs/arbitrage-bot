@@ -10,7 +10,7 @@ import { ExchangeRegistry } from '@stove-labs/arbitrage-bot';
 import * as errors from '../src/errors';
 
 describe('exchangeQuipuswapPlugin', () => {
-  const quipuswapList: ExchangeRegistry  = [
+  const quipuswapList: ExchangeRegistry = [
     {
       address: 'KT1Gdix8LoDoQng7YqdPNhdP5V7JRX8FqWvM',
       identifier: 'Quipuswap',

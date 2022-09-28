@@ -20,45 +20,45 @@ export * from './token/types';
 export * from './trigger/types';
 
 export interface Balance {
-    amount: string;
+  amount: string;
 }
 
 export type EcosystemIdentifier = 'TEZOS';
 
 export interface Config {
-    baseToken: Token;
-    quoteToken: Token;
-    plugins: {
-        exchanges: ExchangePlugin[];
-        token: TokenPlugin;
-        trigger: TriggerPlugin;
-        reporter: ReporterPlugin[];
-        profitFinder: ProfitFinderPlugin;
-        keychains: Record<EcosystemIdentifier, any>;
-    };
+  baseToken: Token;
+  quoteToken: Token;
+  plugins: {
+    exchanges: ExchangePlugin[];
+    token: TokenPlugin;
+    trigger: TriggerPlugin;
+    reporter: ReporterPlugin[];
+    profitFinder: ProfitFinderPlugin;
+    keychains: Record<EcosystemIdentifier, any>;
+  };
 }
 
 export enum SwapType {
-    BUY='BUY',
-    SELL='SELL'
+  BUY = 'BUY',
+  SELL = 'SELL',
 }
 
 export interface Swap {
-    tokenIn: Token;
-    tokenOut: Token;
-    type: SwapType;
-    amount: string;
-    limit: string;
-    limitWithoutSlippage: string;
+  tokenIn: Token;
+  tokenOut: Token;
+  type: SwapType;
+  amount: string;
+  limit: string;
+  limitWithoutSlippage: string;
 }
 
 export interface SwapResult {
-    result: { type: 'OK' } | { type: 'ERROR'; data: any };
+  result: { type: 'OK' } | { type: 'ERROR'; data: any };
 }
 
 export interface SwapExecutionManager {
-    getExchangePluginBySwap(swap: Swap): ExchangePlugin;
-    executeSwaps(swaps: Swap[]): Promise<SwapResult[]>;
+  getExchangePluginBySwap(swap: Swap): ExchangePlugin;
+  executeSwaps(swaps: Swap[]): Promise<SwapResult[]>;
 }
 
 export type Address = string;

@@ -1,4 +1,4 @@
-import { Balance, Token } from "../types";
+import { Balance, Token } from '../types';
 
 // might change to enum down the line
 export type ExchangeIdentifier = string;
@@ -13,7 +13,7 @@ export interface ExchangePrice {
   quoteTokenDecimals?: number;
   exchangeIdentifier: ExchangeIdentifier;
   fee: ExchangeFee;
-  spotPrice?: string
+  spotPrice?: string;
 }
 
 export type ExchangePluginConfig = {

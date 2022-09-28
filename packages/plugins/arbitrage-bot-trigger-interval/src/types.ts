@@ -1,3 +1,3 @@
 export interface TriggerIntervalPluginConfig {
-    interval: number;
-  }
+  interval: number;
+}

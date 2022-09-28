@@ -1,11 +1,11 @@
-import { ExchangePlugin } from "./exchange/interface";
-import { ExchangePrice } from "./exchange/types";
-import { ReporterPlugin } from "./reporter/interface";
-import { Config, Token } from "./types";
+import { ExchangePlugin } from './exchange/interface';
+import { ExchangePrice } from './exchange/types';
+import { ReporterPlugin } from './reporter/interface';
+import { Config, Token } from './types';
 
-import { BatchSwapExecutionManager } from "@stove-labs/arbitrage-bot-swap-execution";
+import { BatchSwapExecutionManager } from '@stove-labs/arbitrage-bot-swap-execution';
 
-export * from "./types";
+export * from './types';
 
 class ExchangeManager {
   constructor(public exchanges: ExchangePlugin[]) {}
@@ -33,22 +33,22 @@ export class ArbitrageBotCore {
     // balance at the start baseToken / quoteToken
     const balance = {};
 
-    this.reporter.report({ type: "LIFECYCLE_START" });
+    this.reporter.report({ type: 'LIFECYCLE_START' });
     const prices = await this.exchangeManager.fetchPrices(
       this.config.baseToken,
       this.config.quoteToken
     );
-    this.reporter.report({ type: "PRICES_FETCHED", prices });
+    this.reporter.report({ type: 'PRICES_FETCHED', prices });
     const profitOpportunity =
       this.config.plugins.profitFinder.findProfits(prices);
-    this.reporter.report({ type: "PROFIT_FOUND", profitOpportunity });
+    this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
     // profitOpportunity.swaps -> SwapExecutionManager -> group swaps by ecosystemIdentifier
     // Exchange.forgeTransaction(swap)
     const swapResults = await this.swapExecutionManager.executeSwaps(
       profitOpportunity.swaps
     );
     // report if the execution of the opportunity swap was executed
-    this.reporter.report({ type: "SWAPS_DONE", swapResults });
+    this.reporter.report({ type: 'SWAPS_DONE', swapResults });
 
     // balance after swaps were executed (after arbitrage attempt)
     const balanceAfterArbitrage = {};
@@ -56,7 +56,7 @@ export class ArbitrageBotCore {
     // quoteToken: old balance -> new balance
     // report the difference between indicated profit from swaps and the real balance delta
     this.reporter.report({
-      type: "ARBITRAGE_COMPLETE",
+      type: 'ARBITRAGE_COMPLETE',
       payload: { balance, balanceAfterArbitrage, profitOpportunity },
     });
   }

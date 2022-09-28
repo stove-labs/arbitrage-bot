@@ -3,8 +3,8 @@ import {
   Swap,
   SwapResult,
   SwapExecutionManager,
-} from "@stove-labs/arbitrage-bot";
-import * as _ from "lodash";
+} from '@stove-labs/arbitrage-bot';
+import * as _ from 'lodash';
 
 export class BatchSwapExecutionManager implements SwapExecutionManager {
   constructor(public exchanges: ExchangePlugin[], public keychains: any) {}
@@ -17,7 +17,7 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
 
   // this logic can live in a standalone plugin, e.g. SwapExecutionBatchPlugin or SwapExecutionContractPlugin
   public async executeSwaps(swaps: Swap[]): Promise<SwapResult[]> {
-    const groupedSwaps = _.groupBy(swaps, "ecosystemIdentifier");
+    const groupedSwaps = _.groupBy(swaps, 'ecosystemIdentifier');
     // go through all the identifiers
     Object.keys(groupedSwaps).map((ecosystemIdentifier) => {
       // find keychain by ecosystem identifier and use it to authorise the swap

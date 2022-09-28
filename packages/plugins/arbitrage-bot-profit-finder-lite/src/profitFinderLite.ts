@@ -6,14 +6,8 @@ import {
   SwapType,
 } from '@stove-labs/arbitrage-bot';
 import { ExchangePrice, ProfitOpportunity } from '@stove-labs/arbitrage-bot';
-import {
-  findOptimalQuoteTokenAmount,
-  orderLowToHigh,
-} from './math';
-import {
-  getAmountInGivenOut,
-  getAmountOutGivenIn,
-} from './pools/xyk/xykPool';
+import { findOptimalQuoteTokenAmount, orderLowToHigh } from './math';
+import { getAmountInGivenOut, getAmountOutGivenIn } from './pools/xyk/xykPool';
 
 export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
   /**
@@ -60,7 +54,7 @@ const addTokenDecimals = (
 };
 
 /**
- * 
+ *
  * @param prices ExchangePrices with token decimals
  * @param amount optimal amount for quote token
  * @param profitSplitForSlippage typical value is >= 2; deactivate with = 0

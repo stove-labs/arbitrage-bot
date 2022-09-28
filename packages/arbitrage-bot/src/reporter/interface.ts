@@ -1,4 +1,4 @@
-import { ReporterPluginEvent } from "./types";
+import { ReporterPluginEvent } from './types';
 
 export interface ReporterPlugin {
   report(event: ReporterPluginEvent): void;
