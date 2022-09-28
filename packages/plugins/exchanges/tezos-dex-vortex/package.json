@@ -1,17 +1,22 @@
 {
-  "name": "@stove-labs/arbitrage-bot-swap-execution",
+  "name": "@stove-labs/tezos-dex-vortex",
   "version": "0.0.0",
-  "description": "> TODO: description",
+  "description": "plugin for the tezos DEX Vortex",
+  "keywords": [
+    "DEX",
+    "Tezos",
+    "Vortex",
+    "decentralized",
+    "exchange",
+    "CFMM"
+  ],
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
-  "license": "MIT",
-  "main": "./dist/lib/swapExecution.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
+  "license": "ISC",
+  "main": "./dist/lib/exchangeVortexPlugin.js",
+  "typings": "./dist/types/exchangeVortexPlugin.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -28,7 +33,7 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^0.0.0"
+    "@stove-labs/arbitrage-bot-exchange-utils": "^0.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.3",

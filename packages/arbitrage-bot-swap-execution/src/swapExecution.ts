@@ -17,12 +17,12 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
 
   // this logic can live in a standalone plugin, e.g. SwapExecutionBatchPlugin or SwapExecutionContractPlugin
   public async executeSwaps(swaps: Swap[]): Promise<SwapResult[]> {
-    const grouppedSwaps = _.groupBy(swaps, "ecosystemIdentifier");
+    const groupedSwaps = _.groupBy(swaps, "ecosystemIdentifier");
     // go through all the identifiers
-    Object.keys(grouppedSwaps).map((ecosystemIdentifier) => {
+    Object.keys(groupedSwaps).map((ecosystemIdentifier) => {
       // find keychain by ecosystem identifier and use it to authorise the swap
       // in case of tezos, pass information from the keychain to a taquito signer....
-      const swaps = grouppedSwaps[ecosystemIdentifier];
+      const swaps = groupedSwaps[ecosystemIdentifier];
       // iterate through swaps and forge a batch operation for each ecosystem identifier
       // forge an internal operation for the inside of the batch using an ExchangePlugin
       // retrieved using this.getExchangePluginBySwap(swap).forgeOperation(swap)
