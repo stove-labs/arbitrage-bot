@@ -66,7 +66,6 @@ describe('exchangeQuipuswapPlugin', () => {
       const baseToken = quipuswapList[0].ticker1; // XTZ
       const quoteToken = quipuswapList[0].ticker2; // SMAK
 
-      // @ts-ignore
       const balances = plugin.getBalances(
         { ticker: baseToken }, // XTZ
         { ticker: quoteToken }, // SMAK
@@ -81,7 +80,7 @@ describe('exchangeQuipuswapPlugin', () => {
       const baseToken = quipuswapList[0].ticker2; // SMAK
       const quoteToken = quipuswapList[0].ticker1; // XTZ
 
-      const balances = plugin['getBalances'](
+      const balances = plugin.getBalances(
         { ticker: baseToken }, // SMAK
         { ticker: quoteToken }, // XTZ
         storage
