@@ -22,7 +22,7 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
    * typical value for profitSplitForSlippage
    * profitSplitForSlippage >= 2
    * to deactivate:
-   * profitSplitForSlippage = 1
+   * profitSplitForSlippage = 0
    */
   constructor(
     public config: {
