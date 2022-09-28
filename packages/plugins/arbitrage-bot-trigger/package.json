@@ -1,12 +1,12 @@
 {
-  "name": "@stove-labs/arbitrage-bot-trigger-interval",
+  "name": "@stove-labs/arbitrage-bot-trigger",
   "version": "0.0.0",
   "description": "trigger plugin that follows an interval approach for the arbitrage bot",
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/triggerPlugin.js",
-  "typings": "./dist/types/triggerPlugin.d.ts",
+  "main": "./dist/lib/triggerIntervalPlugin.js",
+  "typings": "./dist/types/triggerIntervalPlugin.d.ts",
   "files": [
     "dist"
   ],

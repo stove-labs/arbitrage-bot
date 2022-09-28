@@ -5,8 +5,8 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/tokenRegistry.js",
-  "typings": "./dist/types/tokenRegistry.d.ts",
+  "main": "./dist/lib/tokenRegistryPlugin.js",
+  "typings": "./dist/types/tokenRegistryPlugin.d.ts",
   "files": [
     "dist"
   ],

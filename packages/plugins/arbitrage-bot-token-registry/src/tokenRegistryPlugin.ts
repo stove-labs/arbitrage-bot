@@ -12,7 +12,7 @@ import {
 } from '@stove-labs/arbitrage-bot';
 import * as constants from './constants';
 
-export class TokenRegistry implements TokenPlugin {
+export class TokenRegistryPlugin implements TokenPlugin {
   constructor(public tokenList: TokenList) {}
 
   /**

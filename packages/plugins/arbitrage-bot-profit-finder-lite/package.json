@@ -13,8 +13,8 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/profitFinderLite.js",
-  "typings": "./dist/types/profitFinderLite.d.ts",
+  "main": "./dist/lib/profitFinderLitePlugin.js",
+  "typings": "./dist/types/profitFinderLitePlugin.d.ts",
   "files": [
     "dist"
   ],

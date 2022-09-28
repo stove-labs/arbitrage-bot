@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { TokenRegistry } from '../src/tokenRegistry';
+import { TokenRegistryPlugin } from '../src/tokenRegistryPlugin';
 import * as constants from '../src/constants';
 import { TokenList } from '@stove-labs/arbitrage-bot';
 
@@ -30,7 +30,7 @@ const tokenRegistry = [
 describe('tokenRegistry', () => {
   let plugin;
   beforeEach(() => {
-    plugin = new TokenRegistry(tokenRegistry as TokenList);
+    plugin = new TokenRegistryPlugin(tokenRegistry as TokenList);
   });
 
   it('can retrieve a native token', () => {

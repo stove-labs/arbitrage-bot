@@ -32,7 +32,7 @@ export interface Config {
     exchanges: ExchangePlugin[];
     token: TokenPlugin;
     trigger: TriggerPlugin;
-    reporter: ReporterPlugin[];
+    reporter: ReporterPlugin;
     profitFinder: ProfitFinderPlugin;
     keychains: Record<EcosystemIdentifier, any>;
   };

@@ -11,11 +11,11 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/reporterLite.js",
+  "main": "./dist/lib/consoleReporterPlugin.js",
   "files": [
     "dist"
   ],
-  "typings": "./dist/types/reporterLite.d.ts",
+  "typings": "./dist/types/consoleReporterPlugin.d.ts",
   "publishConfig": {
     "access": "public"
   },

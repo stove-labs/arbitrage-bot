@@ -63,7 +63,7 @@ export class ArbitrageBotCore {
 
   get reporter(): ReporterPlugin {
     // TODO
-    return this.config.plugins.reporter[0];
+    return this.config.plugins.reporter;
   }
 
   start() {

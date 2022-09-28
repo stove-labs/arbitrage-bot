@@ -1,10 +1,10 @@
-import { Config, TokenList } from '@stove-labs/arbitrage-bot';
+import { Config, ExchangeRegistry, TokenList } from '@stove-labs/arbitrage-bot';
 import { ExchangeQuipuswapPlugin } from '@stove-labs/tezos-dex-quipuswap';
 import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
-import { TriggerIntervalPlugin } from '@stove-labs/arbitrage-bot-trigger-interval';
+import { TriggerIntervalPlugin } from '@stove-labs/arbitrage-bot-trigger';
 import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter';
 import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-lite';
-import { TokenRegistry } from '../../plugins/arbitrage-bot-token-registry/dist/types/tokenRegistry';
+import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
 
 const rpcConfig = {
   rpc: '...',
@@ -32,7 +32,7 @@ const tokenList: TokenList = [
   },
 ];
 
-const vortexList = [
+const vortexList: ExchangeRegistry = [
   {
     address: 'KT1LzyPS8rN375tC31WPAVHaQ4HyBvTSLwBu',
     identifier: 'Vortex',
@@ -41,7 +41,7 @@ const vortexList = [
   },
 ];
 
-const quipuswapList = [
+const quipuswapList: ExchangeRegistry = [
   {
     address: 'KT1Gdix8LoDoQng7YqdPNhdP5V7JRX8FqWvM',
     identifier: 'Quipuswap',
@@ -50,7 +50,7 @@ const quipuswapList = [
   },
 ];
 
-const tokenRegistry = new TokenRegistry(tokenList);
+const tokenRegistry = new TokenRegistryPlugin(tokenList);
 
 export const config: Config = {
   baseToken: {
@@ -66,7 +66,7 @@ export const config: Config = {
     ],
     token: tokenRegistry,
     trigger: new TriggerIntervalPlugin({ interval: 60000 }),
-    reporter: [new ConsoleReporterPlugin()],
+    reporter: new ConsoleReporterPlugin(),
     profitFinder: new ProfitFinderLitePlugin({
       tokenRegistry,
       profitSplitForSlippage: 2,
