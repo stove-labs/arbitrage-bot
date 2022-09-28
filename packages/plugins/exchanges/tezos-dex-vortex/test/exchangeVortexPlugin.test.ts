@@ -19,19 +19,6 @@ describe('exchangeVortexPlugin', () => {
         },
     ];
 
-    // TODO: remove next comment block
-    // it("prototyping - remove this test", async () => {
-    //   const plugin = new ExchangeVortexPlugin(
-    //     { rpc: "https://mainnet.api.tez.ie" },
-    //     vortexList
-    //   );
-    //   const baseToken = { ticker: "XTZ" };
-    //   const quoteToken = { ticker: "SMAK" };
-    //   const price = await plugin.fetchPrice(baseToken, quoteToken);
-    //   console.log(price);
-    //   expect(true).to.be.true;
-    // });
-
     describe('fetchPrice', () => {
         // TODO: mock out Taquito requests for happy path and add test
 
@@ -69,7 +56,7 @@ describe('exchangeVortexPlugin', () => {
             const baseToken = vortexList[0].ticker1; // XTZ
             const quoteToken = vortexList[0].ticker2; // SMAK
 
-            const balances = plugin['getBalances'](
+            const balances = plugin.getBalances(
                 { ticker: baseToken }, // XTZ
                 { ticker: quoteToken }, // SMAK
                 storage
@@ -83,7 +70,7 @@ describe('exchangeVortexPlugin', () => {
             const baseToken = vortexList[0].ticker2; // SMAK
             const quoteToken = vortexList[0].ticker1; // XTZ
 
-            const balances = plugin['getBalances'](
+            const balances = plugin.getBalances(
                 { ticker: baseToken }, // SMAK
                 { ticker: quoteToken }, // XTZ
                 storage
@@ -97,7 +84,7 @@ describe('exchangeVortexPlugin', () => {
             const baseToken = 'SMAK';
             const quoteToken = 'SMAK';
 
-            const balances = plugin['getBalances'](
+            const balances = plugin.getBalances(
                 { ticker: baseToken }, // SMAK
                 { ticker: quoteToken }, // SMAK
                 storage
