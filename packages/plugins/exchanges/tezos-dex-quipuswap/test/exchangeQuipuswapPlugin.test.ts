@@ -74,7 +74,8 @@ describe('exchangeQuipuswapPlugin', () => {
             const baseToken = quipuswapList[0].ticker1; // XTZ
             const quoteToken = quipuswapList[0].ticker2; // SMAK
 
-            const balances = plugin['getBalances'](
+            // @ts-ignore
+            const balances = plugin.getBalances(
                 { ticker: baseToken }, // XTZ
                 { ticker: quoteToken }, // SMAK
                 storage
