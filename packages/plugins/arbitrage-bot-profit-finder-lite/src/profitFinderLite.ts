@@ -13,7 +13,7 @@ import {
 import {
   getAmountInGivenOut,
   getAmountOutGivenIn,
-} from './pools/basic/basicPool';
+} from './pools/xyk/xykPool';
 
 export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
   /**

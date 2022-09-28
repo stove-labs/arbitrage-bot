@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
     getAmountInGivenOut,
     getAmountOutGivenIn,
-} from '../../../src/pools/basic/basicPool';
+} from '../../../src/pools/xyk/xykPool';
 
 describe('basicPool', () => {
     it('can calculate amountIn for exact amountOut', () => {

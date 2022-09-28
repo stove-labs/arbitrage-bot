@@ -2,7 +2,7 @@ import { ExchangePrice, } from '@stove-labs/arbitrage-bot';
 import {
   getAmountInGivenOut,
   getAmountOutGivenIn,
-} from './pools/basic/basicPool';
+} from './pools/xyk/xykPool';
 import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 
