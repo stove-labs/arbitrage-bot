@@ -7,11 +7,8 @@ import {
 } from '@stove-labs/arbitrage-bot';
 import { ExchangePrice, ProfitOpportunity } from '@stove-labs/arbitrage-bot';
 import {
-  expectedProfitWithFees,
   findOptimalQuoteTokenAmount,
   orderLowToHigh,
-  splitIntoBuySell,
-  TradingStrategy,
 } from './math';
 import {
   getAmountInGivenOut,
@@ -35,20 +32,15 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
   ) {}
 
   findProfits(prices: ExchangePrice[]): ProfitOpportunity {
-    // TODO: extract token decimals as property of class
     const tokenDecimals = this.config.tokenRegistry.getTokenDecimals(prices);
-    const ascendingSpotPrices = orderLowToHigh(prices, tokenDecimals);
-    const tradingStrategy = splitIntoBuySell(ascendingSpotPrices);
-    const quoteTokenAmount = findOptimalQuoteTokenAmount(
-      tradingStrategy,
-      tokenDecimals
-    );
+    const pricesWithDecimals = addTokenDecimals(prices, tokenDecimals);
+    const ascendingSpotPrices = orderLowToHigh(pricesWithDecimals);
+    const quoteTokenAmount = findOptimalQuoteTokenAmount(ascendingSpotPrices);
 
     const profitOpportunity = createProfitOpportunity(
-      tradingStrategy,
+      prices,
       quoteTokenAmount,
-      tokenDecimals,
-      this.config.profitSplitForSlippage // typical value is anything above 2; deactivating it set to 1
+      this.config.profitSplitForSlippage
     );
 
     // expectedProfitWithFees(amount, prices)
@@ -56,35 +48,59 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
   }
 }
 
+const addTokenDecimals = (
+  prices: ExchangePrice[],
+  tokenDecimals: TokenDecimals
+): ExchangePrice[] => {
+  return prices.map((exchangePrice) => {
+    exchangePrice.baseTokenDecimals = tokenDecimals.baseToken;
+    exchangePrice.quoteTokenDecimals = tokenDecimals.quoteToken;
+    return exchangePrice;
+  });
+};
+
+/**
+ * 
+ * @param prices ExchangePrices with token decimals
+ * @param amount optimal amount for quote token
+ * @param profitSplitForSlippage typical value is >= 2; deactivate with = 0
+ * @returns buy and sell swap
+ */
 export const createProfitOpportunity = (
-  dex: TradingStrategy,
+  prices: ExchangePrice[],
   amount: string,
-  tokenDecimals: TokenDecimals,
   profitSplitForSlippage: number
 ): ProfitOpportunity => {
-  console.log('dex.swapBuy', dex.swapBuy, 'amount', amount)
+  /**
+   * For ascending spot price order in prices:
+   * the first swap is a "buy" for prices[0]
+   * the second swap is a "sell" for prices[1]
+   */
+  const buy = prices[0];
+  const sell = prices[1];
+
+  // compute amountIn for buy
   const buyAmountInBaseToken = getAmountInGivenOut(
-    amount,
-    dex.swapBuy.reserveIn,
-    dex.swapBuy.reserveOut,
+    amount, // optimal amount of quoteToken
+    buy.baseTokenBalance.amount, // reserveIn in base token
+    buy.quoteTokenBalance.amount, // reserveOut in quote token
     3
   );
 
-  console.log('buyAmountInBaseToken',buyAmountInBaseToken.toString())
-
+  // compute amountOut for sell
   const sellAmountOutBaseToken = getAmountOutGivenIn(
-    amount,
-    dex.swapSell.reserveIn,
-    dex.swapSell.reserveOut,
+    amount, // optimal amount of quoteToken
+    sell.quoteTokenBalance.amount, // reserveIn flipped, it is quote token
+    sell.baseTokenBalance.amount, // reserveOut flipped, it is base token
     3
   );
-  const profit = sellAmountOutBaseToken
-    .minus(buyAmountInBaseToken)
-    .multipliedBy(10 ** tokenDecimals.baseToken);
 
-  const buyLimit = buyAmountInBaseToken
-    .multipliedBy(10 ** tokenDecimals.baseToken)
-    .plus(profit.dividedBy(profitSplitForSlippage));
+  const profit = sellAmountOutBaseToken.minus(buyAmountInBaseToken);
+
+  const limitDelta =
+    profitSplitForSlippage === 0 ? 0 : profit.dividedBy(profitSplitForSlippage);
+
+  const buyLimit = buyAmountInBaseToken.plus(limitDelta);
 
   /**
    * tokenIn: baseToken
@@ -94,16 +110,15 @@ export const createProfitOpportunity = (
    * limit: expected amountIn in baseToken + 1/2 expected profit as slippage
    */
   const swapBuy: Swap = {
-    tokenIn: dex.swapBuy.tokenIn,
-    tokenOut: dex.swapBuy.tokenOut,
+    tokenIn: buy.baseToken,
+    tokenOut: buy.quoteToken,
     amount,
     type: SwapType.BUY,
-    limit: buyLimit.toFixed(0, 1),
+    limit: buyLimit.toString(),
+    limitWithoutSlippage: buyAmountInBaseToken.toString(),
   };
 
-  const sellLimit = sellAmountOutBaseToken
-    .multipliedBy(10 ** tokenDecimals.baseToken)
-    .minus(profit.dividedBy(profitSplitForSlippage));
+  const sellLimit = sellAmountOutBaseToken.minus(limitDelta);
 
   /**
    * tokenIn: quoteToken
@@ -113,15 +128,16 @@ export const createProfitOpportunity = (
    * limit: expected amountOut in baseToken + 1/2 expected profit as slippage
    */
   const swapSell: Swap = {
-    tokenIn: dex.swapSell.tokenIn,
-    tokenOut: dex.swapSell.tokenOut,
+    tokenIn: sell.quoteToken,
+    tokenOut: sell.baseToken,
     amount,
     type: SwapType.SELL,
-    limit: sellLimit.toFixed(0, 1),
+    limit: sellLimit.toString(),
+    limitWithoutSlippage: sellAmountOutBaseToken.toString(),
   };
 
   return {
     swaps: [swapBuy, swapSell],
-    profit: { baseTokenAmount: profit.toFixed(0, 1) },
+    profit: { baseTokenAmount: profit.toString() },
   } as ProfitOpportunity;
 };

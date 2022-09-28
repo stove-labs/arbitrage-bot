@@ -7,8 +7,10 @@ export type ExchangeFee = number;
 export interface ExchangePrice {
   baseToken: Token;
   baseTokenBalance: Balance;
+  baseTokenDecimals?: number;
   quoteToken: Token;
   quoteTokenBalance: Balance;
+  quoteTokenDecimals?: number;
   exchangeIdentifier: ExchangeIdentifier;
   fee: ExchangeFee;
   spotPrice?: string

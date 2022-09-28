@@ -49,6 +49,7 @@ export interface Swap {
     type: SwapType;
     amount: string;
     limit: string;
+    limitWithoutSlippage: string;
 }
 
 export interface SwapResult {

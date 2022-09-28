@@ -1,4 +1,4 @@
-import { ExchangePrice, Token, TokenDecimals } from '@stove-labs/arbitrage-bot';
+import { ExchangePrice, } from '@stove-labs/arbitrage-bot';
 import {
   getAmountInGivenOut,
   getAmountOutGivenIn,
@@ -12,22 +12,19 @@ import _ from 'lodash';
  * pay 0.65 XTZ
  * receive 1 USD
  */
-export const addSpotPrice = (
-  prices: ExchangePrice[],
-  tokenDecimals: TokenDecimals
-): ExchangePrice[] => {
+export const addSpotPrice = (prices: ExchangePrice[]): ExchangePrice[] => {
   prices.map((exchangePrice) => {
     const baseTokenReserve = new BigNumber(
       exchangePrice.baseTokenBalance.amount
-    ).dividedBy(10 ** tokenDecimals.baseToken);
+    ).dividedBy(10 ** exchangePrice.baseTokenDecimals);
 
     const quoteTokenReserve = new BigNumber(
       exchangePrice.quoteTokenBalance.amount
-    ).dividedBy(10 ** tokenDecimals.quoteToken);
+    ).dividedBy(10 ** exchangePrice.quoteTokenDecimals);
 
     exchangePrice.spotPrice = baseTokenReserve
       .dividedBy(quoteTokenReserve)
-      .multipliedBy(10 ** tokenDecimals.baseToken)
+      .multipliedBy(10 ** exchangePrice.baseTokenDecimals)
       .toFixed(0, 1);
 
     return exchangePrice;
@@ -43,12 +40,9 @@ export const addSpotPrice = (
  * quoteToken balance = 2 USD
  * Spot price: 1USD = 0.5 XTZ
  */
-export const orderLowToHigh = (
-  prices: ExchangePrice[],
-  tokenDecimals: TokenDecimals
-): ExchangePrice[] => {
+export const orderLowToHigh = (prices: ExchangePrice[]): ExchangePrice[] => {
   //const tokenInfo = getTokenInfo(prices);
-  prices = addSpotPrice(prices, tokenDecimals);
+  prices = addSpotPrice(prices);
 
   return _.orderBy(
     prices,
@@ -62,56 +56,15 @@ export const orderLowToHigh = (
   );
 };
 
-type SwapBuy = {
-  reserveIn: string;
-  reserveOut: string;
-  tokenIn: Token;
-  tokenOut: Token;
-};
-type SwapSell = {
-  reserveIn: string;
-  reserveOut: string;
-  tokenIn: Token;
-  tokenOut: Token;
-};
-export type TradingStrategy = {
-  swapBuy: SwapBuy;
-  swapSell: SwapSell;
-};
-
-/**
- * SpotPrice 0.1 quoteToken/baseToken USD/XTZ
- * SpotPrice 0.2 quoteToken/baseToken USD/XTZ
- */
-export const splitIntoBuySell = (prices: ExchangePrice[]): TradingStrategy => {
-  // spot price lower => amountInGivenOut => BUY
-  const exchangeBuy = {
-    reserveIn: prices[0].baseTokenBalance.amount,
-    reserveOut: prices[0].quoteTokenBalance.amount,
-    tokenIn: prices[0].baseToken,
-    tokenOut: prices[0].quoteToken,
-  } as SwapBuy;
-  // spot price higher => amountOutGivenIn => SELL
-  const exchangeSell = {
-    // notice that quote and base token are flipped here!
-    reserveIn: prices[1].quoteTokenBalance.amount,
-    reserveOut: prices[1].baseTokenBalance.amount,
-    tokenIn: prices[1].quoteToken,
-    tokenOut: prices[1].baseToken,
-  } as SwapSell;
-  return { swapBuy: exchangeBuy, swapSell: exchangeSell };
-};
-
 /**
  * Units:
  * buy.tokenOut = sell.tokenIn [token amount]
  */
 export const findOptimalQuoteTokenAmount = (
-  dex: TradingStrategy,
-  tokenDecimals: TokenDecimals
+  prices: ExchangePrice[]
 ): string => {
   // Univariate quadratic function with coefficients a,b,c f(x)=a*x^2+b*x+c=0
-  const { a, b, c } = extractCoefficientsOfUnivariateQuadraticFunction(dex);
+  const { a, b, c } = extractCoefficientsOfUnivariateQuadraticFunction(prices);
 
   // Solving the quadratic function yields x1 and x2
   // x1 = (- b + sqrt(b² - 4*a*c))/(2*a)
@@ -131,25 +84,30 @@ export const findOptimalQuoteTokenAmount = (
     .dividedBy(new BigNumber(2).multipliedBy(a));
 
   // pick x based on constraints
+  const quoteTokenBalanceReserveExchange1 = new BigNumber(
+    prices[0].quoteTokenBalance.amount
+  ).multipliedBy(10 ** prices[0].quoteTokenDecimals);
+
   let x: BigNumber;
-  if (x1.isPositive() && x1.isLessThan(dex.swapBuy.reserveOut)) {
+
+  if (x1.isPositive() && x1.isLessThan(quoteTokenBalanceReserveExchange1)) {
     x = x1;
   } else if (
     x2.isPositive() &&
-    x2.isLessThan(dex.swapBuy.reserveOut) &&
+    x2.isLessThan(quoteTokenBalanceReserveExchange1) &&
     x2.isGreaterThan(x1)
   ) {
     x = x2;
   } else {
     x = new BigNumber(0);
   }
-  return x.multipliedBy(10 ** tokenDecimals.quoteToken).toFixed(0, 1);
+
+  return x.multipliedBy(10 ** prices[0].quoteTokenDecimals).toFixed(0, 1);
 };
 
-// https://www.notion.so/stove-labs/Profit-Finder-d5844bc7e4ec4db48b2bfe395d42c256#a13825caae334a9299d86ef06801709d
 /**
  * Profit is in baseToken
- * OptimalAmount is quoteToken
+ * OptimalAmount is in quoteToken
  */
 export const expectedProfitWithFees = (
   optimalAmount: string,
@@ -169,37 +127,34 @@ export const expectedProfitWithFees = (
 };
 
 function extractCoefficientsOfUnivariateQuadraticFunction(
-  dex: TradingStrategy
+  price: ExchangePrice[]
 ) {
-  // calculate a
-  const productBuyReserves = new BigNumber(dex.swapBuy.reserveIn).multipliedBy(
-    dex.swapBuy.reserveOut
+  const r1a = new BigNumber(price[0].baseTokenBalance.amount).dividedBy(
+    10 ** price[0].baseTokenDecimals
   );
-  const productSellReserves = new BigNumber(
-    dex.swapSell.reserveIn
-  ).multipliedBy(dex.swapSell.reserveOut);
-  const a = productBuyReserves.minus(productSellReserves);
+  const r1b = new BigNumber(price[0].quoteTokenBalance.amount).dividedBy(
+    10 ** price[0].quoteTokenDecimals
+  );
+  const r2a = new BigNumber(price[1].baseTokenBalance.amount).dividedBy(
+    10 ** price[1].baseTokenDecimals
+  );
+  const r2b = new BigNumber(price[1].quoteTokenBalance.amount).dividedBy(
+    10 ** price[1].quoteTokenDecimals
+  );
+
+  // calculate a
+  const a = r1a.multipliedBy(r1b).minus(r2a.multipliedBy(r2b));
 
   // calculate b
   const b = new BigNumber(2)
-    .multipliedBy(dex.swapBuy.reserveOut)
-    .multipliedBy(dex.swapSell.reserveIn)
-    .multipliedBy(
-      new BigNumber(dex.swapBuy.reserveIn).plus(dex.swapSell.reserveOut)
-    );
+    .multipliedBy(r1b)
+    .multipliedBy(r2b)
+    .multipliedBy(r1a.plus(r2a));
 
   // calculate c
-  const c = new BigNumber(dex.swapBuy.reserveOut)
-    .multipliedBy(dex.swapSell.reserveIn)
-    .multipliedBy(
-      new BigNumber(dex.swapBuy.reserveIn)
-        .multipliedBy(dex.swapSell.reserveIn)
-        .minus(
-          new BigNumber(dex.swapSell.reserveOut).multipliedBy(
-            dex.swapBuy.reserveOut
-          )
-        )
-    );
+  const c = r1b
+    .multipliedBy(r2b)
+    .multipliedBy(r1a.multipliedBy(r2b).minus(r2a.multipliedBy(r1b)));
 
   return { a, b, c };
 }

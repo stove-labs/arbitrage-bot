@@ -5,7 +5,6 @@ import {
   addSpotPrice,
   findOptimalQuoteTokenAmount,
   orderLowToHigh,
-  TradingStrategy,
 } from '../src/math';
 
 describe('math.ts', () => {
@@ -14,16 +13,22 @@ describe('math.ts', () => {
       baseTokenBalance: { amount: '12470264030' },
       quoteTokenBalance: { amount: '19328447920594343' },
       exchangeIdentifier: 'exchange1',
+      baseTokenDecimals: 6,
+      quoteTokenDecimals: 12,
     },
     {
       baseTokenBalance: { amount: '100' }, // 0.000100
       quoteTokenBalance: { amount: '400' }, // 0.000000000400
       exchangeIdentifier: 'exchange2',
+      baseTokenDecimals: 6,
+      quoteTokenDecimals: 12,
     },
     {
       baseTokenBalance: { amount: '1000000' }, // 1.000000
       quoteTokenBalance: { amount: '4000000000000' }, // 4.000000000000
       exchangeIdentifier: 'exchange3',
+      baseTokenDecimals: 6,
+      quoteTokenDecimals: 12,
     },
   ] as ExchangePrice[];
 
@@ -38,7 +43,7 @@ describe('math.ts', () => {
 
   describe('addSpotPrice', () => {
     it('can calculate and add spot price', () => {
-      const pricesWithSpotPrice = addSpotPrice(prices, tokenDecimals);
+      const pricesWithSpotPrice = addSpotPrice(prices);
       pricesWithSpotPrice.forEach((price, index) => {
         expect(price.spotPrice).to.equal(spotPrices[index]);
       });
@@ -49,7 +54,7 @@ describe('math.ts', () => {
     let listOfPrices = [prices[1], prices[0]];
     let ascendingPrices;
     beforeEach(() => {
-      ascendingPrices = orderLowToHigh(listOfPrices, tokenDecimals);
+      ascendingPrices = orderLowToHigh(listOfPrices);
     });
 
     it('can order spot prices in ascending order', () => {
@@ -69,26 +74,31 @@ describe('math.ts', () => {
 
   describe('findOptimalQuoteTokenAmount', () => {
     it('can calculate optimal quote token amount', () => {
-      const tradingStrategy: TradingStrategy = {
-        swapBuy: {
-          reserveIn: '1247026403',
-          reserveOut: '19328447920594343',
-          tokenIn: { ticker: 'XTZ' },
-          tokenOut: { ticker: 'uUSD' },
+      const prices = [
+        {
+          baseToken: { ticker: 'XTZ' },
+          baseTokenBalance: { amount: '12470264030' },
+          quoteToken: { ticker: 'USD' },
+          quoteTokenBalance: { amount: '19328447920594343' },
+          exchangeIdentifier: 'exchange1',
+          baseTokenDecimals: 6,
+          quoteTokenDecimals: 12,
+          fee: 3,
         },
-        swapSell: {
-          reserveIn: ' 7594296904728968',
-          reserveOut: '50125177994',
-          tokenIn: { ticker: 'uUSD' },
-          tokenOut: { ticker: 'XTZ' },
+        {
+          baseToken: { ticker: 'XTZ' },
+          baseTokenBalance: { amount: '50125177994' },
+          quoteToken: { ticker: 'USD' },
+          quoteTokenBalance: { amount: ' 75942969047289680' },
+          exchangeIdentifier: 'exchange2',
+          baseTokenDecimals: 6,
+          quoteTokenDecimals: 12,
+          fee: 3,
         },
-      };
-      const optimalAmount = findOptimalQuoteTokenAmount(
-        tradingStrategy,
-        tokenDecimals
-      );
+      ] as ExchangePrice[];
+      const optimalAmount = findOptimalQuoteTokenAmount(prices);
 
-      expect(optimalAmount).to.equal('174882610223218');
+      expect(optimalAmount).to.equal('174831146443413');
     });
   });
 });
