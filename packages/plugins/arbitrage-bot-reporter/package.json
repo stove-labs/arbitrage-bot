@@ -1,15 +1,21 @@
 {
-  "name": "@stove-labs/arbitrage-bot-token-registry",
+  "name": "@stove-labs/arbitrage-bot-reporter",
   "version": "0.0.0",
-  "description": "token address provider",
+  "description": "console reporter for the arbitrage bot",
+  "keywords": [
+    "console",
+    "reporter",
+    "arbitrage",
+    "bot"
+  ],
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/tokenRegistry.js",
-  "typings": "./dist/types/tokenRegistry.d.ts",
+  "main": "./dist/lib/reporterLite.js",
   "files": [
     "dist"
   ],
+  "typings": "./dist/types/reporterLite.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -18,8 +24,9 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
+    "build": "tsc",
     "test": "mocha -r ts-node/register test/*.ts",
-    "build": "tsc"
+    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"

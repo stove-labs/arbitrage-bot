@@ -1,10 +1,10 @@
 import { Config, TokenList } from '@stove-labs/arbitrage-bot';
 import { ExchangeQuipuswapPlugin } from '@stove-labs/tezos-dex-quipuswap';
 import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
-import { TriggerIntervalPlugin } from '@stove-labs/arbitrage-bot-trigger-lite';
-import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter-lite';
+import { TriggerIntervalPlugin } from '@stove-labs/arbitrage-bot-trigger-interval';
+import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter';
 import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-lite';
-import { TokenRegistry } from '@stove-labs/arbitrage-bot-token-registry';
+import { TokenRegistry } from '../../plugins/arbitrage-bot-token-registry/dist/types/tokenRegistry';
 
 const rpcConfig = {
   rpc: '...',

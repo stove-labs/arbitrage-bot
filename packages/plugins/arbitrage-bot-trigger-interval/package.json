@@ -1,21 +1,15 @@
 {
-  "name": "@stove-labs/arbitrage-bot-reporter-lite",
+  "name": "@stove-labs/arbitrage-bot-trigger-interval",
   "version": "0.0.0",
-  "description": "console reporter for the arbitrage bot",
-  "keywords": [
-    "console",
-    "reporter",
-    "arbitrage",
-    "bot"
-  ],
+  "description": "trigger plugin that follows an interval approach for the arbitrage bot",
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
-  "main": "./dist/lib/arbitrage-bot-reporter-lite.js",
+  "main": "./dist/lib/triggerPlugin.js",
+  "typings": "./dist/types/triggerPlugin.d.ts",
   "files": [
     "dist"
   ],
-  "typings": "./dist/types/reporterLite.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -24,8 +18,9 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
+    "build": "tsc",
     "test": "mocha -r ts-node/register test/*.ts",
-    "build": "tsc"
+    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
