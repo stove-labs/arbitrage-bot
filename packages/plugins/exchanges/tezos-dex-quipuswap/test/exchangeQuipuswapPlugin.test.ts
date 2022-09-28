@@ -10,7 +10,7 @@ import { ExchangeRegistry } from '@stove-labs/arbitrage-bot';
 import * as errors from '../src/errors';
 
 describe('exchangeQuipuswapPlugin', () => {
-  const quipuswapList = [
+  const quipuswapList: ExchangeRegistry  = [
     {
       address: 'KT1Gdix8LoDoQng7YqdPNhdP5V7JRX8FqWvM',
       identifier: 'Quipuswap',
@@ -18,19 +18,6 @@ describe('exchangeQuipuswapPlugin', () => {
       ticker2: 'SMAK',
     },
   ];
-
-  // TODO: remove next comment block
-  // it("prototyping - remove this test", async () => {
-  //   const plugin = new ExchangeQuipuswapPlugin(
-  //     { rpc: "https://mainnet.api.tez.ie" },
-  //     quipuswapList
-  //   );
-  //   const baseToken = { ticker: "XTZ" };
-  //   const quoteToken = { ticker: "SMAK" };
-  //   const price = await plugin.fetchPrice(baseToken, quoteToken);
-  //   console.log(price);
-  //   expect(true).to.be.true;
-  // });
 
   describe('fetchPrice', () => {
     // TODO: mock out Taquito requests for happy path and add test
