@@ -34,6 +34,6 @@ export interface TokenFA2 extends Token {
 export type TokenList = Array<NativeToken | TokenFA12 | TokenFA2>;
 
 export type TokenDecimals = {
-    baseTokenDecimals: number;
-    quoteTokenDecimals: number;
+    baseToken: number;
+    quoteToken: number;
 };

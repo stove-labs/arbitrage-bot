@@ -7,7 +7,6 @@ import {
   orderLowToHigh,
   TradingStrategy,
 } from '../src/math';
-import { BigNumber } from 'bignumber.js';
 
 describe('math.ts', () => {
   const prices = [
@@ -69,26 +68,26 @@ describe('math.ts', () => {
   });
 
   describe('findOptimalQuoteTokenAmount', () => {
-    it.only('can calculate optimal quote token amount', () => {
+    it('can calculate optimal quote token amount', () => {
       const tradingStrategy: TradingStrategy = {
         swapBuy: {
-          reserveIn: '12470',
-          reserveOut: '19328',
+          reserveIn: '1247026403',
+          reserveOut: '19328447920594343',
           tokenIn: { ticker: 'XTZ' },
           tokenOut: { ticker: 'uUSD' },
         },
         swapSell: {
-          reserveIn: '50125',
-          reserveOut: '75942',
-          tokenIn: { ticker: 'XTZ' },
-          tokenOut: { ticker: 'uUSD' },
+          reserveIn: ' 7594296904728968',
+          reserveOut: '50125177994',
+          tokenIn: { ticker: 'uUSD' },
+          tokenOut: { ticker: 'XTZ' },
         },
       };
       const optimalAmount = findOptimalQuoteTokenAmount(
         tradingStrategy,
         tokenDecimals
       );
-      
+
       expect(optimalAmount).to.equal('174882610223218');
     });
   });

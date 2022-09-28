@@ -129,7 +129,7 @@ export const findOptimalQuoteTokenAmount = (
     .negated()
     .minus(valueInSquareRoot.squareRoot())
     .dividedBy(new BigNumber(2).multipliedBy(a));
-    console.log('x1', x1.toString(), 'x2', x2.toString())
+
   // pick x based on constraints
   let x: BigNumber;
   if (x1.isPositive() && x1.isLessThan(dex.swapBuy.reserveOut)) {
@@ -183,19 +183,19 @@ function extractCoefficientsOfUnivariateQuadraticFunction(
   // calculate b
   const b = new BigNumber(2)
     .multipliedBy(dex.swapBuy.reserveOut)
-    .multipliedBy(dex.swapSell.reserveOut)
+    .multipliedBy(dex.swapSell.reserveIn)
     .multipliedBy(
-      new BigNumber(dex.swapBuy.reserveIn).plus(dex.swapSell.reserveIn)
+      new BigNumber(dex.swapBuy.reserveIn).plus(dex.swapSell.reserveOut)
     );
 
   // calculate c
   const c = new BigNumber(dex.swapBuy.reserveOut)
-    .multipliedBy(dex.swapSell.reserveOut)
+    .multipliedBy(dex.swapSell.reserveIn)
     .multipliedBy(
       new BigNumber(dex.swapBuy.reserveIn)
-        .multipliedBy(dex.swapSell.reserveOut)
+        .multipliedBy(dex.swapSell.reserveIn)
         .minus(
-          new BigNumber(dex.swapSell.reserveIn).multipliedBy(
+          new BigNumber(dex.swapSell.reserveOut).multipliedBy(
             dex.swapBuy.reserveOut
           )
         )

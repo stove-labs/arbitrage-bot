@@ -1,7 +1,7 @@
 import { Swap } from "../types";
 
 export interface Profit {
-  baseTokenBalance: string;
+  baseTokenAmount: string;
 }
 export interface ProfitOpportunity {
   swaps: Swap[];

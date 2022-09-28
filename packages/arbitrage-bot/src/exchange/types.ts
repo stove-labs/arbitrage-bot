@@ -11,7 +11,7 @@ export interface ExchangePrice {
   quoteTokenBalance: Balance;
   exchangeIdentifier: ExchangeIdentifier;
   fee: ExchangeFee;
-  spotPrice?: number
+  spotPrice?: string
 }
 
 export type ExchangePluginConfig = {
