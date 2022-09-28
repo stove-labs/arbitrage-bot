@@ -15,7 +15,6 @@ const tokenRegistry = [
         decimals: 6,
         ecosystemIdentifier: 'TEZOS',
     },
-
     {
         ticker: 'SMAK',
         address: 'KT1...',
