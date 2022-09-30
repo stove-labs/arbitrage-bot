@@ -26,6 +26,10 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^0.0.0"
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@taquito/taquito": "^14.0.0"
+  },
+  "devDependencies": {
+    "fs-extra": "^10.1.0"
   }
 }

@@ -60,4 +60,6 @@ export class TokenRegistryPlugin implements TokenPlugin {
   getTokenDecimals(prices: ExchangePrice[]): TokenDecimals {
     return {} as TokenDecimals;
   }
+
+  
 }
