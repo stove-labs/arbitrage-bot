@@ -25,10 +25,14 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
     }
   ) {}
 
+  /**
+   *
+   * @param prices needs to have token decimals
+   * @returns
+   */
   findProfits(prices: ExchangePrice[]): ProfitOpportunity {
-    const tokenDecimals = this.config.tokenRegistry.getTokenDecimals(prices);
-    const pricesWithDecimals = addTokenDecimals(prices, tokenDecimals);
-    const ascendingSpotPrices = orderLowToHigh(pricesWithDecimals);
+    throwForMissingDecimals(prices);
+    const ascendingSpotPrices = orderLowToHigh(prices);
     const quoteTokenAmount = findOptimalQuoteTokenAmount(ascendingSpotPrices);
 
     const profitOpportunity = createProfitOpportunity(
@@ -41,14 +45,13 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
   }
 }
 
-const addTokenDecimals = (
-  prices: ExchangePrice[],
-  tokenDecimals: TokenDecimals
-): ExchangePrice[] => {
-  return prices.map((exchangePrice) => {
-    exchangePrice.baseTokenDecimals = tokenDecimals.baseToken;
-    exchangePrice.quoteTokenDecimals = tokenDecimals.quoteToken;
-    return exchangePrice;
+const throwForMissingDecimals = (prices: ExchangePrice[]): void => {
+  prices.forEach((price) => {
+    if (!price.baseTokenDecimals || !price.quoteTokenDecimals) {
+      throw new Error(
+        `Can't compute profit opportunities for missing token decimals in ExchangePrices`
+      );
+    }
   });
 };
 
