@@ -32,12 +32,11 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
     const quoteTokenAmount = findOptimalQuoteTokenAmount(ascendingSpotPrices);
 
     const profitOpportunity = createProfitOpportunity(
-      prices,
+      ascendingSpotPrices,
       quoteTokenAmount,
       this.config.profitSplitForSlippage
     );
 
-    // expectedProfitWithFees(amount, prices)
     return profitOpportunity as ProfitOpportunity;
   }
 }
@@ -74,12 +73,16 @@ export const createProfitOpportunity = (
   const sell = prices[1];
 
   // compute amountIn for buy
-  const buyAmountInBaseToken = getAmountInGivenOut(
+  let buyAmountInBaseToken = getAmountInGivenOut(
     amount, // optimal amount of quoteToken
     buy.baseTokenBalance.amount, // reserveIn in base token
     buy.quoteTokenBalance.amount, // reserveOut in quote token
     3
   );
+
+  // buyAmountInBaseToken = new BigNumber(
+  //   buyAmountInBaseToken.multipliedBy(1.0031).toFixed(0, 1)
+  // );
 
   // compute amountOut for sell
   const sellAmountOutBaseToken = getAmountOutGivenIn(
@@ -104,12 +107,16 @@ export const createProfitOpportunity = (
    * limit: expected amountIn in baseToken + 1/2 expected profit as slippage
    */
   const swapBuy: Swap = {
-    tokenIn: buy.baseToken,
-    tokenOut: buy.quoteToken,
     amount,
-    type: SwapType.BUY,
     limit: buyLimit.toString(),
     limitWithoutSlippage: buyAmountInBaseToken.toString(),
+    tokenIn: buy.baseToken,
+    tokenInDecimals: buy.baseTokenDecimals,
+    tokenOutDecimals: buy.quoteTokenDecimals,
+    tokenOut: buy.quoteToken,
+    type: SwapType.BUY,
+    identifier: buy.identifier,
+    ecosystemIdentifier: buy.ecosystemIdentifier,
   };
 
   const sellLimit = sellAmountOutBaseToken.minus(limitDelta);
@@ -122,12 +129,16 @@ export const createProfitOpportunity = (
    * limit: expected amountOut in baseToken + 1/2 expected profit as slippage
    */
   const swapSell: Swap = {
-    tokenIn: sell.quoteToken,
-    tokenOut: sell.baseToken,
     amount,
-    type: SwapType.SELL,
     limit: sellLimit.toString(),
     limitWithoutSlippage: sellAmountOutBaseToken.toString(),
+    tokenIn: sell.quoteToken,
+    tokenInDecimals: sell.quoteTokenDecimals,
+    tokenOutDecimals: sell.baseTokenDecimals,
+    tokenOut: sell.baseToken,
+    type: SwapType.SELL,
+    identifier: sell.identifier,
+    ecosystemIdentifier: sell.ecosystemIdentifier,
   };
 
   return {
