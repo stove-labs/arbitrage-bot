@@ -32,6 +32,8 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^0.0.0"
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "chalk": "^4.1.2",
+    "tslog": "^3.3.4"
   }
 }
