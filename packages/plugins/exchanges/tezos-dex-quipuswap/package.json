@@ -36,6 +36,8 @@
   "dependencies": {
     "@stove-labs/arbitrage-bot": "^0.0.0",
     "@stove-labs/arbitrage-bot-exchange-utils": "^0.0.0",
+    "@stove-labs/arbitrage-bot-token-registry": "^0.0.0",
+    "@taquito/signer": "^14.0.0",
     "@taquito/taquito": "^14.0.0"
   },
   "devDependencies": {
@@ -44,6 +46,7 @@
     "@types/mocha": "^9.1.1",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
+    "fs-extra": "^10.1.0",
     "mocha": "^10.0.0",
     "ts-node": "^10.9.1"
   }

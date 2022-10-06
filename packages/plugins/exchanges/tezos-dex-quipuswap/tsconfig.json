@@ -3,10 +3,11 @@
   "compilerOptions": {
     "declarationDir": "./dist/types",
     "outDir": "./dist/lib",
+    "resolveJsonModule": true
   },
   "include": [
     "./src/**/*"
-  ],
+, "test/helpers/quipuswap-dex-tez-token.default_storage.ts"  ],
   "exclude": [
     "test"
   ]
