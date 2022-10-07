@@ -139,3 +139,6 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+
+### sandbox specific
+deployments/
