@@ -5,6 +5,8 @@ import accounts from '../../accounts';
 import metadataContract from '../contracts/MetadataStorage.json';
 import metadataStorage from '../storage/MetadataStorage';
 import writeAddressToFile from '../../saveDeployment';
+import chalk from 'chalk';
+const yellow = chalk.yellow;
 
 (async () => {
   const tezos = new TezosToolkit(config.rpc);
@@ -22,7 +24,6 @@ import writeAddressToFile from '../../saveDeployment';
     originationOperation.contractAddress
   );
   console.log(
-    'Metadata contract address:',
-    originationOperation.contractAddress
+    yellow('Metadata contract address:', originationOperation.contractAddress)
   );
 })();

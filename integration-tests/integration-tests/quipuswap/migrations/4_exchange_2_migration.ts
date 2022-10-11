@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
 const standard = process.env.EXCHANGE_TOKEN_STANDARD || 'FA12';
 const tokenDexAmount = process.env.TOKEN_DEX_2_AMOUNT;
 const tezDexAmount = process.env.TEZ_DEX_2_AMOUNT;

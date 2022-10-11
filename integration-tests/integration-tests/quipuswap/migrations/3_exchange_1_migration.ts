@@ -1,20 +1,21 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
 const standard = process.env.EXCHANGE_TOKEN_STANDARD || 'FA12';
 const tokenTotalSupply = process.env.TOKEN_TOTAL_SUPPLY;
 const tokenDexAmount = process.env.TOKEN_DEX_1_AMOUNT;
 const tezDexAmount = process.env.TEZ_DEX_1_AMOUNT;
 const defaultTokenId = process.env.DEFAULT_TOKEN_ID_FA2;
 
-import writeAddressToFile from '../../saveDeployment';
 import { TezosToolkit, OpKind, ParamsWithKind } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 import { MichelsonMap } from '@taquito/michelson-encoder';
+import chalk from 'chalk';
+const yellow = chalk.yellow;
+
 import accounts from '../../accounts';
 import config from '../../config';
 import factoryStorage from '../storage/Factory';
 import metadataStorageInstance from '../../deployments/metadataContract';
 import bakeryInstance from '../../deployments/bakerRegistry';
+import writeAddressToFile from '../../saveDeployment';
 
 (async () => {
   if (['FA2', 'FA12'].includes(standard)) {
@@ -48,7 +49,7 @@ import bakeryInstance from '../../deployments/bakerRegistry';
     );
 
     console.log(
-      `Factory address: ${factoryOriginationOperation.contractAddress}`
+      yellow(`Factory address: ${factoryOriginationOperation.contractAddress}`)
     );
     await writeAddressToFile(
       'factory1',
@@ -107,7 +108,9 @@ import bakeryInstance from '../../deployments/bakerRegistry';
       tokenOriginationOperation.contractAddress
     );
 
-    console.log(`Token address: ${tokenOriginationOperation.contractAddress}`);
+    console.log(
+      yellow(`Token address: ${tokenOriginationOperation.contractAddress}`)
+    );
 
     let tokenInstance = await tezos.contract.at(
       tokenOriginationOperation.contractAddress!
@@ -137,7 +140,7 @@ import bakeryInstance from '../../deployments/bakerRegistry';
         internalOperationResultsExchange1.result['originated_contracts'][0];
 
       await writeAddressToFile('exchange1', exchangeAddress);
-      console.log('Exchange 1 address:', exchangeAddress);
+      console.log(yellow('Exchange 1 address:', exchangeAddress));
     } else {
       let updateOperatorsOperation = await tokenInstance.methods
         .update_operators([
@@ -171,7 +174,7 @@ import bakeryInstance from '../../deployments/bakerRegistry';
         internalOperationResultsExchange1.result['originated_contracts'][0];
 
       await writeAddressToFile('exchange1', exchangeAddress);
-      console.log('Exchange 1 address:', exchangeAddress);
+      console.log(yellow('Exchange 1 address:', exchangeAddress));
     }
   }
 })();

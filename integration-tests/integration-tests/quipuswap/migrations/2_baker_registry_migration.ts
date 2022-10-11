@@ -5,6 +5,8 @@ import { MichelsonMap } from '@taquito/michelson-encoder';
 import config from '../../config';
 import accounts from '../../accounts';
 import writeAddressToFile from '../../saveDeployment';
+import chalk from 'chalk';
+const yellow = chalk.yellow;
 
 (async () => {
   const tezos = new TezosToolkit(config.rpc);
@@ -22,7 +24,9 @@ import writeAddressToFile from '../../saveDeployment';
     originationOperation.contractAddress
   );
   console.log(
-    'Baker registry contract address',
-    originationOperation.contractAddress
+    yellow(
+      'Baker registry contract address',
+      originationOperation.contractAddress
+    )
   );
 })();
