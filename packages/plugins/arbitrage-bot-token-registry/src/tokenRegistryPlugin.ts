@@ -9,6 +9,7 @@ import {
   TokenPlugin,
   TokenDecimals,
   ExchangePrice,
+  ProfitOpportunity,
 } from '@stove-labs/arbitrage-bot';
 import * as constants from './constants';
 
@@ -57,6 +58,18 @@ export class TokenRegistryPlugin implements TokenPlugin {
     return tokenInstance;
   }
 
+  addTokenInfo(profitOpportunity: ProfitOpportunity): ProfitOpportunity {
+    profitOpportunity.swaps.forEach((swap) => {
+      swap.tokenIn = this.getTokenInfo(swap.tokenIn, swap.ecosystemIdentifier);
+      swap.tokenOut = this.getTokenInfo(
+        swap.tokenOut,
+        swap.ecosystemIdentifier
+      );
+    });
+
+    return profitOpportunity;
+  }
+
   getTokenDecimals(prices: ExchangePrice[]): TokenDecimals {
     const baseTokenFromList = this.tokenList.find(
       (tokenListItem) => prices[0].baseToken.ticker === tokenListItem.ticker
@@ -64,18 +77,16 @@ export class TokenRegistryPlugin implements TokenPlugin {
     const quoteTokenFromList = this.tokenList.find(
       (tokenListItem) => prices[0].quoteToken.ticker === tokenListItem.ticker
     );
-    
+
     return {
       baseToken: baseTokenFromList.decimals,
       quoteToken: quoteTokenFromList.decimals,
     } as TokenDecimals;
   }
 
-  addTokenDecimals = (
-    prices: ExchangePrice[],
-  ): ExchangePrice[] => {
+  addTokenDecimals = (prices: ExchangePrice[]): ExchangePrice[] => {
     const tokenDecimals = this.getTokenDecimals(prices);
-    
+
     return prices.map((exchangePrice) => {
       exchangePrice.baseTokenDecimals = tokenDecimals.baseToken;
       exchangePrice.quoteTokenDecimals = tokenDecimals.quoteToken;
@@ -83,3 +94,5 @@ export class TokenRegistryPlugin implements TokenPlugin {
     });
   };
 }
+
+export * from './types'
