@@ -1,3 +1,3 @@
 export default {
-    rpc: 'http://localhost:20000'
+    rpc: 'http://127.0.0.1:8732'
 }
