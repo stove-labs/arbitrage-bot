@@ -18,10 +18,10 @@ export const getAmountInGivenOut = (
     .multipliedBy(basisPoints)
     .multipliedBy(reserveIn);
   const denominator = new BigNumber(reserveOut)
-    .multipliedBy(basisPoints)
-    .minus(amountOutBN.multipliedBy(basisPoints - fee));
+    .minus(amountOut)
+    .multipliedBy(basisPoints - fee);
 
-  return numerator.idiv(denominator);
+  return numerator.idiv(denominator).plus(1);
 };
 
 /**
