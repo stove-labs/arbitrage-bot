@@ -17,6 +17,7 @@
     }
   },
   "scripts":{
+    "clean": "lerna clean",
     "bootstrap": "lerna bootstrap --hoist",
     "build:all": "lerna run build",
     "test:all": "lerna run test",
