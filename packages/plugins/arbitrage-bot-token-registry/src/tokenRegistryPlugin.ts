@@ -84,7 +84,7 @@ export class TokenRegistryPlugin implements TokenPlugin {
     } as TokenDecimals;
   }
 
-  addTokenDecimals = (prices: ExchangePrice[]): ExchangePrice[] => {
+  addTokenDecimals(prices: ExchangePrice[]): ExchangePrice[] {
     const tokenDecimals = this.getTokenDecimals(prices);
 
     return prices.map((exchangePrice) => {
@@ -94,5 +94,3 @@ export class TokenRegistryPlugin implements TokenPlugin {
     });
   };
 }
-
-export * from './types'
