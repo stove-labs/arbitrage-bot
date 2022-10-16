@@ -54,7 +54,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     // TODO: consider different error handling approach
     this.throwForUndefinedAddress(exchangeAddress);
 
-    // fetch smart contract storage of Quipuswap DEX
+    // fetch smart contract storage of Vortex DEX
     const storage = await this.getStorage(exchangeAddress);
     // retrieve balances
     const balances = this.getBalances(baseToken, quoteToken, storage);
