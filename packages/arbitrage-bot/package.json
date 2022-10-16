@@ -16,6 +16,7 @@
   "files": [
     "dist"
   ],
+  "typings": "./dist/types/arbitrageBotCore.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
@@ -25,7 +26,6 @@
     "test": "mocha -r ts-node/register test/*.ts",
     "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
-  "typings": "./dist/types/arbitrageBotCore.d.ts",
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
@@ -35,15 +35,14 @@
     "@types/mocha": "^9.1.1",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
+    "cli-progress": "^3.11.2",
     "mocha": "^10.0.0",
     "ts-node": "^10.9.1"
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot-swap-execution": "^0.0.0",
     "@types/lodash": "^4.14.185",
-    "lodash": "^4.17.21",
-    "mocha": "^10.0.0",
-    "ts-node": "^10.9.1"
+    "lodash": "^4.17.21"
   },
   "publishConfig": {
     "access": "public"

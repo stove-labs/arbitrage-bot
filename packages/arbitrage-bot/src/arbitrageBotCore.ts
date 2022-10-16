@@ -37,10 +37,6 @@ export class ArbitrageBotCore {
     // balance at the start baseToken / quoteToken
     const balance = {};
 
-    // console.log(await this.config.plugins.exchanges[0].fetchPrice(
-    //   this.config.baseToken,
-    //   this.config.quoteToken
-    // ));
     this.reporter.report({ type: 'LIFECYCLE_START' });
     const prices = await this.exchangeManager.fetchPrices(
       this.config.baseToken,
@@ -51,17 +47,18 @@ export class ArbitrageBotCore {
 
     const profitOpportunity =
       this.config.plugins.profitFinder.findProfits(prices);
-    // deactivate check for prototyping
-    // if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive())
-    //   return;
+
     this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
-    // profitOpportunity.swaps -> SwapExecutionManager -> group swaps by ecosystemIdentifier
-    // Exchange.forgeTransaction(swap)
-    // const swapResults = await this.swapExecutionManager.executeSwaps(
-    //   profitOpportunity.swaps
-    // );
+    // if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
+    //   return;
+
+    this.token.addTokenInfo(profitOpportunity);
+
+    const swapResults = await this.swapExecutionManager.executeSwaps(
+      profitOpportunity.swaps
+    );
     // report if the execution of the opportunity swap was executed
-    //this.reporter.report({ type: 'SWAPS_DONE', swapResults });
+    this.reporter.report({ type: 'SWAPS_DONE', swapResults });
 
     // // balance after swaps were executed (after arbitrage attempt)
     // const balanceAfterArbitrage = {};
@@ -93,13 +90,12 @@ export class ArbitrageBotCore {
       this.config.plugins.exchanges,
       this.config.plugins.keychains
     );
-
     await this.startLifecycle();
 
     // register the trigger
-    // this.config.plugins.trigger.register(async () => {
-    //   // each time the trigger is triggered, run the lifecycle from scratch
-    //   await this.startLifecycle();
-    // });
+    this.config.plugins.trigger.register(async () => {
+      // each time the trigger is triggered, run the lifecycle from scratch
+      await this.startLifecycle();
+    });
   }
 }
