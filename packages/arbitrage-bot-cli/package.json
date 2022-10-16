@@ -45,7 +45,6 @@
     "@stove-labs/arbitrage-bot-token-registry": "^0.0.0",
     "@stove-labs/arbitrage-bot-trigger": "^0.0.0",
     "@stove-labs/tezos-dex-quipuswap": "^0.0.0",
-    "@stove-labs/tezos-dex-spicyswap": "^0.0.0",
     "@stove-labs/tezos-dex-vortex": "^0.0.0",
     "@types/ora": "^3.2.0",
     "lodash": "^4.17.21",
