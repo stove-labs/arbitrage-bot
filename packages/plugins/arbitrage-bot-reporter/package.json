@@ -33,7 +33,16 @@
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@topcli/spinner": "^1.1.0",
+    "@types/ora": "^3.2.0",
     "chalk": "^4.1.2",
-    "tslog": "^3.3.4"
+    "cli-spinners": "^2.7.0",
+    "ora": "^3.2.0",
+    "tslog": "^3.3.4",
+    "yargs": "^17.6.0"
+  },
+  "devDependencies": {
+    "@types/argv": "^0.0.5",
+    "@types/ora": "^3.2.0"
   }
 }
