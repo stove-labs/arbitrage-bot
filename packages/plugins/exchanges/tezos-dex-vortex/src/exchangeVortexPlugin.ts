@@ -287,11 +287,11 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     let quoteTokenBalance = constants.zeroBalance;
 
     if (baseToken.ticker === 'XTZ') {
-      baseTokenBalance = storage.xtzPool.toString();
-      quoteTokenBalance = storage.tokenPool.toString();
+      baseTokenBalance = storage.xtzPool.toFixed();
+      quoteTokenBalance = storage.tokenPool.toFixed();
     } else if (quoteToken.ticker === 'XTZ') {
-      baseTokenBalance = storage.tokenPool.toString();
-      quoteTokenBalance = storage.xtzPool.toString();
+      baseTokenBalance = storage.tokenPool.toFixed();
+      quoteTokenBalance = storage.xtzPool.toFixed();
     }
 
     return {

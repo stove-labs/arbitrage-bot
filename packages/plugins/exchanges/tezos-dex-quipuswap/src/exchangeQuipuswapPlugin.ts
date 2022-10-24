@@ -284,11 +284,11 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
     let quoteTokenBalance = constants.zeroBalance;
 
     if (baseToken.ticker === 'XTZ') {
-      baseTokenBalance = storage.storage.tez_pool.toString();
-      quoteTokenBalance = storage.storage.token_pool.toString();
+      baseTokenBalance = storage.storage.tez_pool.toFixed();
+      quoteTokenBalance = storage.storage.token_pool.toFixed();
     } else if (quoteToken.ticker === 'XTZ') {
-      baseTokenBalance = storage.storage.token_pool.toString();
-      quoteTokenBalance = storage.storage.tez_pool.toString();
+      baseTokenBalance = storage.storage.token_pool.toFixed();
+      quoteTokenBalance = storage.storage.tez_pool.toFixed();
     }
 
     return {
