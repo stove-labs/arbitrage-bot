@@ -3,8 +3,8 @@ import { basisPoints } from '../../constants';
 // Uniswap V2 CFMM a.k.a. x*y=k
 
 /**
- * Example for fee = 0.03% which is 3 BPS out of 1000 BPS
- * amountIn = (amountOut * 1000 * reserveIn) / (reserveOut * 1000 - amountOut * 997)
+ * Example for fee = 0.03% which is 30 BPS out of 10000 BPS
+ * amountIn = (amountOut * 10000 * reserveIn) / ((reserveOut - amountOut) * 9970)
  */
 export const getAmountInGivenOut = (
   amountOut: string,
@@ -25,8 +25,8 @@ export const getAmountInGivenOut = (
 };
 
 /**
- * Example for fee = 0.03% which is 3 BPS out of 1000 BPS
- * amountOut = (amountIn * 997 * reserveOut) / (reserveIn * 1000 + amountIn * 997)
+ * Example for fee = 0.03% which is 30 BPS out of 10000 BPS
+ * amountOut = (amountIn * 9970 * reserveOut) / (reserveIn * 10000 + amountIn * 9970)
  */
 export const getAmountOutGivenIn = (
   amountIn: string,

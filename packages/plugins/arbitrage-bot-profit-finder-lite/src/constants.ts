@@ -1,1 +1,1 @@
-export const basisPoints = 1000;
+export const basisPoints = 10000;
