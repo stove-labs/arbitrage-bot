@@ -8,6 +8,7 @@ import {
   Swap,
   TokenFA12,
   TokenFA2,
+  TokenPlugin,
 } from '@stove-labs/arbitrage-bot';
 import {
   OpKind,
@@ -27,6 +28,8 @@ type QuipuswapStorage = {
   storage: { tez_pool: BigNumber; token_pool: BigNumber };
 };
 
+type Balances = { baseTokenBalance: string; quoteTokenBalance: string };
+
 export class ExchangeQuipuswapPlugin implements ExchangePlugin {
   public identifier: string;
   public ecosystemIdentifier: EcosystemIdentifier = 'TEZOS';
@@ -34,7 +37,8 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
 
   constructor(
     public config: ExchangePluginConfig,
-    public instances: ExchangeRegistry
+    public exchangeInstances: ExchangeRegistry,
+    public tokenInstances: TokenPlugin
   ) {
     this.tezos = new TezosToolkit(config.rpc);
     this.identifier = config.identifier ? config.identifier : 'QUIPUSWAP';
@@ -47,7 +51,7 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
     const exchangeAddress = getExchangeAddressFromRegistry(
       baseToken,
       quoteToken,
-      this.instances
+      this.exchangeInstances
     );
     // TODO: consider different error handling approach
     this.throwForUndefinedAddress(exchangeAddress);
@@ -57,17 +61,61 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
     // retrieve balances
     const balances = this.getBalances(baseToken, quoteToken, storage);
 
-    return {
+    // add decimals
+    const baseTokenWithInfo = this.tokenInstances.getTokenInfo(
       baseToken,
-      baseTokenBalance: { amount: balances.baseTokenBalance.toString() },
+      this.ecosystemIdentifier
+    ) as TokenFA12 | TokenFA2;
+    const quoteTokenWithInfo = this.tokenInstances.getTokenInfo(
       quoteToken,
+      this.ecosystemIdentifier
+    ) as TokenFA12 | TokenFA2;
+
+    const spotPrice = this.calculateSpotPrice(
+      balances,
+      baseTokenWithInfo,
+      quoteTokenWithInfo
+    );
+
+    return {
+      baseToken: baseTokenWithInfo,
+      baseTokenBalance: { amount: balances.baseTokenBalance.toString() },
+      quoteToken: quoteTokenWithInfo,
       quoteTokenBalance: {
         amount: balances.quoteTokenBalance.toString(),
       },
       identifier: this.identifier,
       ecosystemIdentifier: this.ecosystemIdentifier,
       fee: this.fee,
+      spotPrice,
     } as ExchangePrice;
+  }
+
+  /**
+   * Spot price = baseToken/quoteToken
+   * eg. XTZ/USD = 0.65 XTZ/USD
+   * pay 0.65 XTZ
+   * receive 1 USD
+   */
+  private calculateSpotPrice(
+    balances: Balances,
+    baseTokenWithInfo: TokenFA12 | TokenFA2,
+    quoteTokenWithInfo: TokenFA12 | TokenFA2
+  ) {
+    const baseTokenReserve = new BigNumber(balances.baseTokenBalance).dividedBy(
+      10 ** baseTokenWithInfo.decimals
+    );
+
+    const quoteTokenReserve = new BigNumber(
+      balances.quoteTokenBalance
+    ).dividedBy(10 ** quoteTokenWithInfo.decimals);
+
+    const spotPrice = baseTokenReserve
+      .dividedBy(quoteTokenReserve)
+      .multipliedBy(10 ** baseTokenWithInfo.decimals)
+      .toFixed(0, 1);
+
+    return spotPrice;
   }
 
   async forgeOperation(
@@ -77,7 +125,7 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
     const address = getExchangeAddressFromRegistry(
       swap.tokenIn,
       swap.tokenOut,
-      this.instances
+      this.exchangeInstances
     );
     const dexContractInstance = await this.getContractInstance(address);
 
@@ -279,7 +327,7 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
     baseToken: Token,
     quoteToken: Token,
     storage: QuipuswapStorage
-  ): { baseTokenBalance: string; quoteTokenBalance: string } {
+  ): Balances {
     let baseTokenBalance = constants.zeroBalance;
     let quoteTokenBalance = constants.zeroBalance;
 

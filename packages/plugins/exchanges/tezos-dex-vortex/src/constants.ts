@@ -1,2 +1,2 @@
-export const fee = 3; // Basispoints
+export const fee = 28; // Basispoints
 export const zeroBalance = '0';

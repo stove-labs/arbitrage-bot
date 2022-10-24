@@ -83,14 +83,4 @@ export class TokenRegistryPlugin implements TokenPlugin {
       quoteToken: quoteTokenFromList.decimals,
     } as TokenDecimals;
   }
-
-  addTokenDecimals(prices: ExchangePrice[]): ExchangePrice[] {
-    const tokenDecimals = this.getTokenDecimals(prices);
-
-    return prices.map((exchangePrice) => {
-      exchangePrice.baseTokenDecimals = tokenDecimals.baseToken;
-      exchangePrice.quoteTokenDecimals = tokenDecimals.quoteToken;
-      return exchangePrice;
-    });
-  };
 }

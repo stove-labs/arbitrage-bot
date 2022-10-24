@@ -1,7 +1,6 @@
 import {
   ProfitFinderPlugin,
   Swap,
-  TokenDecimals,
   TokenPlugin,
   SwapType,
 } from '@stove-labs/arbitrage-bot';
@@ -19,7 +18,6 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
    */
   constructor(
     public config: {
-      tokenRegistry: TokenPlugin;
       profitSplitForSlippage: number;
     }
   ) {}
@@ -41,7 +39,7 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
 
 const throwForMissingDecimals = (prices: ExchangePrice[]): void => {
   prices.forEach((price) => {
-    if (!price.baseTokenDecimals || !price.quoteTokenDecimals) {
+    if (!price.baseToken.decimals || !price.quoteToken.decimals) {
       throw new Error(
         `Can't compute profit opportunities for missing token decimals in ExchangePrices`
       );
@@ -105,8 +103,8 @@ export const createProfitOpportunity = (
     limit: buyLimit.toString(),
     limitWithoutSlippage: buyAmountInBaseToken.toString(),
     tokenIn: buy.baseToken,
-    tokenInDecimals: buy.baseTokenDecimals,
-    tokenOutDecimals: buy.quoteTokenDecimals,
+    tokenInDecimals: buy.baseToken.decimals,
+    tokenOutDecimals: buy.quoteToken.decimals,
     tokenOut: buy.quoteToken,
     type: SwapType.BUY,
     identifier: buy.identifier,
@@ -128,8 +126,8 @@ export const createProfitOpportunity = (
     limit: sellLimit.toString(),
     limitWithoutSlippage: sellAmountOutBaseToken.toString(),
     tokenIn: sell.quoteToken,
-    tokenInDecimals: sell.quoteTokenDecimals,
-    tokenOutDecimals: sell.baseTokenDecimals,
+    tokenInDecimals: sell.quoteToken.decimals,
+    tokenOutDecimals: sell.baseToken.decimals,
     tokenOut: sell.baseToken,
     type: SwapType.SELL,
     identifier: sell.identifier,

@@ -10,20 +10,21 @@ import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter';
 import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-lite';
 import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
 import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
+import { InMemorySigner } from '@taquito/signer';
 
 const exchangeConfigQuipuswap: ExchangePluginConfig = {
-  rpc: 'https://mainnet.smartpy.io',
+  rpc: 'https://mainnet.tezos.marigold.dev/',
   identifier: 'QUIPUSWAP',
   ecosystemIdentifier: 'TEZOS',
 };
 
 const exchangeConfigVortex: ExchangePluginConfig = {
-  rpc: 'https://mainnet.smartpy.io',
+  rpc: 'https://mainnet.tezos.marigold.dev/',
   identifier: 'VORTEX',
   ecosystemIdentifier: 'TEZOS',
 };
 
-const tokenList: TokenList = [
+const tokenListTezos: TokenList = [
   {
     ticker: 'XTZ',
     address: 'native',
@@ -74,28 +75,27 @@ const vortexList: ExchangeRegistry = [
   },
 ];
 
-const tokenRegistry = new TokenRegistryPlugin(tokenList);
-
-export const config: Config = {
-  baseToken: {
-    ticker: 'XTZ',
-  },
-  quoteToken: {
-    ticker: 'SMAK',
-  },
-  plugins: {
-    exchanges: [
-      new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap, quipuswapList),
-      new ExchangeVortexPlugin(exchangeConfigVortex, vortexList),
-    ],
-    token: tokenRegistry,
-    trigger: new TriggerIntervalPlugin({ interval: 20000 }),
-    reporter: new ConsoleReporterPlugin(),
-    profitFinder: new ProfitFinderLitePlugin({
-      tokenRegistry,
-      profitSplitForSlippage: 0,
-    }),
-    keychains: {
+const tokenRegistry = new TokenRegistryPlugin(tokenListTezos);
+const getConfig = async () => {
+  return {
+    baseToken: {
+      ticker: 'XTZ',
+    },
+    quoteToken: {
+      ticker: 'SMAK',
+    },
+    plugins: {
+      exchanges: [
+        new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap, quipuswapList, tokenRegistry),
+        new ExchangeVortexPlugin(exchangeConfigVortex, vortexList, tokenRegistry),
+      ],
+      token: tokenRegistry,
+      trigger: new TriggerIntervalPlugin({ interval: 10000 }),
+      reporter: new ConsoleReporterPlugin(),
+      profitFinder: new ProfitFinderLitePlugin({
+        profitSplitForSlippage: 0,
+      }),
+      keychains: {
       TEZOS: {},
     },
   },

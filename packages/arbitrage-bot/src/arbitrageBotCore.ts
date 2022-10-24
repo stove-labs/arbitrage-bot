@@ -21,8 +21,6 @@ class ExchangeManager {
       )
     );
 
-    this.token.addTokenDecimals(prices);
-
     return prices;
   }
 }
@@ -49,8 +47,8 @@ export class ArbitrageBotCore {
       this.config.plugins.profitFinder.findProfits(prices);
 
     this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
-    // if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
-    //   return;
+    if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
+      return;
 
     this.token.addTokenInfo(profitOpportunity);
 

@@ -1,16 +1,14 @@
-import { Balance, EcosystemIdentifier, Token } from '../types';
+import { Balance, EcosystemIdentifier, TokenFA12, TokenFA2 } from '../types';
 
 // might change to enum down the line
 export type ExchangeIdentifier = string;
 export type ExchangeFee = number;
 
 export interface ExchangePrice {
-  baseToken: Token;
+  baseToken: TokenFA12 | TokenFA2;
   baseTokenBalance: Balance;
-  baseTokenDecimals?: number;
-  quoteToken: Token;
+  quoteToken: TokenFA12 | TokenFA2;
   quoteTokenBalance: Balance;
-  quoteTokenDecimals?: number;
   identifier: ExchangeIdentifier;
   ecosystemIdentifier: EcosystemIdentifier;
   fee: ExchangeFee;

@@ -22,6 +22,5 @@ export interface TokenPlugin {
     // TODO: pick one type of an array of types
   ): TokenFA12 | TokenFA2 | NativeToken | undefined;
   getTokenDecimals(prices: ExchangePrice[]): TokenDecimals;
-  addTokenDecimals(prices: ExchangePrice[]): ExchangePrice[];
   addTokenInfo(profitOpportunity: ProfitOpportunity): ProfitOpportunity;
 }
