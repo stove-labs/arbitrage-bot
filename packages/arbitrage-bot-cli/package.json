@@ -46,6 +46,7 @@
     "@stove-labs/arbitrage-bot-trigger": "^0.0.0",
     "@stove-labs/tezos-dex-quipuswap": "^0.0.0",
     "@stove-labs/tezos-dex-vortex": "^0.0.0",
+    "@taquito/signer": "^14.0.0",
     "@types/ora": "^3.2.0",
     "lodash": "^4.17.21",
     "yargs": "^17.5.1"
