@@ -21,6 +21,5 @@ export interface TokenPlugin {
     identifier: EcosystemIdentifier
     // TODO: pick one type of an array of types
   ): TokenFA12 | TokenFA2 | NativeToken | undefined;
-  getTokenDecimals(prices: ExchangePrice[]): TokenDecimals;
   addTokenInfo(profitOpportunity: ProfitOpportunity): ProfitOpportunity;
 }
