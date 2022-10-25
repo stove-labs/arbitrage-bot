@@ -39,8 +39,6 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
 
   constructor(
     public config: ExchangePluginConfig,
-    public exchangeInstances: ExchangeRegistry,
-    public tokenInstances: TokenPlugin
   ) {
     this.tezos = new TezosToolkit(config.rpc);
     this.identifier = config.identifier ? config.identifier : 'VORTEX';
@@ -52,7 +50,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     const exchangeAddress = getExchangeAddressFromRegistry(
       baseToken,
       quoteToken,
-      this.exchangeInstances
+      this.config.exchangeInstances
     );
 
     // TODO: consider different error handling approach
@@ -64,11 +62,11 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     const balances = this.getBalances(baseToken, quoteToken, storage);
 
     // add decimals
-    const baseTokenWithInfo = this.tokenInstances.getTokenInfo(
+    const baseTokenWithInfo = this.config.tokenInstances.getTokenInfo(
       baseToken,
       this.ecosystemIdentifier
     ) as TokenFA12 | TokenFA2;
-    const quoteTokenWithInfo = this.tokenInstances.getTokenInfo(
+    const quoteTokenWithInfo = this.config.tokenInstances.getTokenInfo(
       quoteToken,
       this.ecosystemIdentifier
     ) as TokenFA12 | TokenFA2;
@@ -127,7 +125,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     const address = getExchangeAddressFromRegistry(
       swap.tokenIn,
       swap.tokenOut,
-      this.exchangeInstances
+      this.config.exchangeInstances
     );
     const dexContractInstance = await this.getContractInstance(address);
 

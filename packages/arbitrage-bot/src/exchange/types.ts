@@ -1,4 +1,4 @@
-import { Balance, EcosystemIdentifier, TokenFA12, TokenFA2 } from '../types';
+import { Balance, EcosystemIdentifier, TokenFA12, TokenFA2, TokenPlugin } from '../types';
 
 // might change to enum down the line
 export type ExchangeIdentifier = string;
@@ -19,6 +19,8 @@ export type ExchangePluginConfig = {
   rpc: string;
   identifier: ExchangeIdentifier;
   ecosystemIdentifier: EcosystemIdentifier;
+  tokenInstances: TokenPlugin;
+  exchangeInstances: ExchangeRegistry
 };
 
 export type ExchangeRegistry = {

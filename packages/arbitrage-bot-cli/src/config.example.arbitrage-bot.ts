@@ -12,17 +12,6 @@ import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
 import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
 import { InMemorySigner } from '@taquito/signer';
 
-const exchangeConfigQuipuswap: ExchangePluginConfig = {
-  rpc: 'https://mainnet.tezos.marigold.dev/',
-  identifier: 'QUIPUSWAP',
-  ecosystemIdentifier: 'TEZOS',
-};
-
-const exchangeConfigVortex: ExchangePluginConfig = {
-  rpc: 'https://mainnet.tezos.marigold.dev/',
-  identifier: 'VORTEX',
-  ecosystemIdentifier: 'TEZOS',
-};
 
 const tokenListTezos: TokenList = [
   {
@@ -75,7 +64,25 @@ const vortexList: ExchangeRegistry = [
   },
 ];
 
-const tokenRegistry = new TokenRegistryPlugin(tokenListTezos);
+const tokenRegistryTezos = new TokenRegistryPlugin(tokenListTezos);
+
+
+const exchangeConfigQuipuswap: ExchangePluginConfig = {
+  rpc: 'https://mainnet.tezos.marigold.dev/',
+  identifier: 'QUIPUSWAP',
+  ecosystemIdentifier: 'TEZOS',
+  tokenInstances: tokenRegistryTezos,
+  exchangeInstances: quipuswapList
+};
+
+const exchangeConfigVortex: ExchangePluginConfig = {
+  rpc: 'https://mainnet.tezos.marigold.dev/',
+  identifier: 'VORTEX',
+  ecosystemIdentifier: 'TEZOS',
+  tokenInstances: tokenRegistryTezos,
+  exchangeInstances: vortexList
+};
+
 const getConfig = async () => {
   return {
     baseToken: {
@@ -86,10 +93,10 @@ const getConfig = async () => {
     },
     plugins: {
       exchanges: [
-        new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap, quipuswapList, tokenRegistry),
-        new ExchangeVortexPlugin(exchangeConfigVortex, vortexList, tokenRegistry),
+        new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap),
+        new ExchangeVortexPlugin(exchangeConfigVortex),
       ],
-      token: tokenRegistry,
+      token: tokenRegistryTezos,
       trigger: new TriggerIntervalPlugin({ interval: 10000 }),
       reporter: new ConsoleReporterPlugin(),
       profitFinder: new ProfitFinderLitePlugin({
