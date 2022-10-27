@@ -3,12 +3,10 @@ import {
   ExchangePluginConfig,
   Token,
   ExchangePrice,
-  ExchangeRegistry,
   Swap,
   TokenFA2,
   TokenFA12,
   EcosystemIdentifier,
-  TokenPlugin,
 } from '@stove-labs/arbitrage-bot';
 import { getExchangeAddressFromRegistry } from '@stove-labs/arbitrage-bot-exchange-utils';
 
@@ -18,31 +16,24 @@ import {
   OpKind,
   TransferParams,
 } from '@taquito/taquito';
-import { BigNumber } from 'bignumber.js';
 import * as constants from './constants';
 import * as errors from './errors';
+import { calculateSpotPrice } from './math';
 import { DexFa12ContractType } from './types/dex_fa2.types';
 import { Fa12ContractType } from './types/token/fa12.types';
 import { tas, timestamp } from './types/type-aliases';
-
-type VortexStorage = {
-  xtzPool: BigNumber;
-  tokenPool: BigNumber;
-};
-
-type Balances = { baseTokenBalance: string; quoteTokenBalance: string };
+import { VortexStorage } from './types/types';
 
 export class ExchangeVortexPlugin implements ExchangePlugin {
   public identifier: string;
   public ecosystemIdentifier: EcosystemIdentifier = 'TEZOS';
   public tezos: TezosToolkit;
 
-  constructor(
-    public config: ExchangePluginConfig,
-  ) {
+  constructor(public config: ExchangePluginConfig) {
     this.tezos = new TezosToolkit(config.rpc);
     this.identifier = config.identifier ? config.identifier : 'VORTEX';
   }
+
   async fetchPrice(
     baseToken: Token,
     quoteToken: Token
@@ -71,7 +62,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
       this.ecosystemIdentifier
     ) as TokenFA12 | TokenFA2;
 
-    const spotPrice = this.calculateSpotPrice(
+    const spotPrice = calculateSpotPrice(
       balances,
       baseTokenWithInfo,
       quoteTokenWithInfo
@@ -89,33 +80,6 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
       fee: this.fee,
       spotPrice,
     } as unknown as ExchangePrice;
-  }
-
-  /**
-   * Spot price = baseToken/quoteToken
-   * eg. XTZ/USD = 0.65 XTZ/USD
-   * pay 0.65 XTZ
-   * receive 1 USD
-   */
-  private calculateSpotPrice(
-    balances: Balances,
-    baseTokenWithInfo: TokenFA12 | TokenFA2,
-    quoteTokenWithInfo: TokenFA12 | TokenFA2
-  ) {
-    const baseTokenReserve = new BigNumber(balances.baseTokenBalance).dividedBy(
-      10 ** baseTokenWithInfo.decimals
-    );
-
-    const quoteTokenReserve = new BigNumber(
-      balances.quoteTokenBalance
-    ).dividedBy(10 ** quoteTokenWithInfo.decimals);
-
-    const spotPrice = baseTokenReserve
-      .dividedBy(quoteTokenReserve)
-      .multipliedBy(10 ** baseTokenWithInfo.decimals)
-      .toFixed(0, 1);
-
-    return spotPrice;
   }
 
   async forgeOperation(
@@ -174,7 +138,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
   }
 
   /**
-   * Quipuswap doesn't support a swapType of "BUY" (getAmountInGivenOut).
+   * Vortex doesn't support a swapType of "BUY" (getAmountInGivenOut).
    * That's why it is not possible to apply slippage on the XTZ amountIn.
    */
   getParamsXtzToTokenSwapBuy(
@@ -207,7 +171,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
   }
 
   /**
-   * Quipuswap doesn't support a swapType of "BUY" (getAmountInGivenOut).
+   * Vortex doesn't support a swapType of "BUY" (getAmountInGivenOut).
    * That's why it is not possible to apply slippage on the token amountIn.
    */
   getParamsTokenToXtzSwapBuy(
@@ -347,8 +311,10 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
   }
 
   private getDeadlineTimestamp() {
-    // offset 30 seconds
-    return new Date(new Date().getTime() + 30000).toISOString() as timestamp;
+    // eg. offset is 40 seconds
+    return new Date(
+      new Date().getTime() + constants.deadlineOffset
+    ).toISOString() as timestamp;
   }
 
   private throwForUndefinedAddress(address: string | undefined): void {
@@ -357,7 +323,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
 
   /**
    * Returns the protocol fee expressed in basis points
-   * eg. 0.03% (=0.003) equals 3 basis points
+   * eg. 0.03% (=0.003) equals 30 basis points out of 10,000 total basis points
    */
   private get fee() {
     return constants.fee;
