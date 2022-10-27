@@ -3,12 +3,10 @@ import {
   ExchangePluginConfig,
   Token,
   ExchangePrice,
-  ExchangeRegistry,
   EcosystemIdentifier,
   Swap,
   TokenFA12,
   TokenFA2,
-  TokenPlugin,
 } from '@stove-labs/arbitrage-bot';
 import {
   OpKind,
@@ -16,28 +14,22 @@ import {
   TezosToolkit,
   TransferParams,
 } from '@taquito/taquito';
-import { BigNumber } from 'bignumber.js';
+
 import * as constants from './constants';
 import * as errors from './errors';
 import { getExchangeAddressFromRegistry } from '@stove-labs/arbitrage-bot-exchange-utils';
 import { QuipuswapDexTezTokenContractType } from './types/taquito-types-quipuswap/quipuswap-dex-tez-token.types';
 import { tas } from './types/type-aliases';
 import { Fa12ContractType } from './types/token/fa12.types';
-
-type QuipuswapStorage = {
-  storage: { tez_pool: BigNumber; token_pool: BigNumber };
-};
-
-type Balances = { baseTokenBalance: string; quoteTokenBalance: string };
+import { calculateSpotPrice } from './math';
+import { Balances, QuipuswapStorage } from './types/types';
 
 export class ExchangeQuipuswapPlugin implements ExchangePlugin {
   public identifier: string;
   public ecosystemIdentifier: EcosystemIdentifier = 'TEZOS';
   public tezos: TezosToolkit;
 
-  constructor(
-    public config: ExchangePluginConfig,
-  ) {
+  constructor(public config: ExchangePluginConfig) {
     this.tezos = new TezosToolkit(config.rpc);
     this.identifier = config.identifier ? config.identifier : 'QUIPUSWAP';
   }
@@ -69,7 +61,7 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
       this.ecosystemIdentifier
     ) as TokenFA12 | TokenFA2;
 
-    const spotPrice = this.calculateSpotPrice(
+    const spotPrice = calculateSpotPrice(
       balances,
       baseTokenWithInfo,
       quoteTokenWithInfo
@@ -87,33 +79,6 @@ export class ExchangeQuipuswapPlugin implements ExchangePlugin {
       fee: this.fee,
       spotPrice,
     } as ExchangePrice;
-  }
-
-  /**
-   * Spot price = baseToken/quoteToken
-   * eg. XTZ/USD = 0.65 XTZ/USD
-   * pay 0.65 XTZ
-   * receive 1 USD
-   */
-  private calculateSpotPrice(
-    balances: Balances,
-    baseTokenWithInfo: TokenFA12 | TokenFA2,
-    quoteTokenWithInfo: TokenFA12 | TokenFA2
-  ) {
-    const baseTokenReserve = new BigNumber(balances.baseTokenBalance).dividedBy(
-      10 ** baseTokenWithInfo.decimals
-    );
-
-    const quoteTokenReserve = new BigNumber(
-      balances.quoteTokenBalance
-    ).dividedBy(10 ** quoteTokenWithInfo.decimals);
-
-    const spotPrice = baseTokenReserve
-      .dividedBy(quoteTokenReserve)
-      .multipliedBy(10 ** baseTokenWithInfo.decimals)
-      .toFixed(0, 1);
-
-    return spotPrice;
   }
 
   async forgeOperation(
