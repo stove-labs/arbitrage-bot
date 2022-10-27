@@ -14,20 +14,8 @@ import { ArbitrageBotCore } from '@stove-labs/arbitrage-bot';
 import { InMemorySigner } from '@taquito/signer';
 
 describe('Quipuswap-Vortex', () => {
-  it('can perform arbitrage between quipuswap and vortex', async () => {
-    const exchangeConfigQuipuswap: ExchangePluginConfig = {
-      rpc: 'http://127.0.0.1:8732',
-      identifier: 'QUIPUSWAP',
-      ecosystemIdentifier: 'TEZOS',
-    };
-
-    const exchangeConfigVortex: ExchangePluginConfig = {
-      rpc: 'http://127.0.0.1:8732',
-      identifier: 'VORTEX',
-      ecosystemIdentifier: 'TEZOS',
-    };
-
-    const tokenList: TokenList = [
+  it.only('can perform arbitrage between quipuswap and vortex', async () => {
+    const tokenListTezos: TokenList = [
       {
         ticker: 'XTZ',
         address: 'native',
@@ -35,19 +23,19 @@ describe('Quipuswap-Vortex', () => {
         ecosystemIdentifier: 'TEZOS',
       },
       {
-        ticker: 'SMAK',
+        ticker: 'kUSD',
         address: require('../integration-tests/deployments/tokenFA12'),
-        decimals: 12,
+        decimals: 18,
         ecosystemIdentifier: 'TEZOS',
       },
     ];
-
+    const tokenRegistryTezos = new TokenRegistryPlugin(tokenListTezos);
     const quipuswapList: ExchangeRegistry = [
       {
         address: require('../integration-tests/deployments/exchange1'),
         identifier: 'QUIPUSWAP',
         ticker1: 'XTZ',
-        ticker2: 'SMAK',
+        ticker2: 'kUSD',
       },
     ];
 
@@ -56,29 +44,42 @@ describe('Quipuswap-Vortex', () => {
         address: require('../integration-tests/deployments/vortexExchange'),
         identifier: 'VORTEX',
         ticker1: 'XTZ',
-        ticker2: 'SMAK',
+        ticker2: 'kUSD',
       },
     ];
 
-    const tokenRegistry = new TokenRegistryPlugin(tokenList);
+    const exchangeConfigQuipuswap: ExchangePluginConfig = {
+      rpc: 'http://127.0.0.1:8732',
+      identifier: 'QUIPUSWAP',
+      ecosystemIdentifier: 'TEZOS',
+      tokenInstances: tokenRegistryTezos,
+      exchangeInstances: quipuswapList,
+    };
+
+    const exchangeConfigVortex: ExchangePluginConfig = {
+      rpc: 'http://127.0.0.1:8732',
+      identifier: 'VORTEX',
+      ecosystemIdentifier: 'TEZOS',
+      tokenInstances: tokenRegistryTezos,
+      exchangeInstances: vortexList,
+    };
 
     const config: Config = {
       baseToken: {
         ticker: 'XTZ',
       },
       quoteToken: {
-        ticker: 'SMAK',
+        ticker: 'kUSD',
       },
       plugins: {
         exchanges: [
-          new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap, quipuswapList),
-          new ExchangeVortexPlugin(exchangeConfigVortex, vortexList),
+          new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap),
+          new ExchangeVortexPlugin(exchangeConfigVortex),
         ],
-        token: tokenRegistry,
-        trigger: new TriggerIntervalPlugin({ interval: 10000 }),
+        token: tokenRegistryTezos,
+        trigger: new TriggerIntervalPlugin({ interval: 15000 }),
         reporter: new ConsoleReporterPlugin(),
         profitFinder: new ProfitFinderLitePlugin({
-          tokenRegistry,
           profitSplitForSlippage: 0,
         }),
         // accountants: deal with the balances in a plugin
