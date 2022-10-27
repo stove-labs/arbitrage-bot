@@ -1,6 +1,10 @@
 import { Token, ExchangeRegistry } from '@stove-labs/arbitrage-bot';
 import _ from 'lodash';
 
+/**
+ * Returns exchange address for given token ticker pair.
+ * Limited to trading pairs.
+ */
 export const getExchangeAddressFromRegistry = (
   token1: Token,
   token2: Token,
