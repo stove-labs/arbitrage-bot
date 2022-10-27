@@ -14,7 +14,6 @@ class ExchangeManager {
     baseToken: Token,
     quoteToken: Token
   ): Promise<ExchangePrice[]> {
-    // fetch prices / liquidity
     const prices = await Promise.all(
       this.exchanges.map((exchange) =>
         exchange.fetchPrice(baseToken, quoteToken)
@@ -70,7 +69,6 @@ export class ArbitrageBotCore {
   }
 
   get reporter(): ReporterPlugin {
-    // TODO
     return this.config.plugins.reporter;
   }
 

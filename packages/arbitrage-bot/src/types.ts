@@ -15,6 +15,9 @@ export * from './profit-finder/types';
 export * from './reporter/interface';
 export * from './reporter/types';
 
+export * from './swap-execution/interface';
+export * from './swap-execution/types';
+
 export * from './token/interface';
 export * from './token/types';
 
@@ -55,15 +58,6 @@ export interface Swap {
   limitWithoutSlippage: string;
   ecosystemIdentifier: EcosystemIdentifier;
   identifier: ExchangeIdentifier;
-}
-
-export interface SwapResult {
-  result: { type: 'OK', operation: any } | { type: 'ERROR'; data: any };
-}
-
-export interface SwapExecutionManager {
-  getExchangePluginBySwap(swap: Swap): ExchangePlugin;
-  executeSwaps(swaps: Swap[]): Promise<SwapResult[]>;
 }
 
 export type Address = string;
