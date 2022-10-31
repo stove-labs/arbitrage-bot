@@ -9,7 +9,6 @@ import {
   TokenPlugin,
   TokenDecimals,
   ExchangePrice,
-  ProfitOpportunity,
 } from '@stove-labs/arbitrage-bot';
 import * as constants from './constants';
 
@@ -56,18 +55,6 @@ export class TokenRegistryPlugin implements TokenPlugin {
       );
 
     return tokenInstance;
-  }
-
-  addTokenInfo(profitOpportunity: ProfitOpportunity): ProfitOpportunity {
-    profitOpportunity.swaps.forEach((swap) => {
-      swap.tokenIn = this.getTokenInfo(swap.tokenIn, swap.ecosystemIdentifier);
-      swap.tokenOut = this.getTokenInfo(
-        swap.tokenOut,
-        swap.ecosystemIdentifier
-      );
-    });
-
-    return profitOpportunity;
   }
 
   getTokenDecimals(prices: ExchangePrice[]): TokenDecimals {
