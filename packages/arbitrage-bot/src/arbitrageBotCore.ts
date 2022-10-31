@@ -46,10 +46,9 @@ export class ArbitrageBotCore {
       this.config.plugins.profitFinder.findProfits(prices);
 
     this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
+
     if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
       return;
-
-    this.token.addTokenInfo(profitOpportunity);
 
     const swapResults = await this.swapExecutionManager.executeSwaps(
       profitOpportunity.swaps
