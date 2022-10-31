@@ -112,7 +112,7 @@ export const findOptimalQuoteTokenAmount = (prices: ExchangePrice[]) => {
 
   const x = x1.isGreaterThan(x2) ? x1 : x2;
 
-  DEBUG('x', x);
+  DEBUG('x', x.toFixed());
 
   return x.multipliedBy(10 ** prices[0].quoteToken.decimals).toFixed(0, 1);
 };

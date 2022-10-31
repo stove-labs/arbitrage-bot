@@ -1,10 +1,10 @@
 import {
+  ExchangePrice,
+  ProfitOpportunity,
   ProfitFinderPlugin,
   Swap,
-  TokenPlugin,
   SwapType,
 } from '@stove-labs/arbitrage-bot';
-import { ExchangePrice, ProfitOpportunity } from '@stove-labs/arbitrage-bot';
 import { findOptimalQuoteTokenAmount, orderLowToHigh } from './math';
 import { getAmountInGivenOut, getAmountOutGivenIn } from './pools/xyk/xykPool';
 
