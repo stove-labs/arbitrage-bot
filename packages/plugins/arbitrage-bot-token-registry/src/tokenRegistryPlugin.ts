@@ -58,6 +58,16 @@ export class TokenRegistryPlugin implements TokenPlugin {
   }
 
   getTokenDecimals(prices: ExchangePrice[]): TokenDecimals {
-    return {} as TokenDecimals;
+    const baseTokenFromList = this.tokenList.find(
+      (tokenListItem) => prices[0].baseToken.ticker === tokenListItem.ticker
+    );
+    const quoteTokenFromList = this.tokenList.find(
+      (tokenListItem) => prices[0].quoteToken.ticker === tokenListItem.ticker
+    );
+
+    return {
+      baseToken: baseTokenFromList.decimals,
+      quoteToken: quoteTokenFromList.decimals,
+    } as TokenDecimals;
   }
 }

@@ -1,11 +1,14 @@
-import { EcosystemIdentifier, ExchangePrice } from '../types';
+import {
+  EcosystemIdentifier,
+  ExchangePrice,
+  ProfitOpportunity,
+} from '../types';
 import {
   NativeToken,
   Token,
   TokenDecimals,
   TokenFA12,
   TokenFA2,
-  TokenList,
 } from './types';
 
 export interface TokenPlugin {
@@ -18,5 +21,5 @@ export interface TokenPlugin {
     identifier: EcosystemIdentifier
     // TODO: pick one type of an array of types
   ): TokenFA12 | TokenFA2 | NativeToken | undefined;
-  getTokenDecimals(prices: ExchangePrice[]): TokenDecimals;
+  addTokenInfo(profitOpportunity: ProfitOpportunity): ProfitOpportunity;
 }

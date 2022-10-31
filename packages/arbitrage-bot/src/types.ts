@@ -1,8 +1,9 @@
 import { ExchangePlugin } from './exchange/interface';
+import { ExchangeIdentifier } from './exchange/types';
 import { ProfitFinderPlugin } from './profit-finder/interface';
 import { ReporterPlugin } from './reporter/interface';
 import { TokenPlugin } from './token/interface';
-import { Token } from './token/types';
+import { NativeToken, Token, TokenFA12, TokenFA2 } from './token/types';
 import { TriggerPlugin } from './trigger/types';
 
 export * from './exchange/interface';
@@ -13,6 +14,9 @@ export * from './profit-finder/types';
 
 export * from './reporter/interface';
 export * from './reporter/types';
+
+export * from './swap-execution/interface';
+export * from './swap-execution/types';
 
 export * from './token/interface';
 export * from './token/types';
@@ -46,19 +50,14 @@ export enum SwapType {
 export interface Swap {
   tokenIn: Token;
   tokenOut: Token;
+  tokenInDecimals: number;
+  tokenOutDecimals: number;
   type: SwapType;
   amount: string;
   limit: string;
   limitWithoutSlippage: string;
-}
-
-export interface SwapResult {
-  result: { type: 'OK' } | { type: 'ERROR'; data: any };
-}
-
-export interface SwapExecutionManager {
-  getExchangePluginBySwap(swap: Swap): ExchangePlugin;
-  executeSwaps(swaps: Swap[]): Promise<SwapResult[]>;
+  ecosystemIdentifier: EcosystemIdentifier;
+  identifier: ExchangeIdentifier;
 }
 
 export type Address = string;

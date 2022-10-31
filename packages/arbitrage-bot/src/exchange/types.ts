@@ -1,23 +1,26 @@
-import { Balance, Token } from '../types';
+import { Balance, EcosystemIdentifier, TokenFA12, TokenFA2, TokenPlugin } from '../types';
 
 // might change to enum down the line
 export type ExchangeIdentifier = string;
 export type ExchangeFee = number;
 
 export interface ExchangePrice {
-  baseToken: Token;
+  baseToken: TokenFA12 | TokenFA2;
   baseTokenBalance: Balance;
-  baseTokenDecimals?: number;
-  quoteToken: Token;
+  quoteToken: TokenFA12 | TokenFA2;
   quoteTokenBalance: Balance;
-  quoteTokenDecimals?: number;
-  exchangeIdentifier: ExchangeIdentifier;
+  identifier: ExchangeIdentifier;
+  ecosystemIdentifier: EcosystemIdentifier;
   fee: ExchangeFee;
   spotPrice?: string;
 }
 
 export type ExchangePluginConfig = {
   rpc: string;
+  identifier: ExchangeIdentifier;
+  ecosystemIdentifier: EcosystemIdentifier;
+  tokenInstances: TokenPlugin;
+  exchangeInstances: ExchangeRegistry
 };
 
 export type ExchangeRegistry = {

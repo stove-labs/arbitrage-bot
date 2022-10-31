@@ -1,0 +1,173 @@
+{
+    "prim": "Pair",
+    "args": [
+        [
+            {
+                "prim": "DUP"
+            },
+            {
+                "prim": "CDR"
+            },
+            {
+                "prim": "SWAP"
+            },
+            {
+                "prim": "CAR"
+            },
+            {
+                "prim": "SWAP"
+            },
+            {
+                "prim": "DROP"
+            },
+            {
+                "prim": "DUP"
+            },
+            {
+                "prim": "CDR"
+            },
+            {
+                "prim": "SWAP"
+            },
+            {
+                "prim": "CAR"
+            },
+            {
+                "prim": "NIL",
+                "args": [
+                    {
+                        "prim": "operation"
+                    }
+                ]
+            },
+            {
+                "prim": "SWAP"
+            },
+            {
+                "prim": "IF_LEFT",
+                "args": [
+                    [
+                        {
+                            "prim": "IF_LEFT",
+                            "args": [
+                                [
+                                    {
+                                        "prim": "IF_LEFT",
+                                        "args": [
+                                            [
+                                                {
+                                                    "prim": "DROP"
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    "prim": "DROP"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                ],
+                                [
+                                    {
+                                        "prim": "IF_LEFT",
+                                        "args": [
+                                            [
+                                                {
+                                                    "prim": "DROP"
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    "prim": "SWAP"
+                                                },
+                                                {
+                                                    "prim": "DROP"
+                                                },
+                                                {
+                                                    "prim": "NIL",
+                                                    "args": [
+                                                        {
+                                                            "prim": "operation"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "prim": "SWAP"
+                                                },
+                                                {
+                                                    "prim": "CDR"
+                                                },
+                                                {
+                                                    "prim": "PUSH",
+                                                    "args": [
+                                                        {
+                                                            "prim": "mutez"
+                                                        },
+                                                        {
+                                                            "int": "0"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "prim": "DIG",
+                                                    "args": [
+                                                        {
+                                                            "int": "3"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "prim": "DUP"
+                                                },
+                                                {
+                                                    "prim": "DUG",
+                                                    "args": [
+                                                        {
+                                                            "int": "4"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "prim": "CAR"
+                                                },
+                                                {
+                                                    "prim": "CDR"
+                                                },
+                                                {
+                                                    "prim": "CDR"
+                                                },
+                                                {
+                                                    "prim": "CDR"
+                                                },
+                                                {
+                                                    "prim": "CDR"
+                                                },
+                                                {
+                                                    "prim": "TRANSFER_TOKENS"
+                                                },
+                                                {
+                                                    "prim": "CONS"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                ]
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "prim": "DROP"
+                        }
+                    ]
+                ]
+            },
+            {
+                "prim": "PAIR"
+            }
+        ],
+        {
+            "int": "4"
+        }
+    ]
+}

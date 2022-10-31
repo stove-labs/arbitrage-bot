@@ -4,7 +4,7 @@ import {
   TokenDecimals,
   TokenPlugin,
 } from '@stove-labs/arbitrage-bot';
-import { ProfitFinderLitePlugin } from '../src/profitFinderLite';
+import { ProfitFinderLitePlugin } from '../src/profitFinderLitePlugin';
 import { expect } from 'chai';
 
 describe('profitFinderLite.ts', () => {

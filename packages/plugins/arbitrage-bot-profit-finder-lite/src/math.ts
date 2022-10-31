@@ -1,46 +1,20 @@
 import { ExchangePrice } from '@stove-labs/arbitrage-bot';
 import { getAmountInGivenOut, getAmountOutGivenIn } from './pools/xyk/xykPool';
 import { BigNumber } from 'bignumber.js';
+import { basisPoints } from './constants';
 import _ from 'lodash';
 
-/**
- * Spot price = baseToken/quoteToken
- * eg. XTZ/USD = 0.65 XTZ/USD
- * pay 0.65 XTZ
- * receive 1 USD
- */
-export const addSpotPrice = (prices: ExchangePrice[]): ExchangePrice[] => {
-  prices.map((exchangePrice) => {
-    const baseTokenReserve = new BigNumber(
-      exchangePrice.baseTokenBalance.amount
-    ).dividedBy(10 ** exchangePrice.baseTokenDecimals);
-
-    const quoteTokenReserve = new BigNumber(
-      exchangePrice.quoteTokenBalance.amount
-    ).dividedBy(10 ** exchangePrice.quoteTokenDecimals);
-
-    exchangePrice.spotPrice = baseTokenReserve
-      .dividedBy(quoteTokenReserve)
-      .multipliedBy(10 ** exchangePrice.baseTokenDecimals)
-      .toFixed(0, 1);
-
-    return exchangePrice;
-  });
-  return prices;
-};
+// for DEBUG output
+const argv = require('yargs/yargs')(process.argv.slice(2))
+  .count('verbose')
+  .alias('v', 'verbose').argv;
+const VERBOSE_LEVEL = argv.verbose;
+const DEBUG = VERBOSE_LEVEL >= 2 ? console.log : () => {};
 
 /**
  * Orders exchange prices from low to high spot price based on baseToken and quoteToken definition.
- *
- * Example:
- * baseToken balance = 1 XTZ
- * quoteToken balance = 2 USD
- * Spot price: 1USD = 0.5 XTZ
  */
 export const orderLowToHigh = (prices: ExchangePrice[]): ExchangePrice[] => {
-  //const tokenInfo = getTokenInfo(prices);
-  prices = addSpotPrice(prices);
-
   return _.orderBy(
     prices,
     [
@@ -54,52 +28,93 @@ export const orderLowToHigh = (prices: ExchangePrice[]): ExchangePrice[] => {
 };
 
 /**
- * Units:
- * buy.tokenOut = sell.tokenIn [token amount]
+ * Finds optimal amount x between buy and sell swap.
+ * This is done by solving a univariate quadratic function f(x).
+ * Limited to buy/sell strategy thus 2 swaps total.
+ *
+ * a*x^2+b*x+c=0
+ * x1 = (- b + sqrt(b² - 4*a*c))/(2*a)
+ * x2 = (- b - sqrt(b² - 4*a*c))/(2*a)
  */
-export const findOptimalQuoteTokenAmount = (
-  prices: ExchangePrice[]
-): string => {
-  // Univariate quadratic function with coefficients a,b,c f(x)=a*x^2+b*x+c=0
-  const { a, b, c } = extractCoefficientsOfUnivariateQuadraticFunction(prices);
+export const findOptimalQuoteTokenAmount = (prices: ExchangePrice[]) => {
+  DEBUG('Finding optimal quote token amount for prices: ', prices);
 
-  // Solving the quadratic function yields x1 and x2
+  const { a1, b1, a2, b2 } = extractBalancesWithDecimals(prices);
+
+  const { feeBasis, fee2, fee1 } = getFeeConstants(prices);
+
+  // -b = -bPart1 - bPart2
+  const numeratorB = feeBasis
+    .multipliedBy(a1)
+    .multipliedBy(b1)
+    .multipliedBy(b2)
+    .multipliedBy(fee2);
+
+  const denominatorB = a1
+    .multipliedBy(b1)
+    .multipliedBy(fee2.exponentiatedBy(2))
+    .minus(a2.multipliedBy(b2).multipliedBy(fee1).multipliedBy(fee2));
+
+  const bPart1 = numeratorB.dividedBy(denominatorB);
+
+  const bPart2 = a2
+    .multipliedBy(b1)
+    .multipliedBy(b2)
+    .multipliedBy(fee1)
+    .multipliedBy(fee2)
+    .dividedBy(denominatorB);
+
+  const b = bPart1.negated().minus(bPart2);
+
+  // b² - 4*a*c
+  const valueUnderSquareRoot = a1
+    .multipliedBy(a2)
+    .multipliedBy(b1)
+    .multipliedBy(b2)
+    .multipliedBy(fee1)
+    .multipliedBy(fee2)
+    .multipliedBy(
+      b1.multipliedBy(fee2).plus(feeBasis.multipliedBy(b2)).exponentiatedBy(2)
+    );
+
+  const numerator = valueUnderSquareRoot.squareRoot();
+  // (2*a)
+  const denominator = a1
+    .multipliedBy(b1)
+    .multipliedBy(fee2.exponentiatedBy(2))
+    .minus(a2.multipliedBy(b2).multipliedBy(fee1).multipliedBy(fee2));
+
   // x1 = (- b + sqrt(b² - 4*a*c))/(2*a)
+  let x1 = bPart1
+    .negated()
+    .minus(bPart2)
+    .minus(numerator.dividedBy(denominator));
+
   // x2 = (- b - sqrt(b² - 4*a*c))/(2*a)
-  const valueInSquareRoot = b
-    .pow(2)
-    .minus(new BigNumber(4).multipliedBy(a).multipliedBy(c));
-  // solving for x1
-  const x1 = b
+  let x2 = bPart1
     .negated()
-    .plus(valueInSquareRoot.squareRoot())
-    .dividedBy(new BigNumber(2).multipliedBy(a));
-  // solving for x2
-  const x2 = b
-    .negated()
-    .minus(valueInSquareRoot.squareRoot())
-    .dividedBy(new BigNumber(2).multipliedBy(a));
+    .minus(bPart2)
+    .plus(numerator.dividedBy(denominator));
 
-  // pick x based on constraints
-  const quoteTokenBalanceReserveExchange1 = new BigNumber(
-    prices[0].quoteTokenBalance.amount
-  ).multipliedBy(10 ** prices[0].quoteTokenDecimals);
+  DEBUG('Selecting one quote amount from these values');
+  DEBUG('x1', x1.toFixed(), 'x2', x2.toFixed());
 
-  let x: BigNumber;
+  const quoteTokenBalanceReserveExchange1 = b1;
 
-  if (x1.isPositive() && x1.isLessThan(quoteTokenBalanceReserveExchange1)) {
-    x = x1;
-  } else if (
-    x2.isPositive() &&
-    x2.isLessThan(quoteTokenBalanceReserveExchange1) &&
-    x2.isGreaterThan(x1)
-  ) {
-    x = x2;
-  } else {
-    x = new BigNumber(0);
-  }
+  x1 =
+    x1.isPositive() && x1.isLessThan(quoteTokenBalanceReserveExchange1)
+      ? x1
+      : new BigNumber(0);
+  x2 =
+    x2.isPositive() && x2.isLessThan(quoteTokenBalanceReserveExchange1)
+      ? x2
+      : new BigNumber(0);
 
-  return x.multipliedBy(10 ** prices[0].quoteTokenDecimals).toFixed(0, 1);
+  const x = x1.isGreaterThan(x2) ? x1 : x2;
+
+  DEBUG('x', x.toFixed());
+
+  return x.multipliedBy(10 ** prices[0].quoteToken.decimals).toFixed(0, 1);
 };
 
 /**
@@ -123,35 +138,40 @@ export const expectedProfitWithFees = (
   return profit;
 };
 
-function extractCoefficientsOfUnivariateQuadraticFunction(
-  price: ExchangePrice[]
-) {
-  const r1a = new BigNumber(price[0].baseTokenBalance.amount).dividedBy(
-    10 ** price[0].baseTokenDecimals
+/**
+ * Limited buy/sell strategy thus 2 swaps in total.
+ * 
+ * @param prices needs to be ordered from low to high spot prices
+ * @returns feeBasis, fee1 or the buy swap, fee2 of the sell swap
+ */
+function getFeeConstants(prices: ExchangePrice[]) {
+  const feeBasis = new BigNumber(basisPoints);
+
+  const buySwap = prices[0];
+  const fee1 = feeBasis.minus(buySwap.fee);
+
+  const sellSwap = prices[1];
+  const fee2 = feeBasis.minus(sellSwap.fee);
+
+  return { feeBasis, fee2, fee1 };
+}
+
+function extractBalancesWithDecimals(prices: ExchangePrice[]) {
+  const a1 = new BigNumber(prices[0].baseTokenBalance.amount).dividedBy(
+    10 ** prices[0].baseToken.decimals
   );
-  const r1b = new BigNumber(price[0].quoteTokenBalance.amount).dividedBy(
-    10 ** price[0].quoteTokenDecimals
-  );
-  const r2a = new BigNumber(price[1].baseTokenBalance.amount).dividedBy(
-    10 ** price[1].baseTokenDecimals
-  );
-  const r2b = new BigNumber(price[1].quoteTokenBalance.amount).dividedBy(
-    10 ** price[1].quoteTokenDecimals
+  const b1 = new BigNumber(prices[0].quoteTokenBalance.amount).dividedBy(
+    10 ** prices[0].quoteToken.decimals
   );
 
-  // calculate a
-  const a = r1a.multipliedBy(r1b).minus(r2a.multipliedBy(r2b));
+  const a2 = new BigNumber(prices[1].baseTokenBalance.amount).dividedBy(
+    10 ** prices[1].baseToken.decimals
+  );
+  const b2 = new BigNumber(prices[1].quoteTokenBalance.amount).dividedBy(
+    10 ** prices[1].quoteToken.decimals
+  );
 
-  // calculate b
-  const b = new BigNumber(2)
-    .multipliedBy(r1b)
-    .multipliedBy(r2b)
-    .multipliedBy(r1a.plus(r2a));
-
-  // calculate c
-  const c = r1b
-    .multipliedBy(r2b)
-    .multipliedBy(r1a.multipliedBy(r2b).minus(r2a.multipliedBy(r1b)));
-
-  return { a, b, c };
+  DEBUG('Balances');
+  DEBUG(a1.toFixed(), b1.toFixed(), a2.toFixed(), b2.toFixed());
+  return { a1, b1, a2, b2 };
 }

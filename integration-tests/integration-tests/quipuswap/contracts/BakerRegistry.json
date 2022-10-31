@@ -1,0 +1,22 @@
+{
+  "contractName": "BakerRegistry",
+  "abi": [],
+  "michelson": "[ { \"prim\": \"parameter\",\n    \"args\":\n      [ { \"prim\": \"or\",\n          \"args\":\n            [ { \"prim\": \"key_hash\", \"annots\": [ \"%register\" ] },\n              { \"prim\": \"key_hash\", \"annots\": [ \"%validate\" ] } ] } ] },\n  { \"prim\": \"storage\",\n    \"args\":\n      [ { \"prim\": \"big_map\",\n          \"args\": [ { \"prim\": \"key_hash\" }, { \"prim\": \"bool\" } ] } ] },\n  { \"prim\": \"code\",\n    \"args\":\n      [ [ { \"prim\": \"LAMBDA\",\n            \"args\":\n              [ { \"prim\": \"pair\",\n                  \"args\":\n                    [ { \"prim\": \"key_hash\" },\n                      { \"prim\": \"big_map\",\n                        \"args\":\n                          [ { \"prim\": \"key_hash\" }, { \"prim\": \"bool\" } ] } ] },\n                { \"prim\": \"pair\",\n                  \"args\":\n                    [ { \"prim\": \"list\", \"args\": [ { \"prim\": \"operation\" } ] },\n                      { \"prim\": \"big_map\",\n                        \"args\":\n                          [ { \"prim\": \"key_hash\" }, { \"prim\": \"bool\" } ] } ] },\n                [ { \"prim\": \"DUP\" }, { \"prim\": \"CDR\" }, { \"prim\": \"SWAP\" },\n                  { \"prim\": \"CAR\" },\n                  { \"prim\": \"NIL\", \"args\": [ { \"prim\": \"operation\" } ] },\n                  { \"prim\": \"SWAP\" }, { \"prim\": \"DUP\" },\n                  { \"prim\": \"DUG\", \"args\": [ { \"int\": \"2\" } ] },\n                  { \"prim\": \"SOME\" }, { \"prim\": \"SET_DELEGATE\" },\n                  { \"prim\": \"CONS\" },\n                  { \"prim\": \"DIG\", \"args\": [ { \"int\": \"2\" } ] },\n                  { \"prim\": \"PUSH\",\n                    \"args\": [ { \"prim\": \"bool\" }, { \"prim\": \"True\" } ] },\n                  { \"prim\": \"DIG\", \"args\": [ { \"int\": \"3\" } ] },\n                  { \"prim\": \"SWAP\" }, { \"prim\": \"SOME\" }, { \"prim\": \"SWAP\" },\n                  { \"prim\": \"UPDATE\" }, { \"prim\": \"SWAP\" },\n                  { \"prim\": \"PAIR\" } ] ] }, { \"prim\": \"SWAP\" },\n          { \"prim\": \"DUP\" }, { \"prim\": \"CDR\" }, { \"prim\": \"SWAP\" },\n          { \"prim\": \"CAR\" },\n          { \"prim\": \"IF_LEFT\",\n            \"args\":\n              [ [ { \"prim\": \"PAIR\" }, { \"prim\": \"EXEC\" } ],\n                [ { \"prim\": \"SWAP\" }, { \"prim\": \"DUP\" },\n                  { \"prim\": \"DUG\", \"args\": [ { \"int\": \"2\" } ] },\n                  { \"prim\": \"SWAP\" }, { \"prim\": \"DUP\" },\n                  { \"prim\": \"DUG\", \"args\": [ { \"int\": \"2\" } ] },\n                  { \"prim\": \"GET\" },\n                  { \"prim\": \"IF_NONE\",\n                    \"args\":\n                      [ [ { \"prim\": \"PAIR\" }, { \"prim\": \"EXEC\" } ],\n                        [ { \"prim\": \"DROP\", \"args\": [ { \"int\": \"2\" } ] },\n                          { \"prim\": \"SWAP\" }, { \"prim\": \"DROP\" },\n                          { \"prim\": \"NIL\",\n                            \"args\": [ { \"prim\": \"operation\" } ] },\n                          { \"prim\": \"PAIR\" } ] ] } ] ] } ] ] } ]",
+  "source": "#include \"../partials/BakerRegistryMethods.ligo\"\n\n(* BakerRegistry - Contract to register the baker *)\nfunction main (const p : registry_action; const s : registry_storage) : (list (operation) * registry_storage) is\n  case p of\n    | Validate(baker)    -> validate(baker, s)\n    | Register(baker)    -> register(baker, s)\n  end\n",
+  "sourcePath": "/root/tezos/quipuswap-core/contracts/main/BakerRegistry.ligo",
+  "compiler": {
+    "name": "ligo",
+    "version": "0.9.0"
+  },
+  "networks": {
+    "NetXy4TQfKStove": {
+      "events": {},
+      "links": {},
+      "address": "KT1M4Bg15cZsn2Exw95y8CovRAzHwDJmuAqR",
+      "transactionHash": "ooQ2ErL5ca5ngdqGbCJgTdZNcwYa5LxRMJKC3udm5K5ifXY3kj5"
+    }
+  },
+  "schemaVersion": "3.2.0-tezos.1",
+  "updatedAt": "2022-10-06T09:36:30.558Z",
+  "networkType": "tezos"
+}

@@ -1,17 +1,15 @@
 import {
+  ExchangePrice,
+  ProfitOpportunity,
   ProfitFinderPlugin,
   Swap,
-  TokenDecimals,
-  TokenPlugin,
   SwapType,
 } from '@stove-labs/arbitrage-bot';
-import { ExchangePrice, ProfitOpportunity } from '@stove-labs/arbitrage-bot';
 import { findOptimalQuoteTokenAmount, orderLowToHigh } from './math';
 import { getAmountInGivenOut, getAmountOutGivenIn } from './pools/xyk/xykPool';
 
 export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
   /**
-   *
    * profitSplitForSlippage is part of the arbitrage strategy
    * typical value for profitSplitForSlippage
    * profitSplitForSlippage >= 2
@@ -20,36 +18,32 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
    */
   constructor(
     public config: {
-      tokenRegistry: TokenPlugin;
       profitSplitForSlippage: number;
     }
   ) {}
 
   findProfits(prices: ExchangePrice[]): ProfitOpportunity {
-    const tokenDecimals = this.config.tokenRegistry.getTokenDecimals(prices);
-    const pricesWithDecimals = addTokenDecimals(prices, tokenDecimals);
-    const ascendingSpotPrices = orderLowToHigh(pricesWithDecimals);
+    throwForMissingDecimals(prices);
+    const ascendingSpotPrices = orderLowToHigh(prices);
     const quoteTokenAmount = findOptimalQuoteTokenAmount(ascendingSpotPrices);
 
     const profitOpportunity = createProfitOpportunity(
-      prices,
+      ascendingSpotPrices,
       quoteTokenAmount,
       this.config.profitSplitForSlippage
     );
 
-    // expectedProfitWithFees(amount, prices)
     return profitOpportunity as ProfitOpportunity;
   }
 }
 
-const addTokenDecimals = (
-  prices: ExchangePrice[],
-  tokenDecimals: TokenDecimals
-): ExchangePrice[] => {
-  return prices.map((exchangePrice) => {
-    exchangePrice.baseTokenDecimals = tokenDecimals.baseToken;
-    exchangePrice.quoteTokenDecimals = tokenDecimals.quoteToken;
-    return exchangePrice;
+const throwForMissingDecimals = (prices: ExchangePrice[]): void => {
+  prices.forEach((price) => {
+    if (!price.baseToken.decimals || !price.quoteToken.decimals) {
+      throw new Error(
+        `Can't compute profit opportunities for missing token decimals in ExchangePrices`
+      );
+    }
   });
 };
 
@@ -74,11 +68,11 @@ export const createProfitOpportunity = (
   const sell = prices[1];
 
   // compute amountIn for buy
-  const buyAmountInBaseToken = getAmountInGivenOut(
+  let buyAmountInBaseToken = getAmountInGivenOut(
     amount, // optimal amount of quoteToken
     buy.baseTokenBalance.amount, // reserveIn in base token
     buy.quoteTokenBalance.amount, // reserveOut in quote token
-    3
+    buy.fee
   );
 
   // compute amountOut for sell
@@ -86,7 +80,7 @@ export const createProfitOpportunity = (
     amount, // optimal amount of quoteToken
     sell.quoteTokenBalance.amount, // reserveIn flipped, it is quote token
     sell.baseTokenBalance.amount, // reserveOut flipped, it is base token
-    3
+    sell.fee
   );
 
   const profit = sellAmountOutBaseToken.minus(buyAmountInBaseToken);
@@ -101,15 +95,20 @@ export const createProfitOpportunity = (
    * tokenOut: quoteToken
    * amount: calculated optimal amountOut in quoteToken
    * type: buy
-   * limit: expected amountIn in baseToken + 1/2 expected profit as slippage
+   * limit: expected amountIn in baseToken + fraction of
+   * expected profit as slippage according to profitSplitForSlippage
    */
   const swapBuy: Swap = {
-    tokenIn: buy.baseToken,
-    tokenOut: buy.quoteToken,
     amount,
-    type: SwapType.BUY,
     limit: buyLimit.toString(),
     limitWithoutSlippage: buyAmountInBaseToken.toString(),
+    tokenIn: buy.baseToken,
+    tokenInDecimals: buy.baseToken.decimals,
+    tokenOutDecimals: buy.quoteToken.decimals,
+    tokenOut: buy.quoteToken,
+    type: SwapType.BUY,
+    identifier: buy.identifier,
+    ecosystemIdentifier: buy.ecosystemIdentifier,
   };
 
   const sellLimit = sellAmountOutBaseToken.minus(limitDelta);
@@ -119,15 +118,20 @@ export const createProfitOpportunity = (
    * tokenOut: baseToken
    * amount: calculated optimal amountIn in quoteToken
    * type: sell
-   * limit: expected amountOut in baseToken + 1/2 expected profit as slippage
+   * limit: expected amountIn in baseToken + fraction of
+   * expected profit as slippage according to profitSplitForSlippage
    */
   const swapSell: Swap = {
-    tokenIn: sell.quoteToken,
-    tokenOut: sell.baseToken,
     amount,
-    type: SwapType.SELL,
     limit: sellLimit.toString(),
     limitWithoutSlippage: sellAmountOutBaseToken.toString(),
+    tokenIn: sell.quoteToken,
+    tokenInDecimals: sell.quoteToken.decimals,
+    tokenOutDecimals: sell.baseToken.decimals,
+    tokenOut: sell.baseToken,
+    type: SwapType.SELL,
+    identifier: sell.identifier,
+    ecosystemIdentifier: sell.ecosystemIdentifier,
   };
 
   return {
