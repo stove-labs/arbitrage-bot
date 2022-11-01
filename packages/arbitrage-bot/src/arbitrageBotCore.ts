@@ -85,7 +85,6 @@ export class ArbitrageBotCore {
       this.config.plugins.exchanges,
       this.config.plugins.keychains
     );
-    await this.startLifecycle();
 
     // register the trigger
     this.config.plugins.trigger.register(async () => {
