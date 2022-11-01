@@ -27,6 +27,7 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
   log: Logger;
 
   spinner: Ora;
+  isSpinning: boolean = false;
 
   constructor() {
     this.log = new Logger();
@@ -37,7 +38,8 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
   report(event: ReporterPluginEvent) {
     switch (event.type) {
       case 'LIFECYCLE_START':
-        this.spinner = ora().start();
+        if (!this.isSpinning) this.spinner = ora().start();
+        this.isSpinning = this.spinner.isSpinning;
         handleLifeCycleStart();
         this.spinner.color = 'yellow';
         this.spinner.text = 'Life cycle started';
