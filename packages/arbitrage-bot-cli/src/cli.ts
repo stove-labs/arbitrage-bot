@@ -28,7 +28,6 @@ yargs(hideBin(process.argv))
       config.baseToken.ticker = argv.b;
       config.quoteToken.ticker = argv.q;
       const core = new ArbitrageBotCore(config);
-      console.info('start command');
       core.start();
     }
   )

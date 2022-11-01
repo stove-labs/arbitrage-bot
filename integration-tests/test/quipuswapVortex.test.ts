@@ -14,7 +14,7 @@ import { TriggerChainPlugin } from '@stove-labs/arbitrage-bot-trigger-chain';
 import { InMemorySigner } from '@taquito/signer';
 
 describe('Quipuswap-Vortex', () => {
-  it.only('can perform arbitrage between quipuswap and vortex', async () => {
+  it('can perform arbitrage between quipuswap and vortex', async () => {
     const tokenListTezos: TokenList = [
       {
         ticker: 'XTZ',
