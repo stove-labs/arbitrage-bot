@@ -33,30 +33,34 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
     this.log.setSettings({
       dateTimeTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-    this.spinner = ora().start();
   }
   report(event: ReporterPluginEvent) {
-    if (event.type === 'LIFECYCLE_START') {
-      handleLifeCycleStart();
-      this.spinner.color = 'yellow';
-      this.spinner.text = 'Life cycle started';
-      //this.spinner.spinner = 'weather'
-    } else if (event.type === 'PROFIT_FOUND') {
-      this.spinner.color = 'green';
-      this.spinner.text = 'Profit opportunity computed';
-      handleProfitFound(event.profitOpportunity);
-      if (
-        BigNumber(event.profitOpportunity.profit.baseTokenAmount).isNegative
-      ) {
-        this.spinner.text = 'Waiting until life cycle restarts';
-        this.spinner.color = 'white'
-      }
-    } else if (event.type === 'PRICES_FETCHED') {
-      this.spinner.color = 'yellow';
-      this.spinner.text = 'Prices fetched';
-      handlePricesFetched(event.prices);
-    } else {
-      this.log.info(event);
+    switch (event.type) {
+      case 'LIFECYCLE_START':
+        this.spinner = ora().start();
+        handleLifeCycleStart();
+        this.spinner.color = 'yellow';
+        this.spinner.text = 'Life cycle started';
+        break;
+      case 'PROFIT_FOUND':
+        this.spinner.color = 'green';
+        this.spinner.text = 'Profit opportunity computed';
+        handleProfitFound(event.profitOpportunity);
+        if (
+          BigNumber(event.profitOpportunity.profit.baseTokenAmount).isNegative
+        ) {
+          this.spinner.text = 'Waiting until life cycle restarts';
+          this.spinner.color = 'white';
+        }
+        break;
+      case 'PRICES_FETCHED':
+        this.spinner.color = 'yellow';
+        this.spinner.text = 'Prices fetched';
+        handlePricesFetched(event.prices);
+        break;
+      default:
+        this.log.info(event);
+        break;
     }
   }
 }
