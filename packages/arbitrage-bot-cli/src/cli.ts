@@ -1,25 +1,43 @@
+#!/usr/bin/env node
 import { ArbitrageBotCore } from '@stove-labs/arbitrage-bot';
-import { config } from './config.example.arbitrage-bot';
+import getConfig from './config.example.arbitrage-bot';
 import { getDuplicateTradingPairsFromAllExchanges } from '@stove-labs/arbitrage-bot-exchange-utils';
 import _ from 'lodash';
 
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
-var argv = require('yargs/yargs')(process.argv.slice(2))
-  .usage('\nUsage: ${0} [cmd] <args>')
-  .help('h')
-  .alias('h', 'help')
-  .alias('v', 'version')
-  .command('start <b> <q>', 'arbitrage bot 🤖', {}, function (argv) {
-    console.log(argv);
-    const core = new ArbitrageBotCore(config);
-    core.start();
+yargs(hideBin(process.argv))
+  .usage('\nUsage: $0 [command]')
+  .options({
+    b: { type: 'string', describe: 'base token ticker' },
+    q: { type: 'string', describe: 'quote token ticker' },
   })
-  .describe('b', 'base token ticker')
-  .describe('q', 'quote token ticker')
-  .example('start', 'ts-node $0 start')
-  .command('list', 'known tickers', {}, function () {
+  .command(
+    'start <b> <q>',
+    'arbitrage bot 🤖',
+    (yargs) => {
+      yargs
+        .positional('b', { describe: 'base token ticker', type: 'string' })
+        .positional('q', { describe: 'quote token ticker', type: 'string' })
+      .option('v', { describe: 'verbose logging', type: 'boolean' })
+      .option('vv', { describe: 'debugging', type: 'boolean' });
+    },
+    async (argv) => {
+      const config = await getConfig();
+      config.baseToken.ticker = argv.b;
+      config.quoteToken.ticker = argv.q;
+      const core = new ArbitrageBotCore(config);
+      console.info('start command');
+      core.start();
+    }
+  )
+  .example('$0 start', '-h')
+  .example('$0 start', 'XTZ kUSD')
+  .command('list', 'known tickers', {}, async () => {
+    const config = await getConfig();
     const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
-      return exchangePlugin.instances;
+      return exchangePlugin.config.exchangeInstances;
     });
 
     const tickersBothExchanges =
@@ -33,43 +51,12 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
     );
   })
   .alias('l', 'list')
-  .epilog('⚠️  Experimental software, use at own risk!').argv;
-
-argv.showHelp();
-
-
-// import yargs from 'yargs';
-
-// yargs
-//   .usage('\nUsage: ${0} [cmd] <args>')
-//   .help('h')
-//   .alias('h', 'help')
-//   .alias('v', 'version')
-//   .command('start', 'arbitrage bot 🤖', {}, function (argv) {
-//     console.log(argv);
-//     const core = new ArbitrageBotCore(config);
-//     core.start();
-//   })
-//   .describe('b', 'base token ticker')
-//   .describe('q', 'quote token ticker')
-//   .demandOption(['b', 'q'])
-//   .example('start', 'ts-node $0 start')
-//   .command('list', 'known tickers', {}, function () {
-//     const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
-//       return exchangePlugin.instances;
-//     });
-
-//     const tickersBothExchanges =
-//       getDuplicateTradingPairsFromAllExchanges(exchangeRegistry);
-
-//     console.log('The config allows for arbitrage between: ');
-//     tickersBothExchanges.forEach(
-//       (tradingPair: { ticker1: string; ticker2: string }) => {
-//         console.log(`   ${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`);
-//       }
-//     );
-//   })
-//   .alias('l', 'list')
-//   .epilog('⚠️  Experimental software, use at own risk!');
-
-// yargs.showHelp();
+  .showHelpOnFail(false, 'Specify -h for available options')
+  .epilog('⚠️  Experimental software, use at own risk!')
+  .alias('v', 'verbose')
+  .alias('vv', 'debugging')
+  .alias('h', 'help')
+  .recommendCommands()
+  .version(false)
+  // .showHelp()
+  .parse();
