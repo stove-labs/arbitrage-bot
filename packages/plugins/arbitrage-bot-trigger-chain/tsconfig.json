@@ -1,0 +1,13 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+      "declarationDir": "./dist/types",
+      "outDir": "./dist/lib"
+    },
+    "include": [
+      "./src/**/*"
+  , "../arbitrage-bot-trigger-chain/src/triggerChainPlugin.ts"  ],
+    "exclude": [
+      "test"
+    ]
+  }

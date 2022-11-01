@@ -32,5 +32,9 @@
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "dependencies": {
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "yargs": "^17.6.0"
   }
 }

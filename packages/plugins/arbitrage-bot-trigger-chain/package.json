@@ -1,0 +1,30 @@
+{
+  "name": "@stove-labs/arbitrage-bot-trigger-chain",
+  "version": "0.0.0",
+  "description": "trigger plugin that follows a chaining approach for the arbitrage lifecycle",
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "./dist/lib/triggerChainPlugin.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha -r ts-node/register test/*.ts",
+    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "dependencies": {
+    "@stove-labs/arbitrage-bot": "^0.0.0"
+  }
+}
