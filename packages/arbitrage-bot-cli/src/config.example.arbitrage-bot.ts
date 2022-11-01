@@ -5,7 +5,7 @@ import {
 } from '@stove-labs/arbitrage-bot';
 import { ExchangeQuipuswapPlugin } from '@stove-labs/tezos-dex-quipuswap';
 import { TriggerIntervalPlugin } from '@stove-labs/arbitrage-bot-trigger-interval';
-import { TriggerChainPlugin } from '@stove-labs/arbitrage-bot-trigger-chain';
+// import { TriggerChainPlugin } from '@stove-labs/arbitrage-bot-trigger-chain';
 import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter';
 import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-lite';
 import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
@@ -51,20 +51,23 @@ const getConfig = async () => {
         new ExchangeVortexPlugin(vortexExchangeConfig),
       ],
       token: tokenRegistryPlugin,
-      trigger: new TriggerChainPlugin({ interval: 15000 }),
+      trigger: new TriggerIntervalPlugin({ interval: 15000 }),
       reporter: new ConsoleReporterPlugin(),
       profitFinder: new ProfitFinderLitePlugin({
         profitSplitForSlippage: 0,
       }),
-      keychains: {
-        TEZOS: {
-          ),
+      keychains: [
+        {
+          TEZOS: {
+            address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+            signer: await InMemorySigner.fromSecretKey(
+              'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
+            ),
+            rpc: tezosRpc,
+          },
         },
-      },
-      accountant: new Accountant({
-        token: tokenRegistryPlugin,
-        rpc: { TEZOS: tezosRpc },
-      }),
+      ],
+      accountant: {} as Accountant,
     },
   } as Config;
 };
