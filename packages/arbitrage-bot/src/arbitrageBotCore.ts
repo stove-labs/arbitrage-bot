@@ -4,8 +4,6 @@ import { ReporterPlugin } from './reporter/interface';
 import { Config, Token, TokenPlugin } from './types';
 import { BigNumber } from 'bignumber.js';
 
-import { BatchSwapExecutionManager } from '@stove-labs/arbitrage-bot-swap-execution';
-
 export * from './types';
 
 class ExchangeManager {
@@ -26,7 +24,6 @@ class ExchangeManager {
 
 export class ArbitrageBotCore {
   public exchangeManager: ExchangeManager;
-  public swapExecutionManager: BatchSwapExecutionManager;
 
   constructor(public config: Config) {}
 
@@ -50,7 +47,7 @@ export class ArbitrageBotCore {
     if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
       return;
 
-    const swapResults = await this.swapExecutionManager.executeSwaps(
+    const swapResults = await this.config.plugins.swapExecutionManager.executeSwaps(
       profitOpportunity.swaps
     );
     // report if the execution of the opportunity swap was executed
@@ -81,11 +78,6 @@ export class ArbitrageBotCore {
 
   async start() {
     this.exchangeManager = new ExchangeManager(this.exchanges, this.token);
-    this.swapExecutionManager = new BatchSwapExecutionManager(
-      this.config.plugins.exchanges,
-      this.config.plugins.keychains
-    );
-    await this.startLifecycle();
 
     // register the trigger
     this.config.plugins.trigger.register(async () => {
