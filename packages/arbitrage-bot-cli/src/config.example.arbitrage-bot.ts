@@ -43,7 +43,7 @@ const exchanges: ExchangePlugin[] = [
   new ExchangeVortexPlugin(vortexExchangeConfig),
 ];
 
-const getConfig = async () => {
+const getConfig = async (): Promise<Config> => {
   const tezosKey = {
     TEZOS: {
       address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
@@ -70,11 +70,11 @@ const getConfig = async () => {
         profitSplitForSlippage: 0,
       }),
       keychains: [tezosKey],
-      accountant: {} as AccountantPlugin,
+      // accountant: {} as AccountantPlugin,
       swapExecutionManager: new BatchSwapExecutionManager(exchanges, [
         tezosKey.TEZOS,
       ]),
     },
-  } as Config;
+  };
 };
 export default getConfig;
