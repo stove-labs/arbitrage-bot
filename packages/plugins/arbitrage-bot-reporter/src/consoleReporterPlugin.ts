@@ -44,6 +44,11 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
         this.spinner.color = 'yellow';
         this.spinner.text = 'Life cycle started';
         break;
+      case 'PRICES_FETCHED':
+        this.spinner.color = 'yellow';
+        this.spinner.text = 'Prices fetched';
+        handlePricesFetched(event.prices);
+        break;
       case 'PROFIT_FOUND':
         this.spinner.color = 'green';
         this.spinner.text = 'Profit opportunity computed';
@@ -54,11 +59,6 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
           this.spinner.text = 'Waiting until life cycle restarts';
           this.spinner.color = 'white';
         }
-        break;
-      case 'PRICES_FETCHED':
-        this.spinner.color = 'yellow';
-        this.spinner.text = 'Prices fetched';
-        handlePricesFetched(event.prices);
         break;
       default:
         this.log.info(event);
