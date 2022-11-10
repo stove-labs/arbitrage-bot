@@ -18,24 +18,23 @@ import tokens from './tokens';
 import quipuswapExchangeRegistry from './quipuswap';
 import vortexExchangeRegistry from './vortex';
 
-const tokenRegistryPlugin = new TokenRegistryPlugin(tokens);
-const a = quipuswapExchangeRegistry as ExchangeRegistry;
 const tezosRpc = 'https://mainnet.tezos.marigold.dev';
+const tokenRegistryPlugin = new TokenRegistryPlugin(tokens);
+
 const quipuswapExchangeConfig: ExchangePluginConfig = {
   rpc: tezosRpc,
   identifier: 'QUIPUSWAP',
   ecosystemIdentifier: 'TEZOS',
   tokenInstances: tokenRegistryPlugin,
-  exchangeInstances: a,
+  exchangeInstances: quipuswapExchangeRegistry,
 };
 
-const b = vortexExchangeRegistry as ExchangeRegistry;
 const vortexExchangeConfig: ExchangePluginConfig = {
   rpc: tezosRpc,
   identifier: 'VORTEX',
   ecosystemIdentifier: 'TEZOS',
   tokenInstances: tokenRegistryPlugin,
-  exchangeInstances: b,
+  exchangeInstances: vortexExchangeRegistry,
 };
 
 const exchanges: ExchangePlugin[] = [
@@ -43,7 +42,7 @@ const exchanges: ExchangePlugin[] = [
   new ExchangeVortexPlugin(vortexExchangeConfig),
 ];
 
-const getConfig = async () => {
+const getConfig = async (): Promise<Config> => {
   const tezosKey = {
     TEZOS: {
       address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
@@ -70,11 +69,11 @@ const getConfig = async () => {
         profitSplitForSlippage: 0,
       }),
       keychains: [tezosKey],
-      accountant: {} as AccountantPlugin,
+      // accountant: {} as AccountantPlugin,
       swapExecutionManager: new BatchSwapExecutionManager(exchanges, [
         tezosKey.TEZOS,
       ]),
     },
-  } as Config;
+  };
 };
 export default getConfig;
