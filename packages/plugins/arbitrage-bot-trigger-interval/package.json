@@ -1,5 +1,5 @@
 {
-  "name": "@stove-labs/arbitrage-bot-trigger",
+  "name": "@stove-labs/arbitrage-bot-trigger-interval",
   "version": "0.0.0",
   "description": "trigger plugin that follows an interval approach for the arbitrage bot",
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
@@ -18,7 +18,7 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "mocha -r ts-node/register test/*.ts",
     "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },

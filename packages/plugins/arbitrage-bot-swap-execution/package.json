@@ -6,12 +6,9 @@
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
   "main": "./dist/lib/swapExecution.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
+  "typings": "./dist/types/swapExecution.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -21,8 +18,9 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
+    "build": "rm -rf dist && tsc",
     "test": "mocha -r ts-node/register test/*.ts",
-    "build": "tsc"
+    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"

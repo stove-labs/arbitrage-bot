@@ -9,14 +9,15 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "restricted"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "build": "tsc",
-    "test": "mocha -r ts-node/register ./test/**.test.ts",
-    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, 'test/**.test.ts'",
+    "test:integration": "mocha -r ts-node/register test/*.ts",
     "migrate:quipuswap:metadata": "ts-node ./integration-tests/quipuswap/migrations/1_metadata_storage_migration.ts",
     "migrate:quipuswap:bakerRegistry": "ts-node ./integration-tests/quipuswap/migrations/2_baker_registry_migration.ts",
     "migrate:quipuswap:exchange1": "ts-node -r dotenv/config ./integration-tests/quipuswap/migrations/3_exchange_1_migration.ts",

@@ -1,10 +1,15 @@
+import { InMemorySigner } from '@taquito/signer';
+
 import { ExchangePlugin } from './exchange/interface';
 import { ExchangeIdentifier } from './exchange/types';
 import { ProfitFinderPlugin } from './profit-finder/interface';
 import { ReporterPlugin } from './reporter/interface';
+import { SwapExecutionManager } from './swap-execution/interface';
 import { TokenPlugin } from './token/interface';
-import { NativeToken, Token, TokenFA12, TokenFA2 } from './token/types';
+import { Token } from './token/types';
 import { TriggerPlugin } from './trigger/types';
+
+export * from './accountant/interface';
 
 export * from './exchange/interface';
 export * from './exchange/types';
@@ -29,6 +34,15 @@ export interface Balance {
 
 export type EcosystemIdentifier = 'TEZOS';
 
+export interface TezosKey {
+  address: string;
+  signer: InMemorySigner;
+  rpc: string;
+  multiplier?: number;
+}
+
+export type EcosystemKey = TezosKey;
+
 export interface Config {
   baseToken: Token;
   quoteToken: Token;
@@ -38,7 +52,8 @@ export interface Config {
     trigger: TriggerPlugin;
     reporter: ReporterPlugin;
     profitFinder: ProfitFinderPlugin;
-    keychains: Record<EcosystemIdentifier, any>;
+    keychains: Record<EcosystemIdentifier, EcosystemKey>[];
+    swapExecutionManager: SwapExecutionManager;
   };
 }
 

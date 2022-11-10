@@ -6,7 +6,7 @@
   },
   "include": [
     "./src/**/*"
-  ],
+, "../arbitrage-bot-trigger-chain/src/triggerChainPlugin.ts"  ],
   "exclude": [
     "test"
   ]

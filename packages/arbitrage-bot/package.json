@@ -22,7 +22,7 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "mocha -r ts-node/register test/*.ts",
     "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
@@ -40,7 +40,6 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot-swap-execution": "^0.0.0",
     "@types/lodash": "^4.14.185",
     "lodash": "^4.17.21"
   },

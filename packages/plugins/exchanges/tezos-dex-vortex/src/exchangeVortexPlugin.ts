@@ -12,7 +12,7 @@ import { getExchangeAddressFromRegistry } from '@stove-labs/arbitrage-bot-exchan
 
 import {
   TezosToolkit,
-  ParamsWithKind,
+  withKind,
   OpKind,
   TransferParams,
 } from '@taquito/taquito';
@@ -85,7 +85,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
   async forgeOperation(
     swap: Swap,
     botAddress: string
-  ): Promise<ParamsWithKind[]> {
+  ): Promise<withKind<TransferParams, OpKind.TRANSACTION>[]> {
     const address = getExchangeAddressFromRegistry(
       swap.tokenIn,
       swap.tokenOut,
@@ -213,7 +213,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     swap: Swap,
     recipient: string,
     dexContractInstance: DexFa12ContractType
-  ) {
+  ): Promise<withKind<TransferParams, OpKind.TRANSACTION>[]> {
     const dexSwapTransferParams = await dexContractInstance.methods
       .tokenToXtz(
         tas.address(recipient),
@@ -257,7 +257,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
         kind: OpKind.TRANSACTION,
         ...tokenRevokeParams,
       },
-    ] as ParamsWithKind[];
+    ];
   }
 
   private async getParamsXtzToTokenSwap(
@@ -265,7 +265,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     receiveMin: string,
     botAddress: string,
     dexContractInstance: DexFa12ContractType
-  ) {
+  ): Promise<withKind<TransferParams, OpKind.TRANSACTION>[]> {
     const dexContractMethodTransferParams = await dexContractInstance.methods
       .xtzToToken(
         tas.address(botAddress),
@@ -282,7 +282,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
         kind: OpKind.TRANSACTION,
         ...dexContractMethodTransferParams,
       },
-    ] as ParamsWithKind[];
+    ];
   }
 
   /**
