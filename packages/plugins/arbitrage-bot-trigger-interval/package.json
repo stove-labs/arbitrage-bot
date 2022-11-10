@@ -18,7 +18,7 @@
     "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "mocha -r ts-node/register test/*.ts",
     "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
