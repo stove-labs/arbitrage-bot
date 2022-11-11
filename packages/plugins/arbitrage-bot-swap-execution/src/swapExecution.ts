@@ -4,6 +4,7 @@ import {
   SwapResult,
   SwapExecutionManager,
   EcosystemKey,
+  EcosystemIdentifier,
 } from '@stove-labs/arbitrage-bot';
 import { handleTezosSwapExecution } from './handleTezosSwapExecution';
 
@@ -13,9 +14,9 @@ import * as _ from 'lodash';
 export class BatchSwapExecutionManager implements SwapExecutionManager {
   constructor(
     public exchanges: ExchangePlugin[],
-    public keychains: EcosystemKey[]
+    public keychains: Record<EcosystemIdentifier, EcosystemKey>[]
   ) {}
-
+  
   getExchangePluginBySwap(swap: Swap): ExchangePlugin {
     return this.exchanges.find(
       (exchange) =>
@@ -37,7 +38,7 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
           // in case of Tezos, pass information from the config.keychain to a taquito signer
           if (ecosystemIdentifier === 'TEZOS') {
             // TODO: retrieve EcosystemKey from Record<EcosystemIdentifier, EcosystemKey> where EcosystemIdentifier === TEZOS
-            const tezosKey = this.keychains[0];
+            const tezosKey = this.keychains[0].TEZOS;
             const botAddress = tezosKey.address;
 
             let batchParameters: withKind<

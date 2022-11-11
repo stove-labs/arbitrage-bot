@@ -53,6 +53,8 @@ const getConfig = async (): Promise<Config> => {
     },
   };
 
+  const keychains = [tezosKey];
+
   return {
     baseToken: {
       ticker: 'XTZ',
@@ -68,11 +70,9 @@ const getConfig = async (): Promise<Config> => {
       profitFinder: new ProfitFinderLitePlugin({
         profitSplitForSlippage: 0,
       }),
-      keychains: [tezosKey],
+      keychains,
       // accountant: {} as AccountantPlugin,
-      swapExecutionManager: new BatchSwapExecutionManager(exchanges, [
-        tezosKey.TEZOS,
-      ]),
+      swapExecutionManager: new BatchSwapExecutionManager(exchanges, keychains),
     },
   };
 };
