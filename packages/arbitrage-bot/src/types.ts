@@ -1,4 +1,5 @@
 import { InMemorySigner } from '@taquito/signer';
+import { AccountantPlugin } from './accountant/interface';
 
 import { ExchangePlugin } from './exchange/interface';
 import { ExchangeIdentifier } from './exchange/types';
@@ -53,6 +54,7 @@ export interface Config {
     reporter: ReporterPlugin;
     profitFinder: ProfitFinderPlugin;
     keychains: Record<EcosystemIdentifier, EcosystemKey>[];
+    accountant: AccountantPlugin;
     swapExecutionManager: SwapExecutionManager;
   };
 }

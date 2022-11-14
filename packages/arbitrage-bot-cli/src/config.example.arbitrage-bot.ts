@@ -1,8 +1,6 @@
 import {
   Config,
   ExchangePluginConfig,
-  ExchangeRegistry,
-  AccountantPlugin,
   ExchangePlugin,
 } from '@stove-labs/arbitrage-bot';
 import { ExchangeQuipuswapPlugin } from '@stove-labs/tezos-dex-quipuswap';
@@ -12,6 +10,9 @@ import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-
 import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
 import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
 import { BatchSwapExecutionManager } from '@stove-labs/arbitrage-bot-swap-execution';
+import { Accountant } from '@stove-labs/arbitrage-bot-accountant';
+
+import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 
 import tokens from './tokens';
@@ -42,10 +43,11 @@ const exchanges: ExchangePlugin[] = [
   new ExchangeVortexPlugin(vortexExchangeConfig),
 ];
 
+const botAddress = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';
 const getConfig = async (): Promise<Config> => {
   const tezosKey = {
     TEZOS: {
-      address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+      address: botAddress,
       signer: await InMemorySigner.fromSecretKey(
         'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
       ),
@@ -71,7 +73,9 @@ const getConfig = async (): Promise<Config> => {
         profitSplitForSlippage: 0,
       }),
       keychains,
-      // accountant: {} as AccountantPlugin,
+      accountant: new Accountant({ TEZOS: botAddress }, tokenRegistryPlugin, {
+        TEZOS: new TezosToolkit(tezosRpc),
+      }),
       swapExecutionManager: new BatchSwapExecutionManager(exchanges, keychains),
     },
   };

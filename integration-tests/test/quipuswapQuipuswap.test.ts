@@ -1,12 +1,10 @@
 import {
-  AccountantPlugin,
   Config,
   ExchangePluginConfig,
   ExchangeRegistry,
   TokenList,
 } from '@stove-labs/arbitrage-bot';
 import { ExchangeQuipuswapPlugin } from '@stove-labs/tezos-dex-quipuswap';
-import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
 import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter';
 import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-lite';
 import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
@@ -15,8 +13,12 @@ import { TriggerChainPlugin } from '@stove-labs/arbitrage-bot-trigger-chain';
 import { InMemorySigner } from '@taquito/signer';
 import { BatchSwapExecutionManager } from '@stove-labs/arbitrage-bot-swap-execution';
 
-describe('Quipuswap-Vortex', () => {
-  it('can perform arbitrage between quipuswap and vortex', async () => {
+import { Accountant } from '../../packages/plugins/arbitrage-bot-accountant/src/accountant';
+
+import { TezosToolkit } from '@taquito/taquito';
+
+describe('Quipuswap1-Quipuswap2', () => {
+  it('can perform arbitrage between quipuswap and quipuswap', async () => {
     const tokenListTezos: TokenList = [
       {
         ticker: 'XTZ',
@@ -35,7 +37,7 @@ describe('Quipuswap-Vortex', () => {
     const quipuswapList: ExchangeRegistry = [
       {
         address: require('../integration-tests/deployments/exchange1'),
-        identifier: 'QUIPUSWAP',
+        identifier: 'QUIPUSWAP1',
         ticker1: 'XTZ',
         ticker2: 'kUSD',
       },
@@ -43,38 +45,39 @@ describe('Quipuswap-Vortex', () => {
 
     const vortexList: ExchangeRegistry = [
       {
-        address: require('../integration-tests/deployments/vortexExchange'),
-        identifier: 'VORTEX',
+        address: require('../integration-tests/deployments/exchange2'),
+        identifier: 'QUIPUSWAP2',
         ticker1: 'XTZ',
         ticker2: 'kUSD',
       },
     ];
-    const sandboxRpc = 'http://127.0.0.1:8732';
+    const sandboxRpc = 'http://127.0.0.1:20000';
     const exchangeConfigQuipuswap: ExchangePluginConfig = {
       rpc: sandboxRpc,
-      identifier: 'QUIPUSWAP',
+      identifier: 'QUIPUSWAP1',
       ecosystemIdentifier: 'TEZOS',
       tokenInstances: tokenRegistryTezos,
       exchangeInstances: quipuswapList,
     };
 
-    const exchangeConfigVortex: ExchangePluginConfig = {
+    const exchangeConfigQuipuswap2: ExchangePluginConfig = {
       rpc: sandboxRpc,
-      identifier: 'VORTEX',
+      identifier: 'QUIPUSWAP2',
       ecosystemIdentifier: 'TEZOS',
       tokenInstances: tokenRegistryTezos,
       exchangeInstances: vortexList,
     };
     const exchanges = [
       new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap),
-      new ExchangeVortexPlugin(exchangeConfigVortex),
+      new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap2),
     ];
 
+    const botAddress = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';
     const tezosKey = {
       TEZOS: {
-        address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+        address: botAddress,
         signer: await InMemorySigner.fromSecretKey(
-          'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
+          'edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt'
         ),
         rpc: sandboxRpc,
       },
@@ -95,6 +98,9 @@ describe('Quipuswap-Vortex', () => {
           profitSplitForSlippage: 0,
         }),
         keychains: [tezosKey],
+        accountant: new Accountant({ TEZOS: botAddress }, tokenRegistryTezos, {
+          TEZOS: new TezosToolkit(sandboxRpc),
+        }),
         swapExecutionManager: new BatchSwapExecutionManager(exchanges, [
           tezosKey,
         ]),
