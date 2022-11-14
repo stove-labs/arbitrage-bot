@@ -1,8 +1,15 @@
 import { ExchangePlugin } from './exchange/interface';
 import { ExchangePrice } from './exchange/types';
 import { ReporterPlugin } from './reporter/interface';
-import { Config, Token, TokenPlugin } from './types';
+import {
+  Config,
+  ProfitOpportunity,
+  SwapResult,
+  Token,
+  TokenPlugin,
+} from './types';
 import { BigNumber } from 'bignumber.js';
+import { Listr } from 'listr2';
 
 export * from './types';
 
@@ -28,30 +35,112 @@ export class ArbitrageBotCore {
   constructor(public config: Config) {}
 
   async startLifecycle() {
-    // balance at the start baseToken / quoteToken
-    const balance = {};
+    interface Ctx {
+      prices: ExchangePrice[];
+      profitOpportunity: ProfitOpportunity;
+      opportunityFound: boolean;
+      swapResults: SwapResult[];
+    }
 
-    this.reporter.report({ type: 'LIFECYCLE_START' });
-    const prices = await this.exchangeManager.fetchPrices(
-      this.config.baseToken,
-      this.config.quoteToken
+    const tasks = new Listr<Ctx>(
+      [
+        {
+          title: this.reporter.report({ type: 'LIFECYCLE_START' }),
+          task: (ctx, task): Listr =>
+            task.newListr((parent) => [
+              {
+                title: this.reporter.report({ type: 'PRICES_FETCHED' }),
+                task: async (ctx, task): Promise<void> => {
+                  ctx.prices = await this.exchangeManager.fetchPrices(
+                    this.config.baseToken,
+                    this.config.quoteToken
+                  );
+
+                  task.title = this.reporter.report({
+                    type: 'PRICES_FETCHED',
+                    prices: ctx.prices,
+                  });
+                },
+              },
+              {
+                title: this.reporter.report({
+                  type: 'PROFIT_FOUND',
+                }),
+                task: async (ctx, task): Promise<void> => {
+                  ctx.profitOpportunity =
+                    this.config.plugins.profitFinder.findProfits(ctx.prices);
+
+                  task.title = this.reporter.report({
+                    type: 'PROFIT_FOUND',
+                    profitOpportunity: ctx.profitOpportunity,
+                  });
+                  ctx.opportunityFound = BigNumber(
+                    ctx.profitOpportunity.profit.baseTokenAmount
+                  ).isPositive();
+                },
+              },
+              {
+                title: this.reporter.report({ type: 'SWAPS_DONE' }),
+                task: async (ctx, task): Promise<void> => {
+                  ctx.swapResults =
+                    await this.config.plugins.swapExecutionManager.executeSwaps(
+                      ctx.profitOpportunity.swaps
+                    );
+
+                  task.title = this.reporter.report({
+                    type: 'SWAPS_DONE',
+                    swapResults: ctx.swapResults,
+                  });
+
+                  parent.task.title =
+                    this.reporter.report({
+                      type: 'PROFIT_FOUND',
+                      profitOpportunity: ctx.profitOpportunity,
+                    }) +
+                    '\n' +
+                    this.reporter.report({
+                      type: 'SWAPS_DONE',
+                      swapResults: ctx.swapResults,
+                    });
+                },
+                enabled: (ctx): boolean => ctx.opportunityFound,
+              },
+            ]),
+        },
+      ],
+      { concurrent: false }
     );
 
-    this.reporter.report({ type: 'PRICES_FETCHED', prices });
+    try {
+      await tasks.run();
+    } catch (e) {
+      console.error(e);
+    }
+    // // balance at the start baseToken / quoteToken
+    // const balance = {};
 
-    const profitOpportunity =
-      this.config.plugins.profitFinder.findProfits(prices);
+    // this.reporter.report({ type: 'LIFECYCLE_START' });
+    // const prices = await this.exchangeManager.fetchPrices(
+    //   this.config.baseToken,
+    //   this.config.quoteToken
+    // );
 
-    this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
+    // this.reporter.report({ type: 'PRICES_FETCHED', prices });
 
-    if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
-      return;
+    // const profitOpportunity =
+    //   this.config.plugins.profitFinder.findProfits(prices);
 
-    const swapResults = await this.config.plugins.swapExecutionManager.executeSwaps(
-      profitOpportunity.swaps
-    );
-    // report if the execution of the opportunity swap was executed
-    this.reporter.report({ type: 'SWAPS_DONE', swapResults });
+    // this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
+
+    // if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
+    //   return;
+
+    // const swapResults =
+    //   await this.config.plugins.swapExecutionManager.executeSwaps(
+    //     profitOpportunity.swaps
+    //   );
+    // // report if the execution of the opportunity swap was executed
+    // this.reporter.report({ type: 'SWAPS_DONE', swapResults });
 
     // // balance after swaps were executed (after arbitrage attempt)
     // const balanceAfterArbitrage = {};

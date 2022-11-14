@@ -4,8 +4,9 @@ import chalk from 'chalk';
 import { handleProfitFound } from './handler/profitFound';
 import { handlePricesFetched } from './handler/pricesFetched';
 import { handleLifeCycleStart } from './handler/lifeCycleStart';
-import ora, { Ora } from 'ora';
 import { BigNumber } from 'bignumber.js';
+import { handleLifeCycleEnd } from './handler/lifeCycleEnd';
+import { handleSwapsDone } from './handler/swapsDone';
 
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .count('verbose')
@@ -13,9 +14,9 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
 
 const VERBOSE_LEVEL = argv.verbose;
 
-export const STATUS = VERBOSE_LEVEL >= 0 ? console.log : () => {};
-export const INFO = VERBOSE_LEVEL >= 1 ? console.log : () => {};
-export const DEBUG = VERBOSE_LEVEL >= 2 ? console.log : () => {};
+export const STATUS = VERBOSE_LEVEL >= 0;
+export const INFO = VERBOSE_LEVEL >= 1;
+export const DEBUG = VERBOSE_LEVEL >= 2;
 
 export const green = chalk.green;
 export const warning = chalk.yellow;
@@ -26,42 +27,29 @@ export const tickerColor = chalk.yellow;
 export class ConsoleReporterPlugin implements ReporterPlugin {
   log: Logger;
 
-  spinner: Ora;
-  isSpinning: boolean = false;
-
   constructor() {
     this.log = new Logger();
     this.log.setSettings({
       dateTimeTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
   }
-  report(event: ReporterPluginEvent) {
+
+  report(event: ReporterPluginEvent): string {
     switch (event.type) {
       case 'LIFECYCLE_START':
-        if (!this.isSpinning) this.spinner = ora().start();
-        this.isSpinning = this.spinner.isSpinning;
-        handleLifeCycleStart();
-        this.spinner.color = 'yellow';
-        this.spinner.text = 'Life cycle started';
-        break;
+        return handleLifeCycleStart();
       case 'PRICES_FETCHED':
-        this.spinner.color = 'yellow';
-        this.spinner.text = 'Prices fetched';
-        handlePricesFetched(event.prices);
-        break;
+        return handlePricesFetched(event.prices);
       case 'PROFIT_FOUND':
-        this.spinner.color = 'green';
-        this.spinner.text = 'Profit opportunity computed';
-        handleProfitFound(event.profitOpportunity);
-        if (
-          BigNumber(event.profitOpportunity.profit.baseTokenAmount).isNegative
-        ) {
-          this.spinner.text = 'Waiting until life cycle restarts';
-          this.spinner.color = 'white';
-        }
-        break;
+        return handleProfitFound(event.profitOpportunity);
+      case 'ARBITRAGE_COMPLETE':
+        return 'Waiting until life cycle restarts';
+      case 'LIFECYCLE_END':
+        return handleLifeCycleEnd();
+      case 'SWAPS_DONE':
+        return handleSwapsDone(event.swapResults);
       default:
-        this.log.info(event);
+        // this.log.info(event);
         break;
     }
   }

@@ -1,47 +1,42 @@
 import { ProfitOpportunity } from '@stove-labs/arbitrage-bot';
 import { BigNumber } from 'bignumber.js';
 import { cyan, green, red } from 'chalk';
-import {
-  warning,
-  tickerColor,
-  DEBUG,
-  INFO,
-  STATUS,
-} from '../consoleReporterPlugin';
+import { tickerColor, DEBUG, INFO, STATUS } from '../consoleReporterPlugin';
 
 const profitColor = (isPositive: boolean) => {
   return isPositive ? green : red;
 };
 
 export const handleProfitFound = (profitOpportunity: ProfitOpportunity) => {
+  if (!profitOpportunity) return 'Searching for profit opportunity...';
   const profit = Number(profitOpportunity.profit.baseTokenAmount);
   const isPositiveProfit = BigNumber(profit).isPositive();
+  if (!isPositiveProfit) return 'Profit opportunity not detected';
+  let message = '';
 
   // INFO('Profit opportunity ' + warning('computed'));
 
   // report whether profit opportunity was detected
-  STATUS(
-    'Profit opportunity ' +
-      profitColor(isPositiveProfit)(
-        isPositiveProfit ? `detected` : `not detected`
-      )
-  );
+
+  message = updateMessage(message, STATUS, 'Profit opportunity detected');
   // Report on SWAP 1
-  INFO(getSwap1Spend(profitOpportunity));
+  message = updateMessage(message, INFO, getSwap1Spend(profitOpportunity));
   // Report on SWAP 2
-  INFO(getSwap2Receive(profitOpportunity));
+  message = updateMessage(message, INFO, getSwap2Receive(profitOpportunity)),
 
   // report expected profit
-  isPositiveProfit
-    ? STATUS(getExpectedProfit(profitOpportunity))
-    : INFO(getExpectedProfit(profitOpportunity));
+  message = isPositiveProfit
+    ? updateMessage(message, STATUS, getExpectedProfit(profitOpportunity))
+    : updateMessage(message, INFO, getExpectedProfit(profitOpportunity));
 
   // report trading path
-  isPositiveProfit
-    ? STATUS(getTradingPath(profitOpportunity))
-    : INFO(getTradingPath(profitOpportunity));
+  message = isPositiveProfit
+    ? updateMessage(message, STATUS, getTradingPath(profitOpportunity))
+    : updateMessage(message, INFO, getTradingPath(profitOpportunity));
 
-  DEBUG(profitOpportunity);
+  message = updateMessage(message, DEBUG, profitOpportunity);
+
+  return message;
 };
 
 const getSwap1Spend = (profitOpportunity: ProfitOpportunity) => {
@@ -97,4 +92,14 @@ const getExpectedProfit = (profitOpportunity: ProfitOpportunity) => {
     profitColor(isPositiveProfit)(expectedProfitString) +
     ' (w/o tx fees)'
   );
+};
+
+const updateMessage = (
+  message: string,
+  shouldInclude: boolean,
+  addition: any
+): string => {
+  if (!shouldInclude) return message;
+
+  return message + addition.toString() + '\n';
 };
