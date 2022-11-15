@@ -77,6 +77,17 @@ export class ArbitrageBotCore {
                   ctx.opportunityFound = BigNumber(
                     ctx.profitOpportunity.profit.baseTokenAmount
                   ).isPositive();
+                  if (!ctx.opportunityFound) {
+                    parent.task.title =
+                      this.reporter.report({
+                        type: 'PROFIT_FOUND',
+                        profitOpportunity: ctx.profitOpportunity,
+                      }) +
+                      '\n' +
+                      this.reporter.report({
+                        type: 'LIFECYCLE_END',
+                      });
+                  }
                 },
               },
               {

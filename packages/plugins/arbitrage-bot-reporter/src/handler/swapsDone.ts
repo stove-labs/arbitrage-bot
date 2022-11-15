@@ -1,5 +1,12 @@
 import { SwapResult } from '@stove-labs/arbitrage-bot';
-import { STATUS, warning, green, red } from '../consoleReporterPlugin';
+import {
+  formattedTicker,
+  STATUS,
+  warning,
+  green,
+  red,
+  tickerColor,
+} from '../consoleReporterPlugin';
 import { BigNumber } from 'bignumber.js';
 
 export const handleSwapsDone = (swapResults: SwapResult[]) => {
@@ -9,35 +16,40 @@ export const handleSwapsDone = (swapResults: SwapResult[]) => {
     const errors = swapResults.reduce((errors, swap) => {
       if (swap.result.type === 'OK') return;
 
-      return errors + '\n' + swap.result.data;
+      return errors + swap.result.data + '\n';
     }, '');
-    return 'Swap unsuccessful\n' + `${errors}`;
+    const message =
+      `Status:               ${red('Swap unsuccessful')}\n` +
+      `Error:                ${red(errors)}`;
+    return message;
   }
   let message: string = '';
 
   swapResults.map((swap) => {
     if (swap.result.type === 'ERROR') return;
-    const profitAndCosts = `Profit: ${formattedProfit(swap)}\nTransaction costs: ${formattedCosts(swap)}`;
-      // swap.result.operation.baseToken.ticker === 'XTZ'
-      //   ? `Total profit: ${totalProfit(swap)}`
-      //   : `Profit: ${formattedProfit(swap)}\nCosts: ${formattedCosts(swap)}`;
     const transaction = warning(
       `https://tzkt.io/${swap.result.operation?.operationHash}\n`
     );
+    const netProfit =
+      swap.result.operation.baseToken.ticker === 'XTZ'
+        ? `Net profit:           ${formattedNetProfit(swap)}\n`
+        : '';
 
     message +=
-      `${green('Swap successful')}\n` +
-      `${profitAndCosts}\n` +
-      `Transaction link: ${transaction}`;
+      `Status:               ${green('Swap successful')}\n` +
+      `Profit:               ${formattedProfit(swap)}\n` +
+      `Transaction costs:    ${formattedCosts(swap)}\n` +
+      `${netProfit}` +
+      `Transaction link:     ${transaction}`;
   });
 
   return message;
 };
 
-const totalProfit = (swap: SwapResult): string => {
+const formattedNetProfit = (swap: SwapResult): string => {
   if (swap.result.type === 'ERROR') return '';
 
-  return `${warning('XTZ')} ${green(
+  return `${tickerColor(formattedTicker('XTZ'))} ${green(
     BigNumber(swap.result.operation?.profit?.amount)
       .minus(BigNumber(swap.result.operation?.totalOperationCost))
       .dividedBy(
@@ -49,7 +61,9 @@ const totalProfit = (swap: SwapResult): string => {
 const formattedProfit = (swap: SwapResult): string => {
   if (swap.result.type === 'ERROR') return '';
 
-  return `${warning(swap.result.operation.baseToken.ticker)} ${green(
+  return `${tickerColor(
+    formattedTicker(swap.result.operation.baseToken.ticker)
+  )} ${green(
     BigNumber(swap.result.operation?.profit?.amount).dividedBy(
       new BigNumber(10).pow(Number(swap.result.operation?.profit?.decimals))
     )
@@ -59,7 +73,7 @@ const formattedProfit = (swap: SwapResult): string => {
 const formattedCosts = (swap: SwapResult): string => {
   if (swap.result.type === 'ERROR') return '';
 
-  return `${warning('XTZ')} ${red(
+  return `${tickerColor(formattedTicker('XTZ'))} ${red(
     BigNumber(swap.result.operation?.totalOperationCost).dividedBy(
       new BigNumber(10).pow(6)
     )

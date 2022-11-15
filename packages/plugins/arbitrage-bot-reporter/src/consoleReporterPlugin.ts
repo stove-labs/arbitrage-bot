@@ -23,6 +23,15 @@ export const warning = chalk.yellow;
 export const blue = chalk.blue;
 export const red = chalk.red;
 export const tickerColor = chalk.yellow;
+export const profitColor = (isPositive: boolean) => {
+  return isPositive ? green : red;
+};
+// pad ticker shorter than 5 chars
+export const formattedTicker = (ticker: string): string => {
+  const FORMATTED_TICKER_LENGTH = 5;
+
+  return (ticker + '    ').substring(0, FORMATTED_TICKER_LENGTH);
+};
 
 export class ConsoleReporterPlugin implements ReporterPlugin {
   log: Logger;

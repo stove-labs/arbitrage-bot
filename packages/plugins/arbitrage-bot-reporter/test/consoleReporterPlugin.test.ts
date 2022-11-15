@@ -106,7 +106,7 @@ describe('consoleReporterPlugin', () => {
           {
             title: reporter.report({ type: 'LIFECYCLE_START' }),
             task: (ctx, task): Listr =>
-              task.newListr([
+              task.newListr((parent) => [
                 {
                   title: reporter.report({ type: 'PRICES_FETCHED' }),
                   task: async (ctx, task): Promise<void> => {
@@ -134,6 +134,17 @@ describe('consoleReporterPlugin', () => {
                       (ctx.opportunityFound = BigNumber(
                         ctx.profitOpportunity.profit.baseTokenAmount
                       ).isPositive());
+                    if (!ctx.opportunityFound) {
+                      parent.task.title =
+                        reporter.report({
+                          type: 'PROFIT_FOUND',
+                          profitOpportunity: ctx.profitOpportunity,
+                        }) +
+                        '\n' +
+                        reporter.report({
+                          type: 'LIFECYCLE_END',
+                        });
+                    }
                   },
                 },
                 {
@@ -163,165 +174,523 @@ describe('consoleReporterPlugin', () => {
     }
   );
 
-  step('can report on one full lifecycle where profit was found', async () => {
-    const prices: ExchangePrice[] = [
-      {
-        baseToken: {
-          ticker: 'XTZ',
-          address: 'native',
-          decimals: 6,
-          ecosystemIdentifier: 'TEZOS',
-        },
-        baseTokenBalance: { amount: '145416563245' },
-        quoteToken: {
-          ticker: 'kUSD',
-          address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
-          decimals: 18,
-          ecosystemIdentifier: 'TEZOS',
-        },
-        quoteTokenBalance: { amount: '198676450055331726699899' },
-        identifier: 'QUIPUSWAP',
-        ecosystemIdentifier: 'TEZOS',
-        fee: 30,
-        spotPrice: '731926',
-      },
-      {
-        baseToken: {
-          ticker: 'XTZ',
-          address: 'native',
-          decimals: 6,
-          ecosystemIdentifier: 'TEZOS',
-        },
-        baseTokenBalance: { amount: '14223194732' },
-        quoteToken: {
-          ticker: 'kUSD',
-          address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
-          decimals: 18,
-          ecosystemIdentifier: 'TEZOS',
-        },
-        quoteTokenBalance: { amount: '19272019166664506280072' },
-        identifier: 'VORTEX',
-        ecosystemIdentifier: 'TEZOS',
-        fee: 28,
-        spotPrice: '738023',
-      },
-    ];
-
-    const profitOpportunity: ProfitOpportunity = {
-      swaps: [
+  step(
+    'can report on one full lifecycle where profit was found with native token profit',
+    async () => {
+      const prices: ExchangePrice[] = [
         {
-          amount: '21908525265582003606',
-          limit: '16085456',
-          limitWithoutSlippage: '16085456',
-          tokenIn: { ticker: 'XTZ' },
-          tokenInDecimals: 6,
-          tokenOutDecimals: 18,
-          tokenOut: { ticker: 'kUSD' },
-          type: SwapType.BUY,
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '145416563245' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '198676450055331726699899' },
           identifier: 'QUIPUSWAP',
           ecosystemIdentifier: 'TEZOS',
+          fee: 30,
+          spotPrice: '731926',
         },
         {
-          amount: '21908525265582003606',
-          limit: '16105466',
-          limitWithoutSlippage: '16105466',
-          tokenIn: { ticker: 'kUSD' },
-          tokenInDecimals: 18,
-          tokenOutDecimals: 6,
-          tokenOut: { ticker: 'XTZ' },
-          type: SwapType.SELL,
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '14223194732' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '19272019166664506280072' },
           identifier: 'VORTEX',
           ecosystemIdentifier: 'TEZOS',
+          fee: 28,
+          spotPrice: '738023',
         },
-      ],
-      profit: { baseTokenAmount: '20010' },
-    };
-    const swapResults: SwapResult[] = [
-      {
-        result: {
-          type: 'OK',
-          operation: {
-            ecosystem: 'Tezos',
-            exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
-            operationHash: 'hashhashhash',
-            profit: { amount: '23443', decimals: '6' },
-            totalOperationCost: '3030', //string
-            baseToken: { ticker: 'XTZ' },
-            quoteToken: { ticker: 'kUSD' },
+      ];
+
+      const profitOpportunity: ProfitOpportunity = {
+        swaps: [
+          {
+            amount: '21908525265582003606',
+            limit: '16085456',
+            limitWithoutSlippage: '16085456',
+            tokenIn: { ticker: 'XTZ' },
+            tokenInDecimals: 6,
+            tokenOutDecimals: 18,
+            tokenOut: { ticker: 'kUSD' },
+            type: SwapType.BUY,
+            identifier: 'QUIPUSWAP',
+            ecosystemIdentifier: 'TEZOS',
+          },
+          {
+            amount: '21908525265582003606',
+            limit: '16105466',
+            limitWithoutSlippage: '16105466',
+            tokenIn: { ticker: 'kUSD' },
+            tokenInDecimals: 18,
+            tokenOutDecimals: 6,
+            tokenOut: { ticker: 'XTZ' },
+            type: SwapType.SELL,
+            identifier: 'VORTEX',
+            ecosystemIdentifier: 'TEZOS',
+          },
+        ],
+        profit: { baseTokenAmount: '20010' },
+      };
+      const swapResults: SwapResult[] = [
+        {
+          result: {
+            type: 'OK',
+            operation: {
+              ecosystem: 'Tezos',
+              exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
+              operationHash: 'hashhashhash',
+              profit: { amount: '23443', decimals: '6' },
+              totalOperationCost: '3030', //string
+              baseToken: { ticker: 'XTZ' },
+              quoteToken: { ticker: 'kUSD' },
+            },
           },
         },
-      },
-    ];
+      ];
 
-    const tasks = new Listr<Ctx>(
-      [
-        {
-          title: reporter.report({ type: 'LIFECYCLE_START' }),
-          task: (ctx, task): Listr =>
-            task.newListr((parent) => [
-              {
-                title: reporter.report({ type: 'PRICES_FETCHED' }),
-                task: async (ctx, task): Promise<void> => {
-                  await new Promise((f) => setTimeout(f, 3000));
-                  ctx.prices = prices;
+      const tasks = new Listr<Ctx>(
+        [
+          {
+            title: reporter.report({ type: 'LIFECYCLE_START' }),
+            task: (ctx, task): Listr =>
+              task.newListr((parent) => [
+                {
+                  title: reporter.report({ type: 'PRICES_FETCHED' }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.prices = prices;
 
-                  task.title = reporter.report({
-                    type: 'PRICES_FETCHED',
-                    prices: ctx.prices,
-                  });
+                    task.title = reporter.report({
+                      type: 'PRICES_FETCHED',
+                      prices: ctx.prices,
+                    });
+                  },
                 },
-              },
-              {
-                title: reporter.report({
-                  type: 'PROFIT_FOUND',
-                }),
-                task: async (ctx, task): Promise<void> => {
-                  await new Promise((f) => setTimeout(f, 3000));
-                  ctx.profitOpportunity = profitOpportunity;
-
-                  task.title = reporter.report({
+                {
+                  title: reporter.report({
                     type: 'PROFIT_FOUND',
-                    profitOpportunity: ctx.profitOpportunity,
-                  });
-                  ctx.opportunityFound = BigNumber(
-                    ctx.profitOpportunity.profit.baseTokenAmount
-                  ).isPositive();
-                },
-              },
-              {
-                title: reporter.report({ type: 'SWAPS_DONE' }),
-                task: async (ctx, task): Promise<void> => {
-                  await new Promise((f) => setTimeout(f, 3000));
-                  ctx.swapResults = swapResults;
+                  }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.profitOpportunity = profitOpportunity;
 
-                  task.title = reporter.report({
-                    type: 'SWAPS_DONE',
-                    swapResults: ctx.swapResults,
-                  });
-
-                  parent.task.title =
-                    reporter.report({
+                    task.title = reporter.report({
                       type: 'PROFIT_FOUND',
                       profitOpportunity: ctx.profitOpportunity,
-                    }) +
-                    '\n' +
-                    reporter.report({
+                    });
+                    ctx.opportunityFound = BigNumber(
+                      ctx.profitOpportunity.profit.baseTokenAmount
+                    ).isPositive();
+                    if (!ctx.opportunityFound) {
+                      parent.task.title =
+                        reporter.report({
+                          type: 'PROFIT_FOUND',
+                          profitOpportunity: ctx.profitOpportunity,
+                        }) +
+                        '\n' +
+                        reporter.report({
+                          type: 'LIFECYCLE_END',
+                        });
+                    }
+                  },
+                },
+                {
+                  title: reporter.report({ type: 'SWAPS_DONE' }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.swapResults = swapResults;
+
+                    task.title = reporter.report({
                       type: 'SWAPS_DONE',
                       swapResults: ctx.swapResults,
                     });
-                },
-                enabled: (ctx): boolean => ctx.opportunityFound,
-              },
-            ]),
-        },
-      ],
-      { concurrent: false }
-    );
 
-    try {
-      await tasks.run();
-    } catch (e) {
-      console.error(e);
+                    parent.task.title =
+                      reporter.report({
+                        type: 'PROFIT_FOUND',
+                        profitOpportunity: ctx.profitOpportunity,
+                      }) +
+                      '\n' +
+                      reporter.report({
+                        type: 'SWAPS_DONE',
+                        swapResults: ctx.swapResults,
+                      });
+                  },
+                  enabled: (ctx): boolean => ctx.opportunityFound,
+                },
+              ]),
+          },
+        ],
+        { concurrent: false }
+      );
+
+      try {
+        await tasks.run();
+      } catch (e) {
+        console.error(e);
+      }
     }
-  });
+  );
+
+  step(
+    'can report on one full lifecycle where profit was found with non-native token profit',
+    async () => {
+      const prices: ExchangePrice[] = [
+        {
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '145416563245' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '198676450055331726699899' },
+          identifier: 'QUIPUSWAP',
+          ecosystemIdentifier: 'TEZOS',
+          fee: 30,
+          spotPrice: '731926',
+        },
+        {
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '14223194732' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '19272019166664506280072' },
+          identifier: 'VORTEX',
+          ecosystemIdentifier: 'TEZOS',
+          fee: 28,
+          spotPrice: '738023',
+        },
+      ];
+
+      const profitOpportunity: ProfitOpportunity = {
+        swaps: [
+          {
+            amount: '21908525265582003606',
+            limit: '16085456',
+            limitWithoutSlippage: '16085456',
+            tokenIn: { ticker: 'XTZ' },
+            tokenInDecimals: 6,
+            tokenOutDecimals: 18,
+            tokenOut: { ticker: 'kUSD' },
+            type: SwapType.BUY,
+            identifier: 'QUIPUSWAP',
+            ecosystemIdentifier: 'TEZOS',
+          },
+          {
+            amount: '21908525265582003606',
+            limit: '16105466',
+            limitWithoutSlippage: '16105466',
+            tokenIn: { ticker: 'kUSD' },
+            tokenInDecimals: 18,
+            tokenOutDecimals: 6,
+            tokenOut: { ticker: 'XTZ' },
+            type: SwapType.SELL,
+            identifier: 'VORTEX',
+            ecosystemIdentifier: 'TEZOS',
+          },
+        ],
+        profit: { baseTokenAmount: '20010' },
+      };
+      const swapResults: SwapResult[] = [
+        {
+          result: {
+            type: 'OK',
+            operation: {
+              ecosystem: 'Tezos',
+              exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
+              operationHash: 'hashhashhash',
+              profit: { amount: '23443', decimals: '6' },
+              totalOperationCost: '3030', //string
+              baseToken: { ticker: 'kUSD' },
+              quoteToken: { ticker: 'kBTC' },
+            },
+          },
+        },
+      ];
+
+      const tasks = new Listr<Ctx>(
+        [
+          {
+            title: reporter.report({ type: 'LIFECYCLE_START' }),
+            task: (ctx, task): Listr =>
+              task.newListr((parent) => [
+                {
+                  title: reporter.report({ type: 'PRICES_FETCHED' }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.prices = prices;
+
+                    task.title = reporter.report({
+                      type: 'PRICES_FETCHED',
+                      prices: ctx.prices,
+                    });
+                  },
+                },
+                {
+                  title: reporter.report({
+                    type: 'PROFIT_FOUND',
+                  }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.profitOpportunity = profitOpportunity;
+
+                    task.title = reporter.report({
+                      type: 'PROFIT_FOUND',
+                      profitOpportunity: ctx.profitOpportunity,
+                    });
+                    ctx.opportunityFound = BigNumber(
+                      ctx.profitOpportunity.profit.baseTokenAmount
+                    ).isPositive();
+                    if (!ctx.opportunityFound) {
+                      parent.task.title =
+                        reporter.report({
+                          type: 'PROFIT_FOUND',
+                          profitOpportunity: ctx.profitOpportunity,
+                        }) +
+                        '\n' +
+                        reporter.report({
+                          type: 'LIFECYCLE_END',
+                        });
+                    }
+                  },
+                },
+                {
+                  title: reporter.report({ type: 'SWAPS_DONE' }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.swapResults = swapResults;
+
+                    task.title = reporter.report({
+                      type: 'SWAPS_DONE',
+                      swapResults: ctx.swapResults,
+                    });
+
+                    parent.task.title =
+                      reporter.report({
+                        type: 'PROFIT_FOUND',
+                        profitOpportunity: ctx.profitOpportunity,
+                      }) +
+                      '\n' +
+                      reporter.report({
+                        type: 'SWAPS_DONE',
+                        swapResults: ctx.swapResults,
+                      });
+                  },
+                  enabled: (ctx): boolean => ctx.opportunityFound,
+                },
+              ]),
+          },
+        ],
+        { concurrent: false }
+      );
+
+      try {
+        await tasks.run();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  );
+
+  step(
+    'can report on one full lifecycle where profit was found but swap ended in error',
+    async () => {
+      const prices: ExchangePrice[] = [
+        {
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '145416563245' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '198676450055331726699899' },
+          identifier: 'QUIPUSWAP',
+          ecosystemIdentifier: 'TEZOS',
+          fee: 30,
+          spotPrice: '731926',
+        },
+        {
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '14223194732' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '19272019166664506280072' },
+          identifier: 'VORTEX',
+          ecosystemIdentifier: 'TEZOS',
+          fee: 28,
+          spotPrice: '738023',
+        },
+      ];
+
+      const profitOpportunity: ProfitOpportunity = {
+        swaps: [
+          {
+            amount: '21908525265582003606',
+            limit: '16085456',
+            limitWithoutSlippage: '16085456',
+            tokenIn: { ticker: 'XTZ' },
+            tokenInDecimals: 6,
+            tokenOutDecimals: 18,
+            tokenOut: { ticker: 'kUSD' },
+            type: SwapType.BUY,
+            identifier: 'QUIPUSWAP',
+            ecosystemIdentifier: 'TEZOS',
+          },
+          {
+            amount: '21908525265582003606',
+            limit: '16105466',
+            limitWithoutSlippage: '16105466',
+            tokenIn: { ticker: 'kUSD' },
+            tokenInDecimals: 18,
+            tokenOutDecimals: 6,
+            tokenOut: { ticker: 'XTZ' },
+            type: SwapType.SELL,
+            identifier: 'VORTEX',
+            ecosystemIdentifier: 'TEZOS',
+          },
+        ],
+        profit: { baseTokenAmount: '20010' },
+      };
+      const swapResults: SwapResult[] = [
+        {
+          result: {
+            type: 'ERROR',
+            data: 'expected XTZ profit is lower than total operation cost',
+          },
+        },
+      ];
+
+      const tasks = new Listr<Ctx>(
+        [
+          {
+            title: reporter.report({ type: 'LIFECYCLE_START' }),
+            task: (ctx, task): Listr =>
+              task.newListr((parent) => [
+                {
+                  title: reporter.report({ type: 'PRICES_FETCHED' }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.prices = prices;
+
+                    task.title = reporter.report({
+                      type: 'PRICES_FETCHED',
+                      prices: ctx.prices,
+                    });
+                  },
+                },
+                {
+                  title: reporter.report({
+                    type: 'PROFIT_FOUND',
+                  }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.profitOpportunity = profitOpportunity;
+
+                    task.title = reporter.report({
+                      type: 'PROFIT_FOUND',
+                      profitOpportunity: ctx.profitOpportunity,
+                    });
+                    ctx.opportunityFound = BigNumber(
+                      ctx.profitOpportunity.profit.baseTokenAmount
+                    ).isPositive();
+                    if (!ctx.opportunityFound) {
+                      parent.task.title =
+                        reporter.report({
+                          type: 'PROFIT_FOUND',
+                          profitOpportunity: ctx.profitOpportunity,
+                        }) +
+                        '\n' +
+                        reporter.report({
+                          type: 'LIFECYCLE_END',
+                        });
+                    }
+                  },
+                },
+                {
+                  title: reporter.report({ type: 'SWAPS_DONE' }),
+                  task: async (ctx, task): Promise<void> => {
+                    await new Promise((f) => setTimeout(f, 3000));
+                    ctx.swapResults = swapResults;
+
+                    task.title = reporter.report({
+                      type: 'SWAPS_DONE',
+                      swapResults: ctx.swapResults,
+                    });
+
+                    parent.task.title =
+                      reporter.report({
+                        type: 'PROFIT_FOUND',
+                        profitOpportunity: ctx.profitOpportunity,
+                      }) +
+                      '\n' +
+                      reporter.report({
+                        type: 'SWAPS_DONE',
+                        swapResults: ctx.swapResults,
+                      });
+                  },
+                  enabled: (ctx): boolean => ctx.opportunityFound,
+                },
+              ]),
+          },
+        ],
+        { concurrent: false }
+      );
+
+      try {
+        await tasks.run();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  );
 });
