@@ -1,7 +1,7 @@
-import { INFO } from '../consoleReporterPlugin';
+import { STATUS } from '../consoleReporterPlugin';
 
 export const handleLifeCycleEnd = () => {
-  if (!INFO) return;
+  if (!STATUS) return;
 
   return 'Waiting until life cycle restarts';
 };

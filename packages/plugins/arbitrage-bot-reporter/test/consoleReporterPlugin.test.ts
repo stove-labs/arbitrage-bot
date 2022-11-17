@@ -10,12 +10,122 @@ import { Listr } from 'listr2';
 import { BigNumber } from 'bignumber.js';
 import { step } from 'mocha-steps';
 
-interface Ctx {
-  prices: ExchangePrice[];
-  profitOpportunity: ProfitOpportunity;
-  opportunityFound: boolean;
-  swapResults: SwapResult[];
-}
+const reporter = new ConsoleReporterPlugin();
+
+const startingTitle = (): string => {
+  return reporter.report({
+    type: 'LIFECYCLE_START',
+  })
+    ? reporter.report({ type: 'LIFECYCLE_START' }) + '\n'
+    : '';
+};
+
+const reportFetchPricesStart = (task) => {
+  task.title = startingTitle() + reporter.report({ type: 'PRICES_FETCHED' });
+};
+
+const reportFetchPricesEnd = (task, prices: ExchangePrice[]) => {
+  task.title =
+    startingTitle() +
+    reporter.report({
+      type: 'PRICES_FETCHED',
+      prices,
+    });
+};
+
+const reportFindProfitOpportunityStart = (task) => {
+  task.output = reporter.report({ type: 'PROFIT_FOUND' });
+};
+
+const reportFindProfitOpportunityEnd = (task, profitOpportunity) => {
+  task.title +=
+    '\n' +
+    reporter.report({
+      type: 'PROFIT_FOUND',
+      profitOpportunity,
+    });
+};
+
+const checkIfThereIsProfitOpportunity = (
+  task,
+  profitOpportunity: ProfitOpportunity
+): boolean => {
+  if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
+    task.title =
+      reporter.report({
+        type: 'PROFIT_FOUND',
+        profitOpportunity: profitOpportunity,
+      }) +
+      '\n' +
+      reporter.report({
+        type: 'LIFECYCLE_END',
+      });
+  }
+
+  return BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive();
+};
+
+const reportSwapStart = (task) => {
+  task.output = reporter.report({ type: 'SWAPS_DONE' });
+};
+
+const reportSwapEnd = (task, swapResults: SwapResult[]) => {
+  task.title +=
+    '\n' +
+    reporter.report({
+      type: 'SWAPS_DONE',
+      swapResults,
+    });
+};
+
+const tasks = (prices, profitOpportunity, swapResults, error = false) => {
+  return new Listr(
+    [
+      {
+        task: async (_, task): Promise<void> => {
+          // This try-catch block is here because Error mess up the formatting
+          try {
+            reportFetchPricesStart(task);
+
+            await new Promise((f) => setTimeout(f, 3000));
+
+            reportFetchPricesEnd(task, prices);
+            reportFindProfitOpportunityStart(task);
+
+            await new Promise((f) => setTimeout(f, 3000));
+
+            reportFindProfitOpportunityEnd(task, profitOpportunity);
+
+            if (!checkIfThereIsProfitOpportunity(task, profitOpportunity)) {
+              return;
+            }
+
+            if (error) {
+              const retry = task.isRetrying();
+              if (retry && !(retry.count > 0)) {
+                throw new Error('No profit opportunity detected');
+              }
+            }
+
+            reportSwapStart(task);
+
+            await new Promise((f) => setTimeout(f, 3000));
+
+            reportSwapEnd(task, swapResults);
+          } catch (e) {
+            task.output = '';
+            throw e;
+          }
+        },
+        retry: 3,
+      },
+    ],
+    {
+      concurrent: false,
+      exitOnError: true,
+    }
+  );
+};
 
 describe('consoleReporterPlugin', () => {
   let reporter: ConsoleReporterPlugin;
@@ -101,73 +211,8 @@ describe('consoleReporterPlugin', () => {
       };
       const swapResults: SwapResult[] = [];
 
-      const tasks = new Listr<Ctx>(
-        [
-          {
-            title: reporter.report({ type: 'LIFECYCLE_START' }),
-            task: (ctx, task): Listr =>
-              task.newListr((parent) => [
-                {
-                  title: reporter.report({ type: 'PRICES_FETCHED' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.prices = prices;
-
-                    task.title = reporter.report({
-                      type: 'PRICES_FETCHED',
-                      prices: ctx.prices,
-                    });
-                  },
-                },
-                {
-                  title: reporter.report({
-                    type: 'PROFIT_FOUND',
-                  }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-
-                    ctx.profitOpportunity = profitOpportunity;
-                    (task.title = reporter.report({
-                      type: 'PROFIT_FOUND',
-                      profitOpportunity: ctx.profitOpportunity,
-                    })),
-                      (ctx.opportunityFound = BigNumber(
-                        ctx.profitOpportunity.profit.baseTokenAmount
-                      ).isPositive());
-                    if (!ctx.opportunityFound) {
-                      parent.task.title =
-                        reporter.report({
-                          type: 'PROFIT_FOUND',
-                          profitOpportunity: ctx.profitOpportunity,
-                        }) +
-                        '\n' +
-                        reporter.report({
-                          type: 'LIFECYCLE_END',
-                        });
-                    }
-                  },
-                },
-                {
-                  title: reporter.report({ type: 'SWAPS_DONE' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.swapResults = swapResults;
-
-                    task.title = reporter.report({
-                      type: 'SWAPS_DONE',
-                      swapResults: ctx.swapResults,
-                    });
-                  },
-                  enabled: (ctx): boolean => ctx.opportunityFound,
-                },
-              ]),
-          },
-        ],
-        { concurrent: false }
-      );
-
       try {
-        await tasks.run();
+        await tasks(prices, profitOpportunity, swapResults).run();
       } catch (e) {
         console.error(e);
       }
@@ -266,84 +311,108 @@ describe('consoleReporterPlugin', () => {
         },
       ];
 
-      const tasks = new Listr<Ctx>(
-        [
+      try {
+        await tasks(prices, profitOpportunity, swapResults).run();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  );
+
+  step(
+    'can report on one full lifecycle where profit was found with native token profit and with one retry',
+    async () => {
+      const prices: ExchangePrice[] = [
+        {
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '145416563245' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '198676450055331726699899' },
+          identifier: 'QUIPUSWAP',
+          ecosystemIdentifier: 'TEZOS',
+          fee: 30,
+          spotPrice: '731926',
+        },
+        {
+          baseToken: {
+            ticker: 'XTZ',
+            address: 'native',
+            decimals: 6,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          baseTokenBalance: { amount: '14223194732' },
+          quoteToken: {
+            ticker: 'kUSD',
+            address: 'KT1VSuDnQqktrmJNS1TBxzvGwRFd7TGgVhgC',
+            decimals: 18,
+            ecosystemIdentifier: 'TEZOS',
+          },
+          quoteTokenBalance: { amount: '19272019166664506280072' },
+          identifier: 'VORTEX',
+          ecosystemIdentifier: 'TEZOS',
+          fee: 28,
+          spotPrice: '738023',
+        },
+      ];
+
+      const profitOpportunity: ProfitOpportunity = {
+        swaps: [
           {
-            title: reporter.report({ type: 'LIFECYCLE_START' }),
-            task: (ctx, task): Listr =>
-              task.newListr((parent) => [
-                {
-                  title: reporter.report({ type: 'PRICES_FETCHED' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.prices = prices;
-
-                    task.title = reporter.report({
-                      type: 'PRICES_FETCHED',
-                      prices: ctx.prices,
-                    });
-                  },
-                },
-                {
-                  title: reporter.report({
-                    type: 'PROFIT_FOUND',
-                  }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.profitOpportunity = profitOpportunity;
-
-                    task.title = reporter.report({
-                      type: 'PROFIT_FOUND',
-                      profitOpportunity: ctx.profitOpportunity,
-                    });
-                    ctx.opportunityFound = BigNumber(
-                      ctx.profitOpportunity.profit.baseTokenAmount
-                    ).isPositive();
-                    if (!ctx.opportunityFound) {
-                      parent.task.title =
-                        reporter.report({
-                          type: 'PROFIT_FOUND',
-                          profitOpportunity: ctx.profitOpportunity,
-                        }) +
-                        '\n' +
-                        reporter.report({
-                          type: 'LIFECYCLE_END',
-                        });
-                    }
-                  },
-                },
-                {
-                  title: reporter.report({ type: 'SWAPS_DONE' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.swapResults = swapResults;
-
-                    task.title = reporter.report({
-                      type: 'SWAPS_DONE',
-                      swapResults: ctx.swapResults,
-                    });
-
-                    parent.task.title =
-                      reporter.report({
-                        type: 'PROFIT_FOUND',
-                        profitOpportunity: ctx.profitOpportunity,
-                      }) +
-                      '\n' +
-                      reporter.report({
-                        type: 'SWAPS_DONE',
-                        swapResults: ctx.swapResults,
-                      });
-                  },
-                  enabled: (ctx): boolean => ctx.opportunityFound,
-                },
-              ]),
+            amount: '21908525265582003606',
+            limit: '16085456',
+            limitWithoutSlippage: '16085456',
+            tokenIn: { ticker: 'XTZ' },
+            tokenInDecimals: 6,
+            tokenOutDecimals: 18,
+            tokenOut: { ticker: 'kUSD' },
+            type: SwapType.BUY,
+            identifier: 'QUIPUSWAP',
+            ecosystemIdentifier: 'TEZOS',
+          },
+          {
+            amount: '21908525265582003606',
+            limit: '16105466',
+            limitWithoutSlippage: '16105466',
+            tokenIn: { ticker: 'kUSD' },
+            tokenInDecimals: 18,
+            tokenOutDecimals: 6,
+            tokenOut: { ticker: 'XTZ' },
+            type: SwapType.SELL,
+            identifier: 'VORTEX',
+            ecosystemIdentifier: 'TEZOS',
           },
         ],
-        { concurrent: false }
-      );
+        profit: { baseTokenAmount: '20010' },
+      };
+      const swapResults: SwapResult[] = [
+        {
+          result: {
+            type: 'OK',
+            operation: {
+              ecosystem: 'Tezos',
+              exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
+              operationHash: 'hashhashhash',
+              profit: { amount: '23443', decimals: '6' },
+              totalOperationCost: '3030', //string
+              baseToken: { ticker: 'XTZ' },
+              quoteToken: { ticker: 'kUSD' },
+            },
+          },
+        },
+      ];
 
       try {
-        await tasks.run();
+        await tasks(prices, profitOpportunity, swapResults, true).run();
       } catch (e) {
         console.error(e);
       }
@@ -442,84 +511,8 @@ describe('consoleReporterPlugin', () => {
         },
       ];
 
-      const tasks = new Listr<Ctx>(
-        [
-          {
-            title: reporter.report({ type: 'LIFECYCLE_START' }),
-            task: (ctx, task): Listr =>
-              task.newListr((parent) => [
-                {
-                  title: reporter.report({ type: 'PRICES_FETCHED' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.prices = prices;
-
-                    task.title = reporter.report({
-                      type: 'PRICES_FETCHED',
-                      prices: ctx.prices,
-                    });
-                  },
-                },
-                {
-                  title: reporter.report({
-                    type: 'PROFIT_FOUND',
-                  }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.profitOpportunity = profitOpportunity;
-
-                    task.title = reporter.report({
-                      type: 'PROFIT_FOUND',
-                      profitOpportunity: ctx.profitOpportunity,
-                    });
-                    ctx.opportunityFound = BigNumber(
-                      ctx.profitOpportunity.profit.baseTokenAmount
-                    ).isPositive();
-                    if (!ctx.opportunityFound) {
-                      parent.task.title =
-                        reporter.report({
-                          type: 'PROFIT_FOUND',
-                          profitOpportunity: ctx.profitOpportunity,
-                        }) +
-                        '\n' +
-                        reporter.report({
-                          type: 'LIFECYCLE_END',
-                        });
-                    }
-                  },
-                },
-                {
-                  title: reporter.report({ type: 'SWAPS_DONE' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.swapResults = swapResults;
-
-                    task.title = reporter.report({
-                      type: 'SWAPS_DONE',
-                      swapResults: ctx.swapResults,
-                    });
-
-                    parent.task.title =
-                      reporter.report({
-                        type: 'PROFIT_FOUND',
-                        profitOpportunity: ctx.profitOpportunity,
-                      }) +
-                      '\n' +
-                      reporter.report({
-                        type: 'SWAPS_DONE',
-                        swapResults: ctx.swapResults,
-                      });
-                  },
-                  enabled: (ctx): boolean => ctx.opportunityFound,
-                },
-              ]),
-          },
-        ],
-        { concurrent: false }
-      );
-
       try {
-        await tasks.run();
+        await tasks(prices, profitOpportunity, swapResults).run();
       } catch (e) {
         console.error(e);
       }
@@ -610,84 +603,8 @@ describe('consoleReporterPlugin', () => {
         },
       ];
 
-      const tasks = new Listr<Ctx>(
-        [
-          {
-            title: reporter.report({ type: 'LIFECYCLE_START' }),
-            task: (ctx, task): Listr =>
-              task.newListr((parent) => [
-                {
-                  title: reporter.report({ type: 'PRICES_FETCHED' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.prices = prices;
-
-                    task.title = reporter.report({
-                      type: 'PRICES_FETCHED',
-                      prices: ctx.prices,
-                    });
-                  },
-                },
-                {
-                  title: reporter.report({
-                    type: 'PROFIT_FOUND',
-                  }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.profitOpportunity = profitOpportunity;
-
-                    task.title = reporter.report({
-                      type: 'PROFIT_FOUND',
-                      profitOpportunity: ctx.profitOpportunity,
-                    });
-                    ctx.opportunityFound = BigNumber(
-                      ctx.profitOpportunity.profit.baseTokenAmount
-                    ).isPositive();
-                    if (!ctx.opportunityFound) {
-                      parent.task.title =
-                        reporter.report({
-                          type: 'PROFIT_FOUND',
-                          profitOpportunity: ctx.profitOpportunity,
-                        }) +
-                        '\n' +
-                        reporter.report({
-                          type: 'LIFECYCLE_END',
-                        });
-                    }
-                  },
-                },
-                {
-                  title: reporter.report({ type: 'SWAPS_DONE' }),
-                  task: async (ctx, task): Promise<void> => {
-                    await new Promise((f) => setTimeout(f, 3000));
-                    ctx.swapResults = swapResults;
-
-                    task.title = reporter.report({
-                      type: 'SWAPS_DONE',
-                      swapResults: ctx.swapResults,
-                    });
-
-                    parent.task.title =
-                      reporter.report({
-                        type: 'PROFIT_FOUND',
-                        profitOpportunity: ctx.profitOpportunity,
-                      }) +
-                      '\n' +
-                      reporter.report({
-                        type: 'SWAPS_DONE',
-                        swapResults: ctx.swapResults,
-                      });
-                  },
-                  enabled: (ctx): boolean => ctx.opportunityFound,
-                },
-              ]),
-          },
-        ],
-        { concurrent: false }
-      );
-
       try {
-        await tasks.run();
+        await tasks(prices, profitOpportunity, swapResults).run();
       } catch (e) {
         console.error(e);
       }
