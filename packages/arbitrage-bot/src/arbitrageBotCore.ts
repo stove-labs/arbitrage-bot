@@ -1,35 +1,13 @@
 import { ExchangePlugin } from './exchange/interface';
 import { ExchangePrice } from './exchange/types';
 import { ReporterPlugin } from './reporter/interface';
-import {
-  Config,
-  ProfitOpportunity,
-  SwapResult,
-  Token,
-  TokenPlugin,
-} from './types';
+import { Config, ProfitOpportunity, SwapResult, TokenPlugin } from './types';
 import { BigNumber } from 'bignumber.js';
 import { Listr } from 'listr2';
+import { ExchangeManager } from './exchangeManager';
+import { NUMBER_OF_RETRIES } from './constants';
 
 export * from './types';
-
-const NUMBER_OF_RETRIES = 3;
-
-class ExchangeManager {
-  constructor(public exchanges: ExchangePlugin[], public token: TokenPlugin) {}
-  public async fetchPrices(
-    baseToken: Token,
-    quoteToken: Token
-  ): Promise<ExchangePrice[]> {
-    const prices = await Promise.all(
-      this.exchanges.map((exchange) =>
-        exchange.fetchPrice(baseToken, quoteToken)
-      )
-    );
-
-    return prices;
-  }
-}
 
 export class ArbitrageBotCore {
   public exchangeManager: ExchangeManager;
@@ -44,18 +22,6 @@ export class ArbitrageBotCore {
     }
   }
 
-  get reporter(): ReporterPlugin {
-    return this.config.plugins.reporter;
-  }
-
-  get token(): TokenPlugin {
-    return this.config.plugins.token;
-  }
-
-  get exchanges(): ExchangePlugin[] {
-    return this.config.plugins.exchanges;
-  }
-
   async start() {
     this.exchangeManager = new ExchangeManager(this.exchanges, this.token);
 
@@ -67,54 +33,46 @@ export class ArbitrageBotCore {
   }
 
   get tasks() {
-    return new Listr(
-      [
-        {
-          task: async (_, task): Promise<void> => {
-            // This try-catch block is here because Error messes up the formatting
-            try {
-              this.reportFetchPricesStart(task);
+    const tasks = {
+      task: async (_, task): Promise<void> => {
+        // This try-catch block is here because Error messes up the formatting
+        try {
+          // fetch prices from exchanges
+          this.reportFetchPricesStart(task);
+          const prices: ExchangePrice[] =
+            await this.exchangeManager.fetchPrices(
+              this.config.baseToken,
+              this.config.quoteToken
+            );
+          this.reportFetchPricesEnd(task, prices);
 
-              const prices: ExchangePrice[] =
-                await this.exchangeManager.fetchPrices(
-                  this.config.baseToken,
-                  this.config.quoteToken
-                );
+          // find arbitrage, calculate profit opportunity
+          this.reportFindProfitOpportunityStart(task);
+          const profitOpportunity: ProfitOpportunity =
+            this.config.plugins.profitFinder.findProfits(prices);
+          this.reportFindProfitOpportunityEnd(task, profitOpportunity);
+          // restart lifecycle if no profit was found
+          if (!this.hasPositiveProfit(task, profitOpportunity)) return;
 
-              this.reportFetchPricesEnd(task, prices);
-              this.reportFindProfitOpportunityStart(task);
+          // execute swaps for arbitrage
+          this.reportSwapStart(task);
+          const swapResults: SwapResult[] =
+            await this.config.plugins.swapExecutionManager.executeSwaps(
+              profitOpportunity.swaps
+            );
+          this.reportSwapEnd(task, swapResults);
+        } catch (e) {
+          task.output = '';
+          throw e;
+        }
+      },
+      retry: NUMBER_OF_RETRIES,
+    };
 
-              const profitOpportunity: ProfitOpportunity =
-                this.config.plugins.profitFinder.findProfits(prices);
-
-              this.reportFindProfitOpportunityEnd(task, profitOpportunity);
-
-              if (
-                !this.checkIfThereIsProfitOpportunity(task, profitOpportunity)
-              )
-                return;
-
-              this.reportSwapStart(task);
-
-              const swapResults: SwapResult[] =
-                await this.config.plugins.swapExecutionManager.executeSwaps(
-                  profitOpportunity.swaps
-                );
-
-              this.reportSwapEnd(task, swapResults);
-            } catch (e) {
-              task.output = '';
-              throw e;
-            }
-          },
-          retry: NUMBER_OF_RETRIES,
-        },
-      ],
-      {
-        concurrent: false,
-        exitOnError: true,
-      }
-    );
+    return new Listr([tasks], {
+      concurrent: false,
+      exitOnError: true,
+    });
   }
 
   startingTitle = (): string => {
@@ -153,10 +111,7 @@ export class ArbitrageBotCore {
   };
 
   // returns true if there is profit opportunity
-  checkIfThereIsProfitOpportunity = (
-    task,
-    profitOpportunity: ProfitOpportunity
-  ): boolean => {
+  hasPositiveProfit = (task, profitOpportunity: ProfitOpportunity): boolean => {
     if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
       task.title =
         this.reporter.report({
@@ -184,4 +139,16 @@ export class ArbitrageBotCore {
         swapResults,
       });
   };
+
+  get reporter(): ReporterPlugin {
+    return this.config.plugins.reporter;
+  }
+
+  get token(): TokenPlugin {
+    return this.config.plugins.token;
+  }
+
+  get exchanges(): ExchangePlugin[] {
+    return this.config.plugins.exchanges;
+  }
 }
