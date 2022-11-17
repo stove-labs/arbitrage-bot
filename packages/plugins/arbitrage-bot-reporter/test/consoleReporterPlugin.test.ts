@@ -12,21 +12,18 @@ import { step } from 'mocha-steps';
 
 const reporter = new ConsoleReporterPlugin();
 
-const startingTitle = (): string => {
-  return reporter.report({
-    type: 'LIFECYCLE_START',
-  })
-    ? reporter.report({ type: 'LIFECYCLE_START' }) + '\n'
-    : '';
-};
-
 const reportFetchPricesStart = (task) => {
-  task.title = startingTitle() + reporter.report({ type: 'PRICES_FETCHED' });
+  task.title =
+    reporter.report({
+      type: 'LIFECYCLE_START',
+    }) + reporter.report({ type: 'PRICES_FETCHED' });
 };
 
 const reportFetchPricesEnd = (task, prices: ExchangePrice[]) => {
   task.title =
-    startingTitle() +
+    reporter.report({
+      type: 'LIFECYCLE_START',
+    }) +
     reporter.report({
       type: 'PRICES_FETCHED',
       prices,

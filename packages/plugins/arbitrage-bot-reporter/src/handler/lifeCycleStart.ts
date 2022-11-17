@@ -1,7 +1,7 @@
 import { DEBUG } from '../consoleReporterPlugin';
 
 export const handleLifeCycleStart = () => {
-  if (!DEBUG) return;
+  if (!DEBUG) return '';
 
-  return 'Life cycle started';
+  return 'Life cycle started \n';
 };

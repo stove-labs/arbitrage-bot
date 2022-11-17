@@ -76,22 +76,18 @@ export class ArbitrageBotCore {
     });
   }
 
-  startingTitle = (): string => {
-    return this.reporter.report({
-      type: 'LIFECYCLE_START',
-    })
-      ? this.reporter.report({ type: 'LIFECYCLE_START' }) + '\n'
-      : '';
-  };
-
   reportFetchPricesStart = (task) => {
     task.title =
-      this.startingTitle() + this.reporter.report({ type: 'PRICES_FETCHED' });
+      this.reporter.report({
+        type: 'LIFECYCLE_START',
+      }) + this.reporter.report({ type: 'PRICES_FETCHED' });
   };
 
   reportFetchPricesEnd = (task, prices: ExchangePrice[]) => {
     task.title =
-      this.startingTitle() +
+      this.reporter.report({
+        type: 'LIFECYCLE_START',
+      }) +
       this.reporter.report({
         type: 'PRICES_FETCHED',
         prices,

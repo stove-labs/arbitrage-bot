@@ -9,7 +9,7 @@ import {
 } from '../consoleReporterPlugin';
 import { BigNumber } from 'bignumber.js';
 
-export const handleSwapsDone = (swapResults: SwapResult[]) => {
+export const handleSwapsDone = (swapResults?: SwapResult[]) => {
   if (!STATUS) return;
   if (!swapResults) return 'Performing swap...';
   if (swapResults.some((swap) => swap.result.type === 'ERROR')) {

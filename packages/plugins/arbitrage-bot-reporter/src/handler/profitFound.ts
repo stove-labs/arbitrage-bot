@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js';
 import { cyan, green, red } from 'chalk';
 import { formattedTicker, tickerColor, profitColor, DEBUG, INFO, STATUS } from '../consoleReporterPlugin';
 
-export const handleProfitFound = (profitOpportunity: ProfitOpportunity) => {
+export const handleProfitFound = (profitOpportunity?: ProfitOpportunity) => {
   if (!profitOpportunity) return 'Searching for profit opportunity...';
   const profit = Number(profitOpportunity.profit.baseTokenAmount);
   const isPositiveProfit = BigNumber(profit).isPositive();
