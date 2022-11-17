@@ -17,4 +17,4 @@ export * from './token/types';
 
 export * from './trigger/types';
 
-export * from './chain/types';
+export * from '../chainTypes';
