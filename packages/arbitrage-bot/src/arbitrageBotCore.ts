@@ -14,14 +14,6 @@ export class ArbitrageBotCore {
 
   constructor(public config: Config) {}
 
-  async startLifecycle() {
-    try {
-      await this.tasks.run();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   async start() {
     this.exchangeManager = new ExchangeManager(this.exchanges, this.token);
 
@@ -32,44 +24,53 @@ export class ArbitrageBotCore {
     });
   }
 
-  get tasks() {
-    const tasks = {
-      task: async (_, task): Promise<void> => {
-        // This try-catch block is here because Error messes up the formatting
-        try {
-          // fetch prices from exchanges
-          this.reportFetchPricesStart(task);
-          const prices: ExchangePrice[] =
-            await this.exchangeManager.fetchPrices(
-              this.config.baseToken,
-              this.config.quoteToken
-            );
-          this.reportFetchPricesEnd(task, prices);
+  async startLifecycle() {
+    try {
+      await this.taskManager.run();
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
-          // find arbitrage, calculate profit opportunity
-          this.reportFindProfitOpportunityStart(task);
-          const profitOpportunity: ProfitOpportunity =
-            this.config.plugins.profitFinder.findProfits(prices);
-          this.reportFindProfitOpportunityEnd(task, profitOpportunity);
-          // restart lifecycle if no profit was found
-          if (!this.hasPositiveProfit(task, profitOpportunity)) return;
+  get taskManager() {
+    const completeLifeCycle = async (_, task): Promise<void> => {
+      // This try-catch block is here because an Error messes up the formatting
+      try {
+        // fetch prices from exchanges
+        this.reportFetchPricesStart(task);
+        const prices: ExchangePrice[] = await this.exchangeManager.fetchPrices(
+          this.config.baseToken,
+          this.config.quoteToken
+        );
+        this.reportFetchPricesEnd(task, prices);
 
-          // execute swaps for arbitrage
-          this.reportSwapStart(task);
-          const swapResults: SwapResult[] =
-            await this.config.plugins.swapExecutionManager.executeSwaps(
-              profitOpportunity.swaps
-            );
-          this.reportSwapEnd(task, swapResults);
-        } catch (e) {
-          task.output = '';
-          throw e;
-        }
-      },
+        // find arbitrage, calculate profit opportunity
+        this.reportFindProfitOpportunityStart(task);
+        const profitOpportunity: ProfitOpportunity =
+          this.config.plugins.profitFinder.findProfits(prices);
+        this.reportFindProfitOpportunityEnd(task, profitOpportunity);
+        // restart lifecycle if no profit was found
+        if (!this.hasPositiveProfit(task, profitOpportunity)) return;
+
+        // execute swaps for arbitrage
+        this.reportSwapStart(task);
+        const swapResults: SwapResult[] =
+          await this.config.plugins.swapExecutionManager.executeSwaps(
+            profitOpportunity.swaps
+          );
+        this.reportSwapEnd(task, swapResults);
+      } catch (e) {
+        task.output = '';
+        throw e;
+      }
+    };
+
+    const task = {
+      task: completeLifeCycle,
       retry: NUMBER_OF_RETRIES,
     };
 
-    return new Listr([tasks], {
+    return new Listr([task], {
       concurrent: false,
       exitOnError: true,
     });
@@ -110,7 +111,20 @@ export class ArbitrageBotCore {
       });
   };
 
-  // returns true if there is profit opportunity
+  reportSwapStart = (task) => {
+    task.output = this.reporter.report({ type: 'SWAPS_DONE' });
+  };
+
+  reportSwapEnd = (task, swapResults: SwapResult[]) => {
+    task.title +=
+      '\n' +
+      this.reporter.report({
+        type: 'SWAPS_DONE',
+        swapResults,
+      });
+  };
+
+  // returns true if there is a profit opportunity
   hasPositiveProfit = (task, profitOpportunity: ProfitOpportunity): boolean => {
     if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
       task.title =
@@ -125,19 +139,6 @@ export class ArbitrageBotCore {
     }
 
     return BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive();
-  };
-
-  reportSwapStart = (task) => {
-    task.output = this.reporter.report({ type: 'SWAPS_DONE' });
-  };
-
-  reportSwapEnd = (task, swapResults: SwapResult[]) => {
-    task.title +=
-      '\n' +
-      this.reporter.report({
-        type: 'SWAPS_DONE',
-        swapResults,
-      });
   };
 
   get reporter(): ReporterPlugin {
