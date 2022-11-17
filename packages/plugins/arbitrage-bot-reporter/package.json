@@ -25,8 +25,8 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc",
-    "test": "mocha -r ts-node/register test/*.ts",
-    "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
+    "test": "mocha --require mocha-steps -r ts-node/register test/*.ts",
+    "test:watch": "mocha --require mocha-steps -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'"
   },
   "bugs": {
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"

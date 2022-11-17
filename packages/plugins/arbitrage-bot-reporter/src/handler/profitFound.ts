@@ -1,47 +1,41 @@
 import { ProfitOpportunity } from '@stove-labs/arbitrage-bot';
 import { BigNumber } from 'bignumber.js';
 import { cyan, green, red } from 'chalk';
-import {
-  warning,
-  tickerColor,
-  DEBUG,
-  INFO,
-  STATUS,
-} from '../consoleReporterPlugin';
+import { formattedTicker, tickerColor, profitColor, DEBUG, INFO, STATUS } from '../consoleReporterPlugin';
 
-const profitColor = (isPositive: boolean) => {
-  return isPositive ? green : red;
-};
-
-export const handleProfitFound = (profitOpportunity: ProfitOpportunity) => {
+export const handleProfitFound = (profitOpportunity?: ProfitOpportunity) => {
+  if (!profitOpportunity) return 'Searching for profit opportunity...';
   const profit = Number(profitOpportunity.profit.baseTokenAmount);
   const isPositiveProfit = BigNumber(profit).isPositive();
+  if (!isPositiveProfit) return 'Profit opportunity not detected';
+  let message = '';
 
   // INFO('Profit opportunity ' + warning('computed'));
 
   // report whether profit opportunity was detected
-  STATUS(
-    'Profit opportunity ' +
-      profitColor(isPositiveProfit)(
-        isPositiveProfit ? `detected` : `not detected`
-      )
+
+  message = updateMessage(
+    message,
+    STATUS,
+    `Profit opportunity:   ${green('Detected')}`
   );
   // Report on SWAP 1
-  INFO(getSwap1Spend(profitOpportunity));
+  message = updateMessage(message, INFO, getSwap1Spend(profitOpportunity));
   // Report on SWAP 2
-  INFO(getSwap2Receive(profitOpportunity));
-
-  // report expected profit
-  isPositiveProfit
-    ? STATUS(getExpectedProfit(profitOpportunity))
-    : INFO(getExpectedProfit(profitOpportunity));
+  (message = updateMessage(message, INFO, getSwap2Receive(profitOpportunity))),
+    // report expected profit
+    (message = isPositiveProfit
+      ? updateMessage(message, STATUS, getExpectedProfit(profitOpportunity))
+      : updateMessage(message, INFO, getExpectedProfit(profitOpportunity)));
 
   // report trading path
-  isPositiveProfit
-    ? STATUS(getTradingPath(profitOpportunity))
-    : INFO(getTradingPath(profitOpportunity));
+  message = isPositiveProfit
+    ? updateMessage(message, STATUS, getTradingPath(profitOpportunity))
+    : updateMessage(message, INFO, getTradingPath(profitOpportunity));
 
-  DEBUG(profitOpportunity);
+  message = updateMessage(message, DEBUG, JSON.stringify(profitOpportunity,null, 2));
+
+  return message;
 };
 
 const getSwap1Spend = (profitOpportunity: ProfitOpportunity) => {
@@ -49,8 +43,8 @@ const getSwap1Spend = (profitOpportunity: ProfitOpportunity) => {
   const tokenInAmount = profitOpportunity.swaps[0].limitWithoutSlippage;
   const tokenInDecimals = profitOpportunity.swaps[0].tokenInDecimals;
   return (
-    'Spend ' +
-    tickerColor(tokenInTicker) +
+    'Spend:                ' +
+    tickerColor(formattedTicker(tokenInTicker)) +
     cyan(
       ` ${(Number(tokenInAmount) / 10 ** tokenInDecimals).toFixed(
         tokenInDecimals
@@ -64,8 +58,8 @@ const getSwap2Receive = (profitOpportunity: ProfitOpportunity) => {
   const tokenOutAmount = profitOpportunity.swaps[1].limitWithoutSlippage;
   const tokenOutDecimals = profitOpportunity.swaps[1].tokenOutDecimals;
   return (
-    'Receive ' +
-    tickerColor(tokenOutTicker) +
+    'Receive:              ' +
+    tickerColor(formattedTicker(tokenOutTicker)) +
     cyan(
       ` ${(Number(tokenOutAmount) / 10 ** tokenOutDecimals).toFixed(
         tokenOutDecimals
@@ -76,7 +70,7 @@ const getSwap2Receive = (profitOpportunity: ProfitOpportunity) => {
 
 const getTradingPath = (profitOpportunity: ProfitOpportunity) => {
   return (
-    'Path: ' +
+    'Path:                 ' +
     tickerColor(profitOpportunity.swaps[0].tokenIn.ticker) +
     ' -> ' +
     tickerColor(profitOpportunity.swaps[0].tokenOut.ticker) +
@@ -92,9 +86,19 @@ const getExpectedProfit = (profitOpportunity: ProfitOpportunity) => {
   const expectedProfitString = ` ${profit / 10 ** tokenOutDecimals}`;
 
   return (
-    `Expected profit ` +
-    tickerColor(tokenOutTicker) +
+    `Expected profit:      ` +
+    tickerColor(formattedTicker(tokenOutTicker)) +
     profitColor(isPositiveProfit)(expectedProfitString) +
     ' (w/o tx fees)'
   );
+};
+
+const updateMessage = (
+  message: string,
+  shouldInclude: boolean,
+  addition: any
+): string => {
+  if (!shouldInclude) return message;
+
+  return message + addition.toString() + '\n';
 };
