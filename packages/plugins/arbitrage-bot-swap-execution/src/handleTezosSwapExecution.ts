@@ -52,6 +52,7 @@ export const handleTezosSwapExecution = async (
 
   const operation = await tezos.contract.batch(batchParameters).send();
   debugLogOpResults(operation);
+  await operation.confirmation(1);
 
   return {
     result: {

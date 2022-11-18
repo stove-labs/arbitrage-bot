@@ -2,6 +2,8 @@
 
 This arbitrage bot speculates on the price differences between two markets, by taking advantage of the difference in asset prices and trades for a profit. The strategy is to buy crypto at a lower price on one exchange and sell immediately at a higher price on the other.
 
+<img src="https://user-images.githubusercontent.com/8685779/202212510-83cf4879-a7ce-47be-a75a-c8846af046e7.gif" alt="cli-arbitrage-bot" width="700"/>
+
 ## Benefits
 
 - Modular plugin architecture: easy to expand support for more markets; improve reporting capabilities or replacing tailored profit finding algorithms (eg. stable swap).

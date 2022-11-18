@@ -1,4 +1,5 @@
 import { EcosystemIdentifier, EcosystemKey } from './ecosystem/types';
+import { AccountantPlugin } from './accountant/interface';
 import { ExchangePlugin } from './exchange/interface';
 import { ProfitFinderPlugin } from './profit-finder/interface';
 import { ReporterPlugin } from './reporter/interface';
@@ -40,6 +41,7 @@ export interface Config {
     reporter: ReporterPlugin;
     profitFinder: ProfitFinderPlugin;
     keychains: Record<EcosystemIdentifier, EcosystemKey>[];
+    accountant: AccountantPlugin;
     swapExecutionManager: SwapExecutionManager;
   };
 }

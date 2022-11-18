@@ -6,7 +6,6 @@ import {
   TokenList,
 } from '@stove-labs/arbitrage-bot';
 import { ExchangeQuipuswapPlugin } from '@stove-labs/tezos-dex-quipuswap';
-import { ExchangeVortexPlugin } from '@stove-labs/tezos-dex-vortex';
 import { ConsoleReporterPlugin } from '@stove-labs/arbitrage-bot-reporter';
 import { ProfitFinderLitePlugin } from '@stove-labs/arbitrage-bot-profit-finder-lite';
 import { TokenRegistryPlugin } from '@stove-labs/arbitrage-bot-token-registry';
@@ -20,8 +19,8 @@ import rpcConfig from '../config';
 
 import { TezosToolkit } from '@taquito/taquito';
 
-describe('Quipuswap-Vortex', () => {
-  it('can perform arbitrage between quipuswap and vortex', async () => {
+describe('Quipuswap1-Quipuswap2', () => {
+  it('can perform arbitrage between quipuswap and quipuswap', async () => {
     const tokenListTezos: TokenList = [
       {
         ticker: 'XTZ',
@@ -40,7 +39,7 @@ describe('Quipuswap-Vortex', () => {
     const quipuswapList: ExchangeRegistry = [
       {
         address: require('../integration-tests/deployments/exchange1'),
-        identifier: 'QUIPUSWAP',
+        identifier: 'QUIPUSWAP1',
         ticker1: 'XTZ',
         ticker2: 'kUSD',
       },
@@ -48,8 +47,8 @@ describe('Quipuswap-Vortex', () => {
 
     const vortexList: ExchangeRegistry = [
       {
-        address: require('../integration-tests/deployments/vortexExchange'),
-        identifier: 'VORTEX',
+        address: require('../integration-tests/deployments/exchange2'),
+        identifier: 'QUIPUSWAP2',
         ticker1: 'XTZ',
         ticker2: 'kUSD',
       },
@@ -57,22 +56,22 @@ describe('Quipuswap-Vortex', () => {
     const sandboxRpc = rpcConfig.rpc;
     const exchangeConfigQuipuswap: ExchangePluginConfig = {
       rpc: sandboxRpc,
-      identifier: 'QUIPUSWAP',
+      identifier: 'QUIPUSWAP1',
       ecosystemIdentifier: 'TEZOS',
       tokenInstances: tokenRegistryTezos,
       exchangeInstances: quipuswapList,
     };
 
-    const exchangeConfigVortex: ExchangePluginConfig = {
+    const exchangeConfigQuipuswap2: ExchangePluginConfig = {
       rpc: sandboxRpc,
-      identifier: 'VORTEX',
+      identifier: 'QUIPUSWAP2',
       ecosystemIdentifier: 'TEZOS',
       tokenInstances: tokenRegistryTezos,
       exchangeInstances: vortexList,
     };
     const exchanges = [
       new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap),
-      new ExchangeVortexPlugin(exchangeConfigVortex),
+      new ExchangeQuipuswapPlugin(exchangeConfigQuipuswap2),
     ];
 
     const botAddress = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';

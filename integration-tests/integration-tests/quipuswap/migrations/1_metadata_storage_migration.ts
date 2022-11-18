@@ -1,6 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
-import config from '../../config';
+import config from '../../../config';
 import accounts from '../../accounts';
 import metadataContract from '../contracts/MetadataStorage.json';
 import metadataStorage from '../storage/MetadataStorage';
