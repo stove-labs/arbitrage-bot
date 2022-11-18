@@ -1,0 +1,40 @@
+{
+  "name": "@stove-labs/arbitrage-bot-accountant",
+  "version": "0.0.0",
+  "description": "accounting for tezos balances",
+  "keywords": [
+    "tezos",
+    "balance",
+    "fetching",
+    "FA12",
+    "FA2"
+  ],
+  "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
+  "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
+  "license": "MIT",
+  "main": "./dist/lib/accountant.js",
+  "typings": "./dist/types/accountant.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stove-labs/arbitrage-bot.git"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "test": "mocha -r ts-node/register test/*.ts",
+    "test:watch": "mocha -r ts-node/register test/**.ts --watch-extensions ts --watch --watch-files src, './test/**.test.ts'"
+  },
+  "bugs": {
+    "url": "https://github.com/stove-labs/arbitrage-bot/issues"
+  },
+  "dependencies": {
+    "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@stove-labs/arbitrage-bot-token-registry": "^0.0.0",
+    "@taquito/taquito": "^14.1.0"
+  }
+}

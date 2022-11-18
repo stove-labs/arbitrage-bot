@@ -8,7 +8,7 @@ import { TezosToolkit, OpKind, ParamsWithKind } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 import { MichelsonMap } from '@taquito/michelson-encoder';
 import accounts from '../../accounts';
-import config from '../../config';
+import config from '../../../config';
 import factoryStorage from '../storage/Factory';
 import metadataStorageInstance from '../../deployments/metadataContract';
 import bakeryInstance from '../../deployments/bakerRegistry';

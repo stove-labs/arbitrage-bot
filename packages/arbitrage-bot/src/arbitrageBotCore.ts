@@ -1,21 +1,45 @@
 import { ExchangePlugin } from './exchange/interface';
 import { ExchangePrice } from './exchange/types';
 import { ReporterPlugin } from './reporter/interface';
-import { Config, ProfitOpportunity, SwapResult, TokenPlugin } from './types';
+import { NUMBER_OF_RETRIES } from './constants';
+import {
+  AccountantPlugin,
+  Config,
+  EcosystemIdentifier,
+  ProfitFinderPlugin,
+  SwapExecutionManager,
+  Token,
+  ProfitOpportunity,
+  SwapResult,
+  TokenPlugin,
+} from './types';
+
+import { AccountantManager } from './accountantManager';
+import { ExchangeManager } from './exchangeManager';
+
 import { BigNumber } from 'bignumber.js';
 import { Listr } from 'listr2';
-import { ExchangeManager } from './exchangeManager';
-import { NUMBER_OF_RETRIES } from './constants';
 
 export * from './types';
 
 export class ArbitrageBotCore {
   public exchangeManager: ExchangeManager;
+  public accountantManager: AccountantManager;
+  public ecosystems: EcosystemIdentifier[];
 
   constructor(public config: Config) {}
 
   async start() {
+    this.ecosystems = this.keychain.flatMap(
+      (key) => Object.keys(key) as EcosystemIdentifier[]
+    );
     this.exchangeManager = new ExchangeManager(this.exchanges, this.token);
+    this.accountantManager = new AccountantManager(
+      this.accountant,
+      this.ecosystems,
+      this.config.baseToken,
+      this.config.quoteToken
+    );
 
     // register the trigger
     this.config.plugins.trigger.register(async () => {
@@ -38,6 +62,7 @@ export class ArbitrageBotCore {
       try {
         // fetch prices from exchanges
         this.reportFetchPricesStart(task);
+        await this.accountantManager.fetchBalancesBefore();
         const prices: ExchangePrice[] = await this.exchangeManager.fetchPrices(
           this.config.baseToken,
           this.config.quoteToken
@@ -58,6 +83,11 @@ export class ArbitrageBotCore {
           await this.config.plugins.swapExecutionManager.executeSwaps(
             profitOpportunity.swaps
           );
+        await this.accountantManager.fetchBalancesAfter();
+        // this.reporter.report({
+        //   type: 'ARBITRAGE_COMPLETE',
+        //   payload: this.accountantManager.createReport(),
+        // });
         this.reportSwapEnd(task, swapResults);
       } catch (e) {
         task.output = '';
@@ -147,5 +177,21 @@ export class ArbitrageBotCore {
 
   get exchanges(): ExchangePlugin[] {
     return this.config.plugins.exchanges;
+  }
+
+  get profitFinder(): ProfitFinderPlugin {
+    return this.config.plugins.profitFinder;
+  }
+
+  get swapExecutionManager(): SwapExecutionManager {
+    return this.config.plugins.swapExecutionManager;
+  }
+
+  get accountant(): AccountantPlugin {
+    return this.config.plugins.accountant;
+  }
+
+  get keychain() {
+    return this.config.plugins.keychains;
   }
 }

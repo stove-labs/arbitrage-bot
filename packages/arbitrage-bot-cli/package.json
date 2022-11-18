@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot": "^0.0.0",
+    "@stove-labs/arbitrage-bot-accountant": "^0.0.0",
     "@stove-labs/arbitrage-bot-profit-finder-lite": "^0.0.0",
     "@stove-labs/arbitrage-bot-reporter": "^0.0.0",
     "@stove-labs/arbitrage-bot-token-registry": "^0.0.0",
