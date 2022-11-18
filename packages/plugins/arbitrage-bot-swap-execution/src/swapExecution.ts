@@ -16,7 +16,7 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
     public exchanges: ExchangePlugin[],
     public keychains: Record<EcosystemIdentifier, EcosystemKey>[]
   ) {}
-  
+
   getExchangePluginBySwap(swap: Swap): ExchangePlugin {
     return this.exchanges.find(
       (exchange) =>
@@ -55,14 +55,22 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
             )) {
               batchParameters = [...batchParameters, ...operationParameters];
             }
-
-            const swapResultTezos = await handleTezosSwapExecution(
-              swaps,
-              batchParameters,
-              tezosKey
-            );
-
-            return swapResultTezos;
+            console.log(JSON.stringify(batchParameters));
+            try {
+              const swapResultTezos = await handleTezosSwapExecution(
+                swaps,
+                batchParameters,
+                tezosKey
+              );
+              return swapResultTezos;
+            } catch (error) {
+              return {
+                result: {
+                  type: 'ERROR',
+                  data: error.errors,
+                },
+              } as SwapResult;
+            }
           }
         }
       );
