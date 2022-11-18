@@ -1,15 +1,12 @@
-import { Swap, Token, TokenPlugin } from '../types';
-import { EcosystemIdentifier } from '../types';
 import {
   ExchangeIdentifier,
   ExchangePrice,
   ExchangePluginConfig,
 } from './types';
-import {
-  withKind,
-  TransferParams,
-  OpKind,
-} from '@taquito/taquito';
+import { withKind, TransferParams, OpKind } from '@taquito/taquito';
+import { EcosystemIdentifier } from '../ecosystem/types';
+import { Token } from '../token/types';
+import { Swap } from '../blockchain/types';
 
 export interface ExchangePlugin {
   config: ExchangePluginConfig;

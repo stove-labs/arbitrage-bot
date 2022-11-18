@@ -1,4 +1,17 @@
+import { EcosystemIdentifier, EcosystemKey } from './ecosystem/types';
+import { ExchangePlugin } from './exchange/interface';
+import { ProfitFinderPlugin } from './profit-finder/interface';
+import { ReporterPlugin } from './reporter/interface';
+import { SwapExecutionManager } from './swap-execution/interface';
+import { TokenPlugin } from './token/interface';
+import { Token } from './token/types';
+import { TriggerPlugin } from './trigger/types';
+
 export * from './accountant/interface';
+
+export * from './blockchain/types';
+
+export * from './ecosystem/types';
 
 export * from './exchange/interface';
 export * from './exchange/types';
@@ -17,4 +30,16 @@ export * from './token/types';
 
 export * from './trigger/types';
 
-export * from '../chainTypes';
+export interface Config {
+  baseToken: Token;
+  quoteToken: Token;
+  plugins: {
+    exchanges: ExchangePlugin[];
+    token: TokenPlugin;
+    trigger: TriggerPlugin;
+    reporter: ReporterPlugin;
+    profitFinder: ProfitFinderPlugin;
+    keychains: Record<EcosystemIdentifier, EcosystemKey>[];
+    swapExecutionManager: SwapExecutionManager;
+  };
+}

@@ -1,6 +1,6 @@
 import { ExchangePrice } from '../exchange/types';
-import { SwapResult } from '../types';
 import { ProfitOpportunity } from '../profit-finder/types';
+import { SwapResult } from '../swap-execution/types';
 
 export type ReporterPluginEvent =
   | { type: 'LIFECYCLE_START' }

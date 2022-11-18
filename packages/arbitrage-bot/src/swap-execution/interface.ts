@@ -1,4 +1,5 @@
-import { ExchangePlugin, Swap } from '../types';
+import { Swap } from '../blockchain/types';
+import { ExchangePlugin } from '../exchange/interface';
 import { SwapResult } from './types';
 
 export interface SwapExecutionManager {
