@@ -55,7 +55,7 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
             )) {
               batchParameters = [...batchParameters, ...operationParameters];
             }
-            console.log(JSON.stringify(batchParameters));
+
             try {
               const swapResultTezos = await handleTezosSwapExecution(
                 swaps,

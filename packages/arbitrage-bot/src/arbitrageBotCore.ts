@@ -43,8 +43,7 @@ export class ArbitrageBotCore {
   async startLifecycle() {
     this.reporter.report({ type: 'LIFECYCLE_START' });
     await this.accountantManager.fetchBalancesBefore();
-    console.log(await this.accountant.getBalance({ ticker: 'kUSD' }, 'TEZOS'));
-
+    
     const prices = await this.exchangeManager.fetchPrices(
       this.config.baseToken,
       this.config.quoteToken
