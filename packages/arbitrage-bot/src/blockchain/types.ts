@@ -1,10 +1,11 @@
 import { InMemorySigner } from '@taquito/signer';
 import { EcosystemIdentifier } from '../ecosystem/types';
 import { ExchangeIdentifier } from '../exchange/types';
-import { Token } from '../token/types';
+import { NativeToken, Token, TokenFA12, TokenFA2 } from '../token/types';
 
 export interface Balance {
   amount: string;
+  token?: TokenFA12 | TokenFA2 | NativeToken;
 }
 
 export interface TezosKey {
