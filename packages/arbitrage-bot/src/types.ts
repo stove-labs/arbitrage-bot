@@ -1,16 +1,18 @@
-import { InMemorySigner } from '@taquito/signer';
+import { EcosystemIdentifier, EcosystemKey } from './ecosystem/types';
 import { AccountantPlugin } from './accountant/interface';
-
 import { ExchangePlugin } from './exchange/interface';
-import { ExchangeIdentifier } from './exchange/types';
 import { ProfitFinderPlugin } from './profit-finder/interface';
 import { ReporterPlugin } from './reporter/interface';
 import { SwapExecutionManager } from './swap-execution/interface';
 import { TokenPlugin } from './token/interface';
-import { NativeToken, Token, TokenFA12, TokenFA2 } from './token/types';
+import { Token } from './token/types';
 import { TriggerPlugin } from './trigger/types';
 
 export * from './accountant/interface';
+
+export * from './blockchain/types';
+
+export * from './ecosystem/types';
 
 export * from './exchange/interface';
 export * from './exchange/types';
@@ -29,22 +31,6 @@ export * from './token/types';
 
 export * from './trigger/types';
 
-export interface Balance {
-  amount: string;
-  token?: TokenFA12 | TokenFA2 | NativeToken;
-}
-
-export type EcosystemIdentifier = 'TEZOS';
-
-export interface TezosKey {
-  address: string;
-  signer: InMemorySigner;
-  rpc: string;
-  multiplier?: number;
-}
-
-export type EcosystemKey = TezosKey;
-
 export interface Config {
   baseToken: Token;
   quoteToken: Token;
@@ -59,23 +45,3 @@ export interface Config {
     swapExecutionManager: SwapExecutionManager;
   };
 }
-
-export enum SwapType {
-  BUY = 'BUY',
-  SELL = 'SELL',
-}
-
-export interface Swap {
-  tokenIn: Token;
-  tokenOut: Token;
-  tokenInDecimals: number;
-  tokenOutDecimals: number;
-  type: SwapType;
-  amount: string;
-  limit: string;
-  limitWithoutSlippage: string;
-  ecosystemIdentifier: EcosystemIdentifier;
-  identifier: ExchangeIdentifier;
-}
-
-export type Address = string;

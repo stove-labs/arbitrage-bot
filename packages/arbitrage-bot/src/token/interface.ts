@@ -1,6 +1,4 @@
-import {
-  EcosystemIdentifier
-} from '../types';
+import { EcosystemIdentifier } from '../ecosystem/types';
 import {
   NativeToken,
   Token,

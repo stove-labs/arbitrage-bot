@@ -1,4 +1,5 @@
-import { Address, EcosystemIdentifier } from '../types';
+import { EcosystemIdentifier } from '../ecosystem/types';
+import { Address } from '../types';
 
 export interface Token {
   ticker: string;
