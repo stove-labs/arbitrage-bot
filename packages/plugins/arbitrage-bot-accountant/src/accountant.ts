@@ -17,7 +17,10 @@ export class Accountant implements AccountantPlugin {
     public provider: Record<EcosystemIdentifier, any>
   ) {}
 
-  async getBalance(token: Token, ecosystemIdentifier: EcosystemIdentifier) {
+  async getBalance(
+    token: Token,
+    ecosystemIdentifier: EcosystemIdentifier
+  ): Promise<Balance> {
     const tokenInstance = this.tokenPlugin.getTokenInfo(
       token,
       ecosystemIdentifier
@@ -33,7 +36,9 @@ export class Accountant implements AccountantPlugin {
     }
   }
 
-  async handleTezosBalance(token: NativeToken | TokenFA12 | TokenFA2) {
+  async handleTezosBalance(
+    token: NativeToken | TokenFA12 | TokenFA2
+  ): Promise<Balance> {
     const provider = this.provider.TEZOS as TezosToolkit;
     let balance: Balance;
 
@@ -41,6 +46,7 @@ export class Accountant implements AccountantPlugin {
       // XTZ
       case 'native':
         balance = {
+          token,
           amount: await (
             await provider.tz.getBalance(this.botAddress.TEZOS)
           ).toFixed(),
@@ -50,15 +56,15 @@ export class Accountant implements AccountantPlugin {
       default:
         const tokenContractInstance = await provider.contract.at(token.address);
         balance = {
+          token,
           amount: (
-            await tokenContractInstance.views.getBalance(this.botAddress).read()
+            await tokenContractInstance.views
+              .getBalance(this.botAddress.TEZOS)
+              .read()
           ).toFixed(),
         };
     }
 
-    return {
-      token,
-      balance,
-    };
+    return balance;
   }
 }

@@ -44,7 +44,7 @@ describe('Accountant', () => {
 
     const balance = await accountant.getBalance({ ticker: 'XTZ' }, 'TEZOS');
 
-    expect(balance.balance.amount).to.equal(mockedXtzBalance);
+    expect(balance.amount).to.equal(mockedXtzBalance);
   });
 
   it('can fetch token balance', async () => {
@@ -58,6 +58,6 @@ describe('Accountant', () => {
 
     const balance = await accountant.getBalance({ ticker: 'kUSD' }, 'TEZOS');
 
-    expect(balance.balance.amount).to.equal(mockedTokenBalance);
+    expect(balance.amount).to.equal(mockedTokenBalance);
   });
 });

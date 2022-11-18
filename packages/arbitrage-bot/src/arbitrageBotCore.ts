@@ -1,8 +1,19 @@
 import { ExchangePlugin } from './exchange/interface';
 import { ExchangePrice } from './exchange/types';
 import { ReporterPlugin } from './reporter/interface';
-import { Config, Token, TokenPlugin } from './types';
+import {
+  AccountantPlugin,
+  Balance,
+  Config,
+  EcosystemIdentifier,
+  EcosystemKey,
+  ProfitFinderPlugin,
+  SwapExecutionManager,
+  Token,
+  TokenPlugin,
+} from './types';
 import { BigNumber } from 'bignumber.js';
+import { AccountantManager } from './accountantManager';
 
 export * from './types';
 
@@ -24,14 +35,16 @@ class ExchangeManager {
 
 export class ArbitrageBotCore {
   public exchangeManager: ExchangeManager;
+  public accountantManager: AccountantManager;
+  public ecosystems: EcosystemIdentifier[];
 
   constructor(public config: Config) {}
 
   async startLifecycle() {
-    // balance at the start baseToken / quoteToken
-    const balance = {};
-
     this.reporter.report({ type: 'LIFECYCLE_START' });
+    await this.accountantManager.fetchBalancesBefore();
+    console.log(await this.accountant.getBalance({ ticker: 'kUSD' }, 'TEZOS'));
+
     const prices = await this.exchangeManager.fetchPrices(
       this.config.baseToken,
       this.config.quoteToken
@@ -39,29 +52,23 @@ export class ArbitrageBotCore {
 
     this.reporter.report({ type: 'PRICES_FETCHED', prices });
 
-    const profitOpportunity =
-      this.config.plugins.profitFinder.findProfits(prices);
+    const profitOpportunity = this.profitFinder.findProfits(prices);
 
     this.reporter.report({ type: 'PROFIT_FOUND', profitOpportunity });
 
     if (BigNumber(profitOpportunity.profit.baseTokenAmount).isNegative())
       return;
 
-    const swapResults = await this.config.plugins.swapExecutionManager.executeSwaps(
+    const swapResults = await this.swapExecutionManager.executeSwaps(
       profitOpportunity.swaps
     );
-    // report if the execution of the opportunity swap was executed
     this.reporter.report({ type: 'SWAPS_DONE', swapResults });
 
-    // // balance after swaps were executed (after arbitrage attempt)
-    // const balanceAfterArbitrage = {};
-    // // baseToken: old balance -> new balance
-    // // quoteToken: old balance -> new balance
-    // // report the difference between indicated profit from swaps and the real balance delta
-    // this.reporter.report({
-    //   type: 'ARBITRAGE_COMPLETE',
-    //   payload: { balance, balanceAfterArbitrage, profitOpportunity },
-    // });
+    await this.accountantManager.fetchBalancesAfter();
+    this.reporter.report({
+      type: 'ARBITRAGE_COMPLETE',
+      payload: this.accountantManager.createReport(),
+    });
   }
 
   get reporter(): ReporterPlugin {
@@ -76,8 +83,33 @@ export class ArbitrageBotCore {
     return this.config.plugins.exchanges;
   }
 
+  get profitFinder(): ProfitFinderPlugin {
+    return this.config.plugins.profitFinder;
+  }
+
+  get swapExecutionManager(): SwapExecutionManager {
+    return this.config.plugins.swapExecutionManager;
+  }
+
+  get accountant(): AccountantPlugin {
+    return this.config.plugins.accountant;
+  }
+
+  get keychain() {
+    return this.config.plugins.keychains;
+  }
+
   async start() {
+    this.ecosystems = this.keychain.flatMap(
+      (key) => Object.keys(key) as EcosystemIdentifier[]
+    );
     this.exchangeManager = new ExchangeManager(this.exchanges, this.token);
+    this.accountantManager = new AccountantManager(
+      this.accountant,
+      this.ecosystems,
+      this.config.baseToken,
+      this.config.quoteToken
+    );
 
     // register the trigger
     this.config.plugins.trigger.register(async () => {
