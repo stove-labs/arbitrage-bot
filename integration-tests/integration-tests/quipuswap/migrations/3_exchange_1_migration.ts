@@ -11,7 +11,7 @@ import chalk from 'chalk';
 const yellow = chalk.yellow;
 
 import accounts from '../../accounts';
-import config from '../../config';
+import config from '../../../config';
 import factoryStorage from '../storage/Factory';
 import metadataStorageInstance from '../../deployments/metadataContract';
 import bakeryInstance from '../../deployments/bakerRegistry';

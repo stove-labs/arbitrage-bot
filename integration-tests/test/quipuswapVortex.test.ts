@@ -1,6 +1,6 @@
 import {
-  AccountantPlugin,
   Config,
+  EcosystemKey,
   ExchangePluginConfig,
   ExchangeRegistry,
   TokenList,
@@ -14,6 +14,11 @@ import { ArbitrageBotCore } from '@stove-labs/arbitrage-bot';
 import { TriggerChainPlugin } from '@stove-labs/arbitrage-bot-trigger-chain';
 import { InMemorySigner } from '@taquito/signer';
 import { BatchSwapExecutionManager } from '@stove-labs/arbitrage-bot-swap-execution';
+import { Accountant } from '@stove-labs/arbitrage-bot-accountant';
+
+import rpcConfig from '../config';
+
+import { TezosToolkit } from '@taquito/taquito';
 
 describe('Quipuswap-Vortex', () => {
   it('can perform arbitrage between quipuswap and vortex', async () => {
@@ -49,7 +54,7 @@ describe('Quipuswap-Vortex', () => {
         ticker2: 'kUSD',
       },
     ];
-    const sandboxRpc = 'http://127.0.0.1:8732';
+    const sandboxRpc = rpcConfig.rpc;
     const exchangeConfigQuipuswap: ExchangePluginConfig = {
       rpc: sandboxRpc,
       identifier: 'QUIPUSWAP',
@@ -70,14 +75,13 @@ describe('Quipuswap-Vortex', () => {
       new ExchangeVortexPlugin(exchangeConfigVortex),
     ];
 
-    const tezosKey = {
-      TEZOS: {
-        address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
-        signer: await InMemorySigner.fromSecretKey(
-          'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
-        ),
-        rpc: sandboxRpc,
-      },
+    const botAddress = 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb';
+    const tezosKey: EcosystemKey = {
+      address: botAddress,
+      signer: await InMemorySigner.fromSecretKey(
+        'edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq'
+      ),
+      rpc: sandboxRpc,
     };
     const config: Config = {
       baseToken: {
@@ -94,9 +98,12 @@ describe('Quipuswap-Vortex', () => {
         profitFinder: new ProfitFinderLitePlugin({
           profitSplitForSlippage: 0,
         }),
-        keychains: [tezosKey],
+        keychains: [{ TEZOS: tezosKey }],
+        accountant: new Accountant({ TEZOS: botAddress }, tokenRegistryTezos, {
+          TEZOS: new TezosToolkit(sandboxRpc),
+        }),
         swapExecutionManager: new BatchSwapExecutionManager(exchanges, [
-          tezosKey,
+          { TEZOS: tezosKey },
         ]),
       },
     };

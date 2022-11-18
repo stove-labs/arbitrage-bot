@@ -6,7 +6,7 @@ const defaultTokenId = process.env.DEFAULT_TOKEN_ID_FA2;
 
 import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
-import config from '../../config';
+import config from '../../../config';
 import accounts from '../../accounts';
 import { FactoryFa12Code } from '../contracts/factory_fa12.code';
 import {

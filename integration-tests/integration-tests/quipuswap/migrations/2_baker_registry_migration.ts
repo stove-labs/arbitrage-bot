@@ -2,7 +2,7 @@ import { TezosToolkit } from '@taquito/taquito';
 import { InMemorySigner } from '@taquito/signer';
 import BakerRegistry from '../contracts/BakerRegistry.json';
 import { MichelsonMap } from '@taquito/michelson-encoder';
-import config from '../../config';
+import config from '../../../config';
 import accounts from '../../accounts';
 import writeAddressToFile from '../../saveDeployment';
 import chalk from 'chalk';
