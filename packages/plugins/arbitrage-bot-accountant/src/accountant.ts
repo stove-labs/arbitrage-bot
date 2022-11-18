@@ -55,14 +55,28 @@ export class Accountant implements AccountantPlugin {
       // FA12 and FA2
       default:
         const tokenContractInstance = await provider.contract.at(token.address);
-        balance = {
-          token,
-          amount: (
-            await tokenContractInstance.views
-              .getBalance(this.botAddress.TEZOS)
-              .read()
-          ).toFixed(),
-        };
+        const tokenId: number | undefined = (token as TokenFA2).tokenId;
+        if (tokenId) {
+          balance = {
+            token,
+            amount: (
+              await tokenContractInstance.views
+                .balance_of([
+                  { owner: this.botAddress.TEZOS, token_id: tokenId },
+                ])
+                .read()
+            ).toFixed(),
+          };
+        } else {
+          balance = {
+            token,
+            amount: (
+              await tokenContractInstance.views
+                .getBalance(this.botAddress.TEZOS)
+                .read()
+            ).toFixed(),
+          };
+        }
     }
 
     return balance;
