@@ -3,10 +3,8 @@ import { ExchangePrice } from './exchange/types';
 import { ReporterPlugin } from './reporter/interface';
 import {
   AccountantPlugin,
-  Balance,
   Config,
   EcosystemIdentifier,
-  EcosystemKey,
   ProfitFinderPlugin,
   SwapExecutionManager,
   Token,
