@@ -16,22 +16,31 @@ This arbitrage bot speculates on the price differences between two markets, by t
 
 - Multiplier for transaction fee can be increased to stay competitive. 
 
-## Limitations
+## Learning resource
 
+The exercise of using and building upon the arbitrage-bot offers a fantastic hands-on opportunity to learn about blockchain and Tezos development. While the use-case presents technical challenges, it can be overwhelming to extract those learnings by merely going through the code. Therefore, this section lists some of the design/development challenges and discusses their solutions & practical implementations.
+
+1. Read AMM spot price (exchange plugins: eg. [Quipuswap](packages/plugins//exchanges//tezos-dex-quipuswap/README.md#learning-resource))
+2. Compose batch transactions, estimate & apply adjusted FEEs ([swap-execution](packages/plugins/arbitrage-bot-swap-execution/README.md#learning-resource))
+3. Contract views to read FA2 and FA1.2 token balances ([accountant](packages/plugins/arbitrage-bot-accountant/README.md#learning-resource))
+4. Price discovery for arbitrage between 2 DEXs ([profit-finder](packages/plugins/arbitrage-bot-profit-finder-lite/README.md#learning-resource))
+5. Solve polling (without subscribing to block updates) ([trigger](packages/plugins/arbitrage-bot-trigger-chain/README.md#learning-resource))
+
+## Limitations
+The current implementation:
 - Does not have a centralized exchange (CEX) plugin
-- Current implementation supports two (CFMMs) decentralized exchanges on Tezos blockchain:
+- FA1.2 tokens
+- Supports two (CFMMs) decentralized exchanges on Tezos blockchain:
     - Quipuswap (v1) XTZ<>Token
     - Vortex XTZ<>Token
 - Reporting to console
 
 ## Future work
-- Policies for restarting the arbitrage bot on failure
-- Advanced reporting on arbitrage (keyword: *Accountant Plugin*)
+- FA2
 - Quipuswap (v2)
 - Token<>Token
 
 For suggestions please open an issue in this Github repository.
-
 
 ## Community support channel
 - [Stove Labs Telegram Channel](https://t.me/stove_labs)

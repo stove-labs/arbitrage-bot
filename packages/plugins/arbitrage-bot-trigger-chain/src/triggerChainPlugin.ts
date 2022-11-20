@@ -18,7 +18,7 @@ export class TriggerChainPlugin implements TriggerPlugin {
   /**
    * Create a scheduler for calling callbacks with a fixed delay in-between each call.
    *
-   * @param milliseconds the inbetween-delay in milliseconds
+   * @param milliseconds the in between-delay in milliseconds
    * @returns a function to add callbacks to the queue
    */
   withPause(milliseconds) {

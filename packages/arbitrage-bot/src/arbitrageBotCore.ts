@@ -8,7 +8,6 @@ import {
   EcosystemIdentifier,
   ProfitFinderPlugin,
   SwapExecutionManager,
-  Token,
   ProfitOpportunity,
   SwapResult,
   TokenPlugin,
