@@ -3,6 +3,7 @@ import {
   Swap,
   SwapResult,
   TezosKey,
+  Operation,
   Token,
 } from '@stove-labs/arbitrage-bot';
 import {
@@ -25,19 +26,6 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
   .alias('v', 'verbose').argv;
 const VERBOSE_LEVEL = argv.verbose;
 const DEBUG = VERBOSE_LEVEL >= 2 ? console.log : () => {};
-
-type OperationDetailsTezos = {
-  ecosystem: EcosystemIdentifier;
-  exchanges: string[];
-  operationHash: string;
-  profit: {
-    amount: string;
-    decimals: string;
-  };
-  totalOperationCost: string;
-  baseToken: Token;
-  quoteToken: Token;
-};
 
 export const handleTezosSwapExecution = async (
   swaps: Swap[],
@@ -78,7 +66,7 @@ export const handleTezosSwapExecution = async (
   await operation.confirmation(1);
   debugLogOpResults(operation);
 
-  const operationDetails: OperationDetailsTezos = {
+  const operationDetails: Operation = {
     ecosystem: 'TEZOS',
     exchanges: swaps.map((swap) => swap.identifier),
     baseToken: swaps[0].tokenIn,
