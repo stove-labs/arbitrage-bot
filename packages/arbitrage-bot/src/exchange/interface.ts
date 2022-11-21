@@ -12,6 +12,7 @@ export interface ExchangePlugin {
   config: ExchangePluginConfig;
   identifier: ExchangeIdentifier;
   ecosystemIdentifier: EcosystemIdentifier;
+  getExchangeAddress(baseToken: Token, quoteToken: Token): string;
   fetchPrice(baseToken: Token, quoteToken: Token): Promise<ExchangePrice>;
   forgeOperation(
     swap: Swap,

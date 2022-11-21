@@ -56,6 +56,13 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
               batchParameters = [...batchParameters, ...operationParameters];
             }
 
+            const exchangeAddresses = swaps.map((swap) =>
+              this.getExchangePluginBySwap(swap).getExchangeAddress(
+                swaps[0].tokenIn, // baseToken
+                swaps[1].tokenOut // quoteToken
+              )
+            );
+
             try {
               const swapResultTezos = await handleTezosSwapExecution(
                 swaps,
