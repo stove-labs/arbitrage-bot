@@ -105,7 +105,7 @@ export const handleTezosSwapExecution = async (
   };
 };
 
-const getProfitFromOperation = (
+export const getProfitFromOperation = (
   operationResults: OperationContentsAndResultTransaction[],
   botAddress: string,
   swap1ExchangeAddress: string,
