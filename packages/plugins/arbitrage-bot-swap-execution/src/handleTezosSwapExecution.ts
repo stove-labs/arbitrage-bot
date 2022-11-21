@@ -1,10 +1,20 @@
-import { Swap, SwapResult, TezosKey } from '@stove-labs/arbitrage-bot';
+import {
+  EcosystemIdentifier,
+  Swap,
+  SwapResult,
+  TezosKey,
+  Token,
+} from '@stove-labs/arbitrage-bot';
 import {
   TezosToolkit,
   withKind,
   TransferParams,
   OpKind,
 } from '@taquito/taquito';
+import {
+  OperationContentsAndResultTransaction,
+  OperationResultTransaction,
+} from '@taquito/rpc';
 import * as _ from 'lodash';
 import { BigNumber } from 'bignumber.js';
 import { errorXtzProfitLowerThanTotalOperationCost } from './errors';
@@ -16,10 +26,24 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
 const VERBOSE_LEVEL = argv.verbose;
 const DEBUG = VERBOSE_LEVEL >= 2 ? console.log : () => {};
 
+type OperationDetailsTezos = {
+  ecosystem: EcosystemIdentifier;
+  exchanges: string[];
+  operationHash: string;
+  profit: {
+    amount: string;
+    decimals: string;
+  };
+  totalOperationCost: string;
+  baseToken: Token;
+  quoteToken: Token;
+};
+
 export const handleTezosSwapExecution = async (
   swaps: Swap[],
   batchParameters: withKind<TransferParams, OpKind.TRANSACTION>[],
-  ecosystemKey: TezosKey
+  ecosystemKey: TezosKey,
+  exchangeAddresses: string[]
 ): Promise<SwapResult> => {
   // initialize taquito signer with keychain
   const tezos = new TezosToolkit(ecosystemKey.rpc);
@@ -51,15 +75,54 @@ export const handleTezosSwapExecution = async (
     return errorXtzProfitLowerThanTotalOperationCost;
 
   const operation = await tezos.contract.batch(batchParameters).send();
-  debugLogOpResults(operation);
   await operation.confirmation(1);
+  debugLogOpResults(operation);
+
+  const operationDetails: OperationDetailsTezos = {
+    ecosystem: 'TEZOS',
+    exchanges: swaps.map((swap) => swap.identifier),
+    baseToken: swaps[0].tokenIn,
+    quoteToken: swaps[1].tokenOut,
+    operationHash: operation.hash,
+    profit: {
+      amount: getProfitFromOperation(
+        operation.results as OperationContentsAndResultTransaction[],
+        batchParameters[0].source, // botAddress
+        exchangeAddresses[0], // swap 1 exchange address
+        exchangeAddresses[1] // swap 2 exchange address
+      ),
+      decimals: swaps[0].tokenInDecimals.toFixed(),
+    },
+    // TODO: sum from applied BatchOperation
+    totalOperationCost: totalInflatedOpCost.toFixed(),
+  };
 
   return {
     result: {
       type: 'OK',
-      operation: operation,
+      operation: operationDetails,
     },
   };
+};
+
+const getProfitFromOperation = (
+  operationResults: OperationContentsAndResultTransaction[],
+  botAddress: string,
+  swap1ExchangeAddress: string,
+  swap2ExchangeAddress: string
+): string => {
+  // TODO: calculate profit if baseToken == TOKEN
+  const xtzSent = getXtzSent(
+    operationResults,
+    botAddress,
+    swap1ExchangeAddress
+  );
+  const xtzReceived = getXTZReceived(
+    operationResults,
+    botAddress,
+    swap2ExchangeAddress
+  );
+  return new BigNumber(xtzReceived).minus(xtzSent).toFixed();
 };
 
 const isXTZProfitHigherThanTotalOperationCost = (
@@ -78,7 +141,50 @@ const isXTZProfitHigherThanTotalOperationCost = (
   return profit.isGreaterThanOrEqualTo(totalOperationCostInXTZ) ? true : false;
 };
 
+const getXtzSent = (
+  operationResults: OperationContentsAndResultTransaction[],
+  botAddress: string,
+  receivingExchangeAddress: string
+) => {
+  // find operation where bot is XTZ sender and exchange recipient
+  const operation = operationResults.find((op) => {
+    return (
+      op.destination === receivingExchangeAddress && op.source == botAddress
+    );
+  });
+  return operation.amount;
+};
+
+const getXTZReceived = (
+  operationResults: OperationContentsAndResultTransaction[],
+  botAddress: string,
+  exchangeAddress: string
+) => {
+  // find operation where bot calls the exchange to perform token to xtz swap
+  const operation = operationResults.find((op) => {
+    return op.destination === exchangeAddress && op.source === botAddress;
+  });
+
+  // search internal_operation_results where bot is recipient and exchange sender
+  const exchangeToAccount = operation.metadata.internal_operation_results.find(
+    (op) => {
+      return op.source === exchangeAddress && op.destination === botAddress;
+    }
+  );
+
+  // extract XTZ amount balance update
+  const xtzSent = (
+    exchangeToAccount.result as OperationResultTransaction
+  ).balance_updates.find((balanceUpdate) => {
+    return balanceUpdate.contract === botAddress;
+  }).change;
+
+  return xtzSent;
+};
+
 const debugLogOpResults = (operation) => {
+  DEBUG('logging operation');
+  DEBUG(JSON.stringify(operation));
   DEBUG('operation hash', operation.hash);
   DEBUG('errors', operation.errors);
   DEBUG('results\n', operation.results);

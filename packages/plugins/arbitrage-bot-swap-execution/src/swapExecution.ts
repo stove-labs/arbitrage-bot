@@ -67,7 +67,8 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
               const swapResultTezos = await handleTezosSwapExecution(
                 swaps,
                 batchParameters,
-                tezosKey
+                tezosKey,
+                exchangeAddresses
               );
               return swapResultTezos;
             } catch (error) {
