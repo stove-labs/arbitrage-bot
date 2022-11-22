@@ -7,6 +7,7 @@ import { handleLifeCycleStart } from './handler/lifeCycleStart';
 import { BigNumber } from 'bignumber.js';
 import { handleLifeCycleEnd } from './handler/lifeCycleEnd';
 import { handleSwapsDone } from './handler/swapsDone';
+import { handleArbitrageComplete } from './handler/arbitrageComplete';
 
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .count('verbose')
@@ -52,7 +53,7 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
       case 'PROFIT_FOUND':
         return handleProfitFound(event.profitOpportunity);
       case 'ARBITRAGE_COMPLETE':
-        return 'Waiting until life cycle restarts';
+        return handleArbitrageComplete(event.report);
       case 'LIFECYCLE_END':
         return handleLifeCycleEnd();
       case 'SWAPS_DONE':

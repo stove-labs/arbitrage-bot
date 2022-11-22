@@ -9,6 +9,7 @@ import { Token } from './token/types';
 import { TriggerPlugin } from './trigger/types';
 
 export * from './accountant/interface';
+export * from './accountant/types';
 
 export * from './blockchain/types';
 
