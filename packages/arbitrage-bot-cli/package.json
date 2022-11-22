@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/arbitrage-bot-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "command line interface for the arbitrage bot",
   "keywords": [
     "CLI",
@@ -41,13 +41,13 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^1.0.0",
-    "@stove-labs/arbitrage-bot-accountant": "^1.0.0",
-    "@stove-labs/arbitrage-bot-profit-finder-lite": "^1.0.0",
-    "@stove-labs/arbitrage-bot-reporter": "^1.0.0",
-    "@stove-labs/arbitrage-bot-token-registry": "^1.0.0",
-    "@stove-labs/tezos-dex-quipuswap": "^1.0.0",
-    "@stove-labs/tezos-dex-vortex": "^1.0.0",
+    "@stove-labs/arbitrage-bot": "^1.0.1",
+    "@stove-labs/arbitrage-bot-accountant": "^1.0.1",
+    "@stove-labs/arbitrage-bot-profit-finder-lite": "^1.0.1",
+    "@stove-labs/arbitrage-bot-reporter": "^1.0.1",
+    "@stove-labs/arbitrage-bot-token-registry": "^1.0.1",
+    "@stove-labs/tezos-dex-quipuswap": "^1.0.1",
+    "@stove-labs/tezos-dex-vortex": "^1.0.1",
     "@taquito/signer": "^14.0.0",
     "figlet": "^1.5.2",
     "lodash": "^4.17.21",

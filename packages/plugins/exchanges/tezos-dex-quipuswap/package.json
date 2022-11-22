@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/tezos-dex-quipuswap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "plugin for the tezos DEX quipuswap",
   "keywords": [
     "DEX",
@@ -34,9 +34,9 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^1.0.0",
-    "@stove-labs/arbitrage-bot-exchange-utils": "^1.0.0",
-    "@stove-labs/arbitrage-bot-token-registry": "^1.0.0",
+    "@stove-labs/arbitrage-bot": "^1.0.1",
+    "@stove-labs/arbitrage-bot-exchange-utils": "^1.0.1",
+    "@stove-labs/arbitrage-bot-token-registry": "^1.0.1",
     "@taquito/signer": "^14.0.0",
     "@taquito/taquito": "^14.0.0"
   },
