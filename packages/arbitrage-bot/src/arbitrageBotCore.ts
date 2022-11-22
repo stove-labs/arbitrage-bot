@@ -160,7 +160,7 @@ export class ArbitrageBotCore {
   // returns true if there is a profit opportunity
   hasPositiveProfit = (task, profitOpportunity: ProfitOpportunity): boolean => {
     if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
-      task.title =
+      task.title +=
         this.reporter.report({
           type: 'PROFIT_FOUND',
           profitOpportunity: profitOpportunity,
