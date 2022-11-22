@@ -34,7 +34,8 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot-exchange-utils": "^1.0.0"
+    "@stove-labs/arbitrage-bot-exchange-utils": "^1.0.0",
+    "@taquito/taquito": "^14.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.3",

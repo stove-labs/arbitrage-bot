@@ -4,7 +4,6 @@ import chalk from 'chalk';
 import { handleProfitFound } from './handler/profitFound';
 import { handlePricesFetched } from './handler/pricesFetched';
 import { handleLifeCycleStart } from './handler/lifeCycleStart';
-import { BigNumber } from 'bignumber.js';
 import { handleLifeCycleEnd } from './handler/lifeCycleEnd';
 import { handleSwapsDone } from './handler/swapsDone';
 import { handleArbitrageComplete } from './handler/arbitrageComplete';

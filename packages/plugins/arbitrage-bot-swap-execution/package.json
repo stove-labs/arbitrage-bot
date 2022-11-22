@@ -27,6 +27,9 @@
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot": "^1.0.0",
+    "@taquito/rpc": "^14.1.0",
+    "@taquito/taquito": "^14.1.0",
+    "bignumber.js": "^9.1.0",
     "yargs": "^17.6.0"
   },
   "devDependencies": {

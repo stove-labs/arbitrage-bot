@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "@stove-labs/arbitrage-bot": "^1.0.0",
-    "bignumber.js": "^9.1.0"
+    "bignumber.js": "^9.1.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/chai": "^4.3.3",
