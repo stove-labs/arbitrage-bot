@@ -73,9 +73,10 @@ const getConfig = async (): Promise<Config> => {
         profitSplitForSlippage: 0,
       }),
       keychains,
-      accountant: new Accountant({ TEZOS: botAddress }, tokenRegistryPlugin, {
-        TEZOS: new TezosToolkit(tezosRpc),
-      }),
+      // Disabled until lambda views in Taquito is working consistently
+      // accountant: new Accountant({ TEZOS: botAddress }, tokenRegistryPlugin, {
+      //   TEZOS: new TezosToolkit(tezosRpc),
+      // }),
       swapExecutionManager: new BatchSwapExecutionManager(exchanges, keychains),
     },
   };

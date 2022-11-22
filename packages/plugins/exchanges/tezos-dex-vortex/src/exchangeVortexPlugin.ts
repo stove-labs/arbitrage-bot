@@ -34,15 +34,19 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     this.identifier = config.identifier ? config.identifier : 'VORTEX';
   }
 
-  async fetchPrice(
-    baseToken: Token,
-    quoteToken: Token
-  ): Promise<ExchangePrice> {
-    const exchangeAddress = getExchangeAddressFromRegistry(
+  getExchangeAddress(baseToken: Token, quoteToken: Token): string {
+    return getExchangeAddressFromRegistry(
       baseToken,
       quoteToken,
       this.config.exchangeInstances
     );
+  }
+
+  async fetchPrice(
+    baseToken: Token,
+    quoteToken: Token
+  ): Promise<ExchangePrice> {
+    const exchangeAddress = this.getExchangeAddress(baseToken, quoteToken);
 
     // TODO: consider different error handling approach
     this.throwForUndefinedAddress(exchangeAddress);
@@ -86,11 +90,7 @@ export class ExchangeVortexPlugin implements ExchangePlugin {
     swap: Swap,
     botAddress: string
   ): Promise<withKind<TransferParams, OpKind.TRANSACTION>[]> {
-    const address = getExchangeAddressFromRegistry(
-      swap.tokenIn,
-      swap.tokenOut,
-      this.config.exchangeInstances
-    );
+    const address = this.getExchangeAddress(swap.tokenIn, swap.tokenOut);
     const dexContractInstance = await this.getContractInstance(address);
 
     // SWAP BUY XTZ -> TOKEN
