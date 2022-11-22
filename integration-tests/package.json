@@ -5,6 +5,7 @@
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
   "license": "MIT",
+  "private": "true",
   "main": "lib/integration-tests.js",
   "files": [
     "dist"
