@@ -49,10 +49,6 @@ const checkIfThereIsProfitOpportunity = (
 ): boolean => {
   if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
     task.title +=
-      reporter.report({
-        type: 'PROFIT_FOUND',
-        profitOpportunity: profitOpportunity,
-      }) +
       '\n' +
       reporter.report({
         type: 'LIFECYCLE_END',
@@ -295,7 +291,7 @@ describe('consoleReporterPlugin', () => {
           result: {
             type: 'OK',
             operation: {
-              ecosystem: 'Tezos',
+              ecosystem: 'TEZOS',
               exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
               operationHash: 'hashhashhash',
               profit: { amount: '23443', decimals: '6' },
@@ -395,7 +391,7 @@ describe('consoleReporterPlugin', () => {
           result: {
             type: 'OK',
             operation: {
-              ecosystem: 'Tezos',
+              ecosystem: 'TEZOS',
               exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
               operationHash: 'hashhashhash',
               profit: { amount: '23443', decimals: '6' },
@@ -495,7 +491,7 @@ describe('consoleReporterPlugin', () => {
           result: {
             type: 'OK',
             operation: {
-              ecosystem: 'Tezos',
+              ecosystem: 'TEZOS',
               exchanges: ['Quipuswap', 'Vortex'], //string[] not necessarily more than 1 exchange
               operationHash: 'hashhashhash',
               profit: { amount: '23443', decimals: '6' },
