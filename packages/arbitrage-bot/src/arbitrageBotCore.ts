@@ -61,7 +61,10 @@ export class ArbitrageBotCore {
       try {
         // fetch prices from exchanges
         this.reportFetchPricesStart(task);
-        await this.accountantManager.fetchBalancesBefore();
+        this.accountingEnabled
+          ? await this.accountantManager.fetchBalancesBefore()
+          : {};
+
         const prices: ExchangePrice[] = await this.exchangeManager.fetchPrices(
           this.config.baseToken,
           this.config.quoteToken
@@ -75,18 +78,23 @@ export class ArbitrageBotCore {
         this.reportFindProfitOpportunityEnd(task, profitOpportunity);
         // restart lifecycle if no profit was found
         if (!this.hasPositiveProfit(task, profitOpportunity)) return;
-
         // execute swaps for arbitrage
         this.reportSwapStart(task);
         const swapResults: SwapResult[] =
           await this.config.plugins.swapExecutionManager.executeSwaps(
             profitOpportunity.swaps
           );
-        await this.accountantManager.fetchBalancesAfter();
-        // this.reporter.report({
-        //   type: 'ARBITRAGE_COMPLETE',
-        //   payload: this.accountantManager.createReport(),
-        // });
+
+        this.accountingEnabled
+          ? await this.accountantManager.fetchBalancesAfter()
+          : {};
+        this.reporter.report({
+          type: 'ARBITRAGE_COMPLETE',
+          payload: this.accountingEnabled
+            ? this.accountantManager.createReport()
+            : {},
+        });
+
         this.reportSwapEnd(task, swapResults);
       } catch (e) {
         task.output = '';
@@ -192,5 +200,9 @@ export class ArbitrageBotCore {
 
   get keychain() {
     return this.config.plugins.keychains;
+  }
+
+  get accountingEnabled() {
+    return this.accountantManager.isConfigured;
   }
 }
