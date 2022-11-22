@@ -4,6 +4,22 @@ This arbitrage bot speculates on the price differences between two markets, by t
 
 <img src="https://user-images.githubusercontent.com/8685779/202212510-83cf4879-a7ce-47be-a75a-c8846af046e7.gif" alt="cli-arbitrage-bot" width="700"/>
 
+## Usage
+
+Please refer to [CLI package repository](packages/arbitrage-bot-cli/README.md) for detailed instructions.
+
+The quickest way to get started is by running:
+
+```bash
+npx @stove-labs/arbitrage-bot-cli start XTZ kUSD
+# for verbose output
+npx @stove-labs/arbitrage-bot-cli start XTZ kUSD -vv
+# help 
+npx @stove-labs/arbitrage-bot-cli start -h 
+# list tokens in the pre-configured init
+npx @stove-labs/arbitrage-bot-cli list
+```
+
 ## Benefits
 
 - Modular plugin architecture: easy to expand support for more markets; improve reporting capabilities or replacing tailored profit finding algorithms (eg. stable swap).
