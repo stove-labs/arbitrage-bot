@@ -28,7 +28,7 @@ export const handleSwapsDone = (swapResults?: SwapResult[]) => {
   swapResults.map((swap) => {
     if (swap.result.type === 'ERROR') return;
     const transaction = warning(
-      `https://tzkt.io/${swap.result.operation?.operationHash}\n`
+      `https://tzkt.io/${swap.result.operation?.operationHash}`
     );
     const netProfit =
       swap.result.operation.baseToken.ticker === 'XTZ'

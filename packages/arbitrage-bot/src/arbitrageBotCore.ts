@@ -10,6 +10,7 @@ import {
   SwapExecutionManager,
   ProfitOpportunity,
   SwapResult,
+  Report,
   TokenPlugin,
 } from './types';
 
@@ -82,12 +83,17 @@ export class ArbitrageBotCore {
           await this.config.plugins.swapExecutionManager.executeSwaps(
             profitOpportunity.swaps
           );
-        await this.accountantManager.fetchBalancesAfter();
-        // this.reporter.report({
-        //   type: 'ARBITRAGE_COMPLETE',
-        //   payload: this.accountantManager.createReport(),
-        // });
+
         this.reportSwapEnd(task, swapResults);
+
+        // restart lifecycle if swap was unsuccessful
+        if (swapResults.some((swap) => swap.result.type === 'ERROR')) return;
+
+        // report delta for baseToken and QuoteToken
+        this.reportArbitrageCompleteStart(task);
+        await this.accountantManager.fetchBalancesAfter();
+        const report: Report = await this.accountantManager.createReport();
+        this.reportArbitrageCompleteEnd(task, report);
       } catch (e) {
         task.output = '';
         throw e;
@@ -146,6 +152,19 @@ export class ArbitrageBotCore {
       this.reporter.report({
         type: 'SWAPS_DONE',
         swapResults,
+      });
+  };
+
+  reportArbitrageCompleteStart = (task) => {
+    task.output = this.reporter.report({ type: 'ARBITRAGE_COMPLETE' });
+  };
+
+  reportArbitrageCompleteEnd = (task, report: Report) => {
+    task.title +=
+      '\n' +
+      this.reporter.report({
+        type: 'ARBITRAGE_COMPLETE',
+        report,
       });
   };
 

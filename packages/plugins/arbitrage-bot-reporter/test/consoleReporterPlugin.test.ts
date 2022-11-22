@@ -1,6 +1,7 @@
 import {
   ExchangePrice,
   ProfitOpportunity,
+  Report,
   SwapResult,
   SwapType,
 } from '@stove-labs/arbitrage-bot';
@@ -75,7 +76,26 @@ const reportSwapEnd = (task, swapResults: SwapResult[]) => {
     });
 };
 
-const tasks = (prices, profitOpportunity, swapResults, error = false) => {
+const reportArbitrageCompleteStart = (task) => {
+  task.output = reporter.report({ type: 'ARBITRAGE_COMPLETE' });
+};
+
+const reportArbitrageCompleteEnd = (task, report: Report) => {
+  task.title +=
+    '\n' +
+    reporter.report({
+      type: 'ARBITRAGE_COMPLETE',
+      report,
+    });
+};
+
+const tasks = (
+  prices,
+  profitOpportunity,
+  swapResults,
+  report,
+  error = false
+) => {
   return new Listr(
     [
       {
@@ -109,6 +129,12 @@ const tasks = (prices, profitOpportunity, swapResults, error = false) => {
             await new Promise((f) => setTimeout(f, 3000));
 
             reportSwapEnd(task, swapResults);
+
+            if (swapResults.some((swap) => swap.result.type === 'ERROR')) return;
+
+            reportArbitrageCompleteStart(task);
+            await new Promise((f) => setTimeout(f, 3000));
+            reportArbitrageCompleteEnd(task, report);
           } catch (e) {
             task.output = '';
             throw e;
@@ -207,9 +233,25 @@ describe('consoleReporterPlugin', () => {
         profit: { baseTokenAmount: '-1' },
       };
       const swapResults: SwapResult[] = [];
+      const report: Report = {
+        baseToken: {
+          ticker: 'XTZ',
+          decimals: 6,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        baseTokenDelta: '5324',
+        quoteToken: {
+          ticker: 'kUSD',
+          decimals: 18,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        quoteTokenDelta: '21321413415324',
+      };
 
       try {
-        await tasks(prices, profitOpportunity, swapResults).run();
+        await tasks(prices, profitOpportunity, swapResults, report).run();
       } catch (e) {
         console.error(e);
       }
@@ -307,9 +349,25 @@ describe('consoleReporterPlugin', () => {
           },
         },
       ];
+      const report: Report = {
+        baseToken: {
+          ticker: 'XTZ',
+          decimals: 6,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        baseTokenDelta: '5324',
+        quoteToken: {
+          ticker: 'kUSD',
+          decimals: 18,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        quoteTokenDelta: '21321413415324',
+      };
 
       try {
-        await tasks(prices, profitOpportunity, swapResults).run();
+        await tasks(prices, profitOpportunity, swapResults, report).run();
       } catch (e) {
         console.error(e);
       }
@@ -407,9 +465,25 @@ describe('consoleReporterPlugin', () => {
           },
         },
       ];
+      const report: Report = {
+        baseToken: {
+          ticker: 'XTZ',
+          decimals: 6,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        baseTokenDelta: '5324',
+        quoteToken: {
+          ticker: 'kUSD',
+          decimals: 18,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        quoteTokenDelta: '21321413415324',
+      };
 
       try {
-        await tasks(prices, profitOpportunity, swapResults, true).run();
+        await tasks(prices, profitOpportunity, swapResults, report, true).run();
       } catch (e) {
         console.error(e);
       }
@@ -507,9 +581,25 @@ describe('consoleReporterPlugin', () => {
           },
         },
       ];
+      const report: Report = {
+        baseToken: {
+          ticker: 'XTZ',
+          decimals: 6,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        baseTokenDelta: '5324',
+        quoteToken: {
+          ticker: 'kUSD',
+          decimals: 18,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        quoteTokenDelta: '21321413415324',
+      };
 
       try {
-        await tasks(prices, profitOpportunity, swapResults).run();
+        await tasks(prices, profitOpportunity, swapResults, report).run();
       } catch (e) {
         console.error(e);
       }
@@ -599,9 +689,25 @@ describe('consoleReporterPlugin', () => {
           },
         },
       ];
+      const report: Report = {
+        baseToken: {
+          ticker: 'XTZ',
+          decimals: 6,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        baseTokenDelta: '5324',
+        quoteToken: {
+          ticker: 'kUSD',
+          decimals: 18,
+          ecosystemIdentifier: 'TEZOS',
+          address: '0',
+        },
+        quoteTokenDelta: '21321413415324',
+      };
 
       try {
-        await tasks(prices, profitOpportunity, swapResults).run();
+        await tasks(prices, profitOpportunity, swapResults, report).run();
       } catch (e) {
         console.error(e);
       }

@@ -1,7 +1,14 @@
 import { ProfitOpportunity } from '@stove-labs/arbitrage-bot';
 import { BigNumber } from 'bignumber.js';
 import { cyan, green, red } from 'chalk';
-import { formattedTicker, tickerColor, profitColor, DEBUG, INFO, STATUS } from '../consoleReporterPlugin';
+import {
+  formattedTicker,
+  tickerColor,
+  profitColor,
+  DEBUG,
+  INFO,
+  STATUS,
+} from '../consoleReporterPlugin';
 
 export const handleProfitFound = (profitOpportunity?: ProfitOpportunity) => {
   if (!profitOpportunity) return 'Searching for profit opportunity...';
@@ -33,7 +40,11 @@ export const handleProfitFound = (profitOpportunity?: ProfitOpportunity) => {
     ? updateMessage(message, STATUS, getTradingPath(profitOpportunity))
     : updateMessage(message, INFO, getTradingPath(profitOpportunity));
 
-  message = updateMessage(message, DEBUG, JSON.stringify(profitOpportunity,null, 2));
+  message = updateMessage(
+    message,
+    DEBUG,
+    JSON.stringify(profitOpportunity, null, 2)
+  );
 
   return message;
 };
