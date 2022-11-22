@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/arbitrage-bot-accountant",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "accounting for tezos balances",
   "keywords": [
     "tezos",
@@ -33,8 +33,8 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^0.0.0",
-    "@stove-labs/arbitrage-bot-token-registry": "^0.0.0",
+    "@stove-labs/arbitrage-bot": "^1.0.0",
+    "@stove-labs/arbitrage-bot-token-registry": "^1.0.0",
     "@taquito/taquito": "^14.1.0"
   }
 }
