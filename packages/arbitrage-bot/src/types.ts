@@ -42,7 +42,7 @@ export interface Config {
     reporter: ReporterPlugin;
     profitFinder: ProfitFinderPlugin;
     keychains: Record<EcosystemIdentifier, EcosystemKey>[];
-    accountant: AccountantPlugin;
+    accountant?: AccountantPlugin;
     swapExecutionManager: SwapExecutionManager;
   };
 }

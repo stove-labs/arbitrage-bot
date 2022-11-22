@@ -9,13 +9,19 @@ type AccountantBalances = {
 
 export class AccountantManager {
   public balances: Partial<AccountantBalances>;
+  public accountant: AccountantPlugin;
+  public isConfigured: Boolean;
 
   constructor(
-    public accountant: AccountantPlugin,
+    accountant: AccountantPlugin | undefined,
     public ecosystems: EcosystemIdentifier[],
     public baseToken: Token,
     public quoteToken: Token
-  ) {}
+  ) {
+    this.accountant = accountant ? accountant : ({} as AccountantPlugin);
+    this.isConfigured = accountant ? true : false;
+  }
+
   async fetchAllBalances() {
     for (const ecosystem of this.ecosystems) {
       return {
@@ -31,7 +37,6 @@ export class AccountantManager {
     this.balances = { ...this.balances, after: await this.fetchAllBalances() };
   }
 
-  // TODO: check on undefined properties
   createReport() {
     const baseTokenDelta = new BigNumber(this.balances.after.base.amount)
       .minus(this.balances.before.base.amount)

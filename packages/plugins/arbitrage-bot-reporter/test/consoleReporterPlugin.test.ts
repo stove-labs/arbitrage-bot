@@ -49,7 +49,7 @@ const checkIfThereIsProfitOpportunity = (
   profitOpportunity: ProfitOpportunity
 ): boolean => {
   if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
-    task.title =
+    task.title +=
       reporter.report({
         type: 'PROFIT_FOUND',
         profitOpportunity: profitOpportunity,
@@ -100,19 +100,19 @@ const tasks = (
     [
       {
         task: async (_, task): Promise<void> => {
-          // This try-catch block is here because Error mess up the formatting
+          // This try-catch block is here because an Error messes up the formatting
           try {
+            // fetch prices from exchanges
             reportFetchPricesStart(task);
-
             await new Promise((f) => setTimeout(f, 3000));
-
             reportFetchPricesEnd(task, prices);
+
+            // find arbitrage, calculate profit opportunity
             reportFindProfitOpportunityStart(task);
-
             await new Promise((f) => setTimeout(f, 3000));
-
             reportFindProfitOpportunityEnd(task, profitOpportunity);
 
+            // restart lifecycle if no profit was found
             if (!checkIfThereIsProfitOpportunity(task, profitOpportunity)) {
               return;
             }
@@ -124,10 +124,9 @@ const tasks = (
               }
             }
 
+            // execute swaps for arbitrage
             reportSwapStart(task);
-
             await new Promise((f) => setTimeout(f, 3000));
-
             reportSwapEnd(task, swapResults);
 
             if (swapResults.some((swap) => swap.result.type === 'ERROR')) return;

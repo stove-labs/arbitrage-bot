@@ -62,7 +62,10 @@ export class ArbitrageBotCore {
       try {
         // fetch prices from exchanges
         this.reportFetchPricesStart(task);
-        await this.accountantManager.fetchBalancesBefore();
+        this.accountingEnabled
+          ? await this.accountantManager.fetchBalancesBefore()
+          : {};
+
         const prices: ExchangePrice[] = await this.exchangeManager.fetchPrices(
           this.config.baseToken,
           this.config.quoteToken
@@ -76,7 +79,6 @@ export class ArbitrageBotCore {
         this.reportFindProfitOpportunityEnd(task, profitOpportunity);
         // restart lifecycle if no profit was found
         if (!this.hasPositiveProfit(task, profitOpportunity)) return;
-
         // execute swaps for arbitrage
         this.reportSwapStart(task);
         const swapResults: SwapResult[] =
@@ -90,10 +92,12 @@ export class ArbitrageBotCore {
         if (swapResults.some((swap) => swap.result.type === 'ERROR')) return;
 
         // report delta for baseToken and QuoteToken
-        this.reportArbitrageCompleteStart(task);
-        await this.accountantManager.fetchBalancesAfter();
-        const report: Report = await this.accountantManager.createReport();
-        this.reportArbitrageCompleteEnd(task, report);
+        if (this.accountingEnabled) {
+          this.reportArbitrageCompleteStart(task);
+          await this.accountantManager.fetchBalancesAfter();
+          const report: Report = this.accountantManager.createReport();
+          this.reportArbitrageCompleteEnd(task, report);
+        }
       } catch (e) {
         task.output = '';
         throw e;
@@ -171,7 +175,7 @@ export class ArbitrageBotCore {
   // returns true if there is a profit opportunity
   hasPositiveProfit = (task, profitOpportunity: ProfitOpportunity): boolean => {
     if (!BigNumber(profitOpportunity.profit.baseTokenAmount).isPositive()) {
-      task.title =
+      task.title +=
         this.reporter.report({
           type: 'PROFIT_FOUND',
           profitOpportunity: profitOpportunity,
@@ -211,5 +215,9 @@ export class ArbitrageBotCore {
 
   get keychain() {
     return this.config.plugins.keychains;
+  }
+
+  get accountingEnabled() {
+    return this.accountantManager.isConfigured;
   }
 }
