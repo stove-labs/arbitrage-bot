@@ -59,7 +59,7 @@ export class BatchSwapExecutionManager implements SwapExecutionManager {
             const exchangeAddresses = swaps.map((swap) =>
               this.getExchangePluginBySwap(swap).getExchangeAddress(
                 swaps[0].tokenIn, // baseToken
-                swaps[1].tokenOut // quoteToken
+                swaps[0].tokenOut // quoteToken
               )
             );
 
