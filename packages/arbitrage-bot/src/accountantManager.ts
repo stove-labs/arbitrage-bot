@@ -1,4 +1,5 @@
 import { AccountantPlugin } from './accountant/interface';
+import { Report } from './accountant/types';
 import { Balance, EcosystemIdentifier, Token } from './types';
 import { BigNumber } from 'bignumber.js';
 
@@ -37,7 +38,7 @@ export class AccountantManager {
     this.balances = { ...this.balances, after: await this.fetchAllBalances() };
   }
 
-  createReport() {
+  createReport(): Report {
     const baseTokenDelta = new BigNumber(this.balances.after.base.amount)
       .minus(this.balances.before.base.amount)
       .toFixed();

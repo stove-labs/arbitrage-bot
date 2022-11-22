@@ -95,7 +95,7 @@ export class ArbitrageBotCore {
         if (this.accountingEnabled) {
           this.reportArbitrageCompleteStart(task);
           await this.accountantManager.fetchBalancesAfter();
-          const report: Report = this.accountantManager.createReport();
+          const report = this.accountantManager.createReport();
           this.reportArbitrageCompleteEnd(task, report);
         }
       } catch (e) {
