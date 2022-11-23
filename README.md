@@ -6,7 +6,7 @@ This arbitrage bot speculates on the price differences between two markets, by t
 
 ## Usage
 
-Please refer to [CLI package repository](packages/arbitrage-bot-cli/README.md) for detailed instructions.
+Please refer to [CLI package repository](packages/arbitrage-bot-cli/) for detailed instructions.
 
 The quickest way to get started is by running:
 
@@ -36,11 +36,11 @@ npx @stove-labs/arbitrage-bot-cli list
 
 The exercise of using and building upon the arbitrage-bot offers a fantastic hands-on opportunity to learn about blockchain and Tezos development. While the use-case presents technical challenges, it can be overwhelming to extract those learnings by merely going through the code. Therefore, this section lists some of the design/development challenges and discusses their solutions & practical implementations.
 
-1. Read AMM spot price (exchange plugins: eg. [Quipuswap](packages/plugins//exchanges//tezos-dex-quipuswap/README.md#learning-resource))
-2. Compose batch transactions, estimate & apply adjusted FEEs ([swap-execution](packages/plugins/arbitrage-bot-swap-execution/README.md#learning-resource))
-3. Contract views to read FA2 and FA1.2 token balances ([accountant](packages/plugins/arbitrage-bot-accountant/README.md#learning-resource))
+1. Read AMM spot price (exchange plugins: eg. [Quipuswap](packages/plugins//exchanges//tezos-dex-quipuswap/))
+2. Compose batch transactions, estimate & apply adjusted FEEs ([swap-execution](packages/plugins/arbitrage-bot-swap-execution/))
+3. Contract views to read FA2 and FA1.2 token balances ([accountant](packages/plugins/arbitrage-bot-accountant/))
 4. Price discovery for arbitrage between 2 DEXs ([profit-finder](packages/plugins/arbitrage-bot-profit-finder-lite/README.md#learning-resource))
-5. Solve polling (without subscribing to block updates) ([trigger](packages/plugins/arbitrage-bot-trigger-chain/README.md#learning-resource))
+5. Solve polling (without subscribing to block updates) ([trigger](packages/plugins/arbitrage-bot-trigger-chain/))
 
 ## Limitations
 The current implementation:
