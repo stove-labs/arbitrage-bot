@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/arbitrage-bot-profit-finder-lite",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "description": "discovers arbitrage opportunities and calculates profit",
   "keywords": [
     "arbitrage",
@@ -34,7 +34,7 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^1.0.1",
+    "@stove-labs/arbitrage-bot": "^1.0.5",
     "yargs": "^17.6.0"
   }
 }

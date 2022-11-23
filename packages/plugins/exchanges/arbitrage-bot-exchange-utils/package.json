@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/arbitrage-bot-exchange-utils",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "description": "exchange address provider",
   "author": "dexterslabor <dexterslabor@users.noreply.github.com>",
   "homepage": "https://github.com/stove-labs/arbitrage-bot#readme",
@@ -26,7 +26,7 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^1.0.1",
+    "@stove-labs/arbitrage-bot": "^1.0.5",
     "bignumber.js": "^9.1.0",
     "lodash": "^4.17.21"
   },
