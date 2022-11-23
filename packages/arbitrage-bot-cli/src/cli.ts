@@ -3,12 +3,25 @@ import { ArbitrageBotCore } from '@stove-labs/arbitrage-bot';
 import getConfig from './config.example.arbitrage-bot';
 import { getDuplicateTradingPairsFromAllExchanges } from '@stove-labs/arbitrage-bot-exchange-utils';
 import _ from 'lodash';
+import chalk from 'chalk';
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
+const asciLogo = 
+  chalk.reset(`
+  \u2009\u2009\u2009\u2009\u2009_    ____  ____ ___ _____ ____      _    ____ _____   ____   ___ _____ 
+  \u2009\u2009\u2009\u2009/ \\  |  _ \\| __ )_ _|_   _|  _ \\    / \\  / ___| ____| | __ ) / _ \\_   _|
+  \u2009\u2009\u2009/ _ \\ | |_) |  _ \\| |  | | | |_) |  / _ \\| |  _|  _|   |  _ \\| | | || |  
+  \u2009\u2009/ ___ \\|  _ <| |_) | |  | | |  _ <  / ___ \\ |_| | |___  | |_) | |_| || |  
+  \u2009/_/   \\_\\_| \\_\\____/___| |_| |_| \\_\\/_/   \\_\\____|_____| |____/ \\___/ |_|  
+  
+  \t\t\t\t\t\t\tMade by Stove Labs
+`);
+
 yargs(hideBin(process.argv))
-  .usage('\nUsage: $0 [command]')
+  .usage(`${asciLogo}`)
+  .usage(`\nUsage: $0 [command]`)
   .options({
     b: { type: 'string', describe: 'base token ticker' },
     q: { type: 'string', describe: 'quote token ticker' },
@@ -20,8 +33,8 @@ yargs(hideBin(process.argv))
       yargs
         .positional('b', { describe: 'base token ticker', type: 'string' })
         .positional('q', { describe: 'quote token ticker', type: 'string' })
-      .option('v', { describe: 'verbose logging', type: 'boolean' })
-      .option('vv', { describe: 'debugging', type: 'boolean' });
+        .option('v', { describe: 'verbose logging', type: 'boolean' })
+        .option('vv', { describe: 'debugging', type: 'boolean' });
     },
     async (argv) => {
       const config = await getConfig();
