@@ -1,5 +1,88 @@
 # Theory
 
+In the process of arbitrage a trader speculates on the price differences between two markets, by taking advantage of the difference in asset prices and trades for a profit. The strategy is to buy crypto at a lower price on one exchange and sell immediately at a higher price on the other.
+
+* **Base token** is the token we want to accumulate over time through arbitrage trades. We need to have a balance of this token to start trading. It is used in the first swap/trade.
+* **Quote token** is the token we trade against in an arbitrage life-cycle. We don't need to have a balance of this token, because we will receive it from the first swap. Subsequently, we try to sell the total output from the first trade in the second swap for the base token.
+* **Profit** is the difference between `base token` balance before and after the arbitrage life-cycle.
+* **Life cycle** of the arbitrage consists of the `buy` and `sell` swap. It completes when both swaps/trades have been finalized.
+
+An arbitrage opportunity presents itself when the same asset pair is traded on two different exchanges with varying prices. Of course we need to take into account fees as well, because those will cut into the profit opportunity.
+
+|             | DEX1                        | DEX2                         |
+|-------------|-----------------------------|------------------------------|
+| base token  | **low price in base token** | **high price in base token** |
+| quote token | high price in quote token   | low price in quote token     |
+
+#### Swap strategy
+
+|             | DEX1 | DEX2 |
+|-------------|------|------|
+| base token  | buy  | sell |
+| quote token |      |      |
+
+#### Flow of tokens
+
+The profit is the difference between the base token send (1) and receive (4).
+
+|             | DEX1        | DEX2        |
+|-------------|-------------|-------------|
+| base token  | (1) send    | (4) receive |
+| quote token | (2) receive | (3) send    |
+
+#### Objective is to find the parameters of the swap (amounts and limits)
+
+Challenge is to find the optimal amount x, in order to calculate the required base token limits.
+
+|             | DEX1                  | DEX2                  |
+|-------------|-----------------------|-----------------------|
+| base token  | getAmountInGivenOut() | getAmountOutGivenIn() |
+| quote token | optimal amount x      | amount amount x       |
+
+#### Balances of DEX denoted as a1, b1, a2, b2
+
+|             | DEX1 | DEX2 |
+|-------------|------|------|
+| base token  | a1   | a2   |
+| quote token | b1   | b2   |
+
+#### Finding the optimal quote token amount x
+
+The following formulas are simplified for 0.3% fee (=1-997/1000). The final algorithm uses parameterized fees for each exchange independently.
+
+```math
+getAmountInGivenOut=\frac{amountOut*1000*reserveIn}{reserveOut*1000-amountOut*997}
+
+getAmountOutGivenIn=\frac{amountIn*997*reserveOut}{reserveIn*1000+amountIn*997}
+```
+
+
+|             | DEX1 | DEX2 |
+|-------------|------|------|
+| base token  | Δa1  | Δa2  |
+| quote token | x    | x    |
+
+```math
+\Delta a_1 = getAmountInGivenOut(x) = \frac{x*1000*a_1}{b_1*1000-x*f_1}
+\Delta a_2 = getAmountOutGivenIn(x) = \frac{x*f_2*a_2}{b_2*1000+x*f_2}
+```
+
+Finally our profit function is
+
+```math
+f(x)=\Delta a_2 - \Delta a_1 = \frac{x*f_2*a_2}{b_2*1000+x*f_2} - \frac{x*1000*a_1}{b_1*1000-x*f_1}
+```
+And we want to find the biggest amount of x, where x < b1 and x < b2 (can't trade more quote token than there is in the pool).
+
+We set the first derivative of this function to zero. Solving that yields us x1 and x2.
+```math
+f'(x)=\frac{\delta}{\delta x}(f(x))=0
+\text{Rearranging the function to fit the univariate quadratic function}
+f'(x)= ax^2 + bx + c = 0
+\text{Allows us to extract the coefficients and solve it with this formula}
+x_{1,2}=-\frac{b±\sqrt{b²-4ac}}{2a}
+```
+
 
 # Implementation
 
