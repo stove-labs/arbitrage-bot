@@ -16,11 +16,11 @@ export const handleSwapsDone = (swapResults?: SwapResult[]) => {
     const errors = swapResults.reduce((errors, swap) => {
       if (swap.result.type === 'OK') return;
 
-      return errors + swap.result.data + '\n';
+      return errors + JSON.stringify(swap.result.data, null, 2) + '\n';
     }, '');
     const message =
       `Status:               ${red('Swap unsuccessful')}\n` +
-      `Error:                ${red(errors)}`;
+      `Error:                \n${red(errors)}`;
     return message;
   }
   let message: string = '';
