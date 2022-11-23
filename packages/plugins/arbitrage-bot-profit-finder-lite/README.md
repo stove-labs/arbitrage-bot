@@ -62,10 +62,17 @@ getAmountOutGivenIn=\frac{amountIn*997*reserveOut}{reserveIn*1000+amountIn*997}
 | base token  | Δa1  | Δa2  |
 | quote token | x    | x    |
 
+
 ```math
 \Delta a_1 = getAmountInGivenOut(x) = \frac{x*1000*a_1}{b_1*1000-x*f_1}
+```
+
+and
+
+```math
 \Delta a_2 = getAmountOutGivenIn(x) = \frac{x*f_2*a_2}{b_2*1000+x*f_2}
 ```
+
 
 Finally our profit function is
 
@@ -76,12 +83,21 @@ And we want to find the biggest amount of x, where x < b1 and x < b2 (can't trad
 
 We set the first derivative of this function to zero. Solving that yields us x1 and x2.
 ```math
-f'(x)=\frac{\delta}{\delta x}(f(x))=0
-\text{Rearranging the function to fit the univariate quadratic function}
+\frac{\delta}{\delta x}f(x)=f'(x)=0
+```
+Rearranging the function to fit the univariate quadratic function
+```math
 f'(x)= ax^2 + bx + c = 0
-\text{Allows us to extract the coefficients and solve it with this formula}
+```
+Allows us to extract the coefficients and solve it with this formula
+
+```math
 x_{1,2}=-\frac{b±\sqrt{b²-4ac}}{2a}
 ```
+
+This is an example where base token is XTZ (y-axis) and quote token kUSD (x-axis). The optimal solution for quote token amount is x=23 kUSD that gives us a profit of 0.057 XTZ. Any other value would extract less arbitrage through the two trades.
+<img width="367" alt="image" src="https://user-images.githubusercontent.com/8685779/203608922-58cb339e-f556-4072-96f1-ce21c079b650.png">
+
 
 
 # Implementation
