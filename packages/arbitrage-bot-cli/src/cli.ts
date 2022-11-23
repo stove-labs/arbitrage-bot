@@ -6,9 +6,11 @@ import _ from 'lodash';
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { asciLogo } from './asciLogo';
 
 yargs(hideBin(process.argv))
-  .usage('\nUsage: $0 [command]')
+  .usage(`${asciLogo}`)
+  .usage(`\nUsage: $0 [command]`)
   .options({
     b: { type: 'string', describe: 'base token ticker' },
     q: { type: 'string', describe: 'quote token ticker' },
@@ -20,8 +22,8 @@ yargs(hideBin(process.argv))
       yargs
         .positional('b', { describe: 'base token ticker', type: 'string' })
         .positional('q', { describe: 'quote token ticker', type: 'string' })
-      .option('v', { describe: 'verbose logging', type: 'boolean' })
-      .option('vv', { describe: 'debugging', type: 'boolean' });
+        .option('v', { describe: 'verbose logging', type: 'boolean' })
+        .option('vv', { describe: 'debugging', type: 'boolean' });
     },
     async (argv) => {
       const config = await getConfig();

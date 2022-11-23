@@ -7,6 +7,7 @@ import { handleLifeCycleStart } from './handler/lifeCycleStart';
 import { handleLifeCycleEnd } from './handler/lifeCycleEnd';
 import { handleSwapsDone } from './handler/swapsDone';
 import { handleArbitrageComplete } from './handler/arbitrageComplete';
+import ora, { Ora } from 'ora';
 
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .count('verbose')
@@ -35,6 +36,7 @@ export const formattedTicker = (ticker: string): string => {
 
 export class ConsoleReporterPlugin implements ReporterPlugin {
   log: Logger;
+  spinner: Ora;
 
   constructor() {
     this.log = new Logger();
@@ -46,6 +48,7 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
   report(event: ReporterPluginEvent): string {
     switch (event.type) {
       case 'LIFECYCLE_START':
+        this.spinner && this.spinner.stop();
         return handleLifeCycleStart();
       case 'PRICES_FETCHED':
         return handlePricesFetched(event.prices);
@@ -54,7 +57,11 @@ export class ConsoleReporterPlugin implements ReporterPlugin {
       case 'ARBITRAGE_COMPLETE':
         return handleArbitrageComplete(event.report);
       case 'LIFECYCLE_END':
-        return handleLifeCycleEnd();
+        this.spinner = ora({
+          text: 'Waiting until life cycle restarts',
+          color: 'yellow',
+        }).start();
+        return '';
       case 'SWAPS_DONE':
         return handleSwapsDone(event.swapResults);
       default:
