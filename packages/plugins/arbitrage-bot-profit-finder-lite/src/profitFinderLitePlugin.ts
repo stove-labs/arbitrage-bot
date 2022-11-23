@@ -33,7 +33,7 @@ export class ProfitFinderLitePlugin implements ProfitFinderPlugin {
       this.config.profitSplitForSlippage
     );
 
-    return profitOpportunity as ProfitOpportunity;
+    return profitOpportunity;
   }
 }
 
