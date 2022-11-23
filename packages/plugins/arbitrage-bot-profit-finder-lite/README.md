@@ -52,7 +52,9 @@ The following formulas are simplified for 0.3% fee (=1-997/1000). The final algo
 
 ```math
 getAmountInGivenOut=\frac{amountOut*1000*reserveIn}{reserveOut*1000-amountOut*997}
+```
 
+```math
 getAmountOutGivenIn=\frac{amountIn*997*reserveOut}{reserveIn*1000+amountIn*997}
 ```
 
@@ -62,24 +64,20 @@ getAmountOutGivenIn=\frac{amountIn*997*reserveOut}{reserveIn*1000+amountIn*997}
 | base token  | Δa1  | Δa2  |
 | quote token | x    | x    |
 
-
 ```math
 \Delta a_1 = getAmountInGivenOut(x) = \frac{x*1000*a_1}{b_1*1000-x*f_1}
 ```
-
-and
 
 ```math
 \Delta a_2 = getAmountOutGivenIn(x) = \frac{x*f_2*a_2}{b_2*1000+x*f_2}
 ```
 
-
-Finally our profit function is
+Finally our profit function is:
 
 ```math
 f(x)=\Delta a_2 - \Delta a_1 = \frac{x*f_2*a_2}{b_2*1000+x*f_2} - \frac{x*1000*a_1}{b_1*1000-x*f_1}
 ```
-And we want to find the biggest amount of x, where x < b1 and x < b2 (can't trade more quote token than there is in the pool).
+And we want to find the biggest amount of x, where x < b1 and x < b2 (can't trade more quote tokens than there is in the pool).
 
 We set the first derivative of this function to zero. Solving that yields us x1 and x2.
 ```math
