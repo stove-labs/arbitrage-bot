@@ -23,7 +23,7 @@
     "build": "rm -rf dist && tsc",
     "test": "mocha -r ts-node/register test/*.ts",
     "test:watch": "mocha -r ts-node/register test/**/**.ts --watch-extensions ts --watch --watch-files src, './test/**/**.test.ts'",
-    "cli": "node ./dist/lib/cli.js"
+    "cli": "node ./dist/lib/cli.js -h"
   },
   "typings": "./dist/types/types.d.ts",
   "bugs": {
@@ -52,6 +52,7 @@
     "@stove-labs/tezos-dex-vortex": "^1.0.5",
     "@taquito/signer": "^14.0.0",
     "figlet": "^1.5.2",
+    "fs": "^0.0.1-security",
     "lodash": "^4.17.21",
     "yargs": "^17.5.1"
   },
