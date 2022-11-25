@@ -8,10 +8,10 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { asciLogo } from './asciLogo';
 import { exportConfigToFile, loadConfigFromFile } from './configToJson';
-const configPath = '/config.json';
+
+const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
 
 const list = async () => {
-  const configFromFile = loadConfigFromFile(process.cwd() + configPath);
   const config = await getConfig(configFromFile);
   const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
     return exchangePlugin.config.exchangeInstances;
@@ -46,7 +46,6 @@ yargs(hideBin(process.argv))
         .option('vv', { describe: 'debugging', type: 'boolean' });
     },
     async (argv) => {
-      const configFromFile = loadConfigFromFile(process.cwd() + configPath);
       const config = await getConfig(configFromFile);
 
       config.baseToken.ticker = argv.b;
