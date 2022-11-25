@@ -7,6 +7,7 @@ import _ from 'lodash';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { asciLogo } from './asciLogo';
+import { exportConfigToFile, loadConfigFromFile } from './configToJson';
 
 yargs(hideBin(process.argv))
   .usage(`${asciLogo}`)
@@ -26,7 +27,9 @@ yargs(hideBin(process.argv))
         .option('vv', { describe: 'debugging', type: 'boolean' });
     },
     async (argv) => {
-      const config = await getConfig();
+      const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
+      const config = await getConfig(configFromFile);
+
       config.baseToken.ticker = argv.b;
       config.quoteToken.ticker = argv.q;
       const core = new ArbitrageBotCore(config);
@@ -36,7 +39,8 @@ yargs(hideBin(process.argv))
   .example('$0 start', '-h')
   .example('$0 start', 'XTZ kUSD')
   .command('list', 'known tickers', {}, async () => {
-    const config = await getConfig();
+    const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
+    const config = await getConfig(configFromFile);
     const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
       return exchangePlugin.config.exchangeInstances;
     });
@@ -51,6 +55,10 @@ yargs(hideBin(process.argv))
       }
     );
   })
+  .command('init', 'creates an example config file', {}, () => {
+    exportConfigToFile();
+    console.log('config.json initialized');
+  })
   .alias('l', 'list')
   .showHelpOnFail(false, 'Specify -h for available options')
   .epilog('⚠️  Experimental software, use at own risk!')
@@ -59,5 +67,5 @@ yargs(hideBin(process.argv))
   .alias('h', 'help')
   .recommendCommands()
   .version(false)
-  // .showHelp()
+  //.showHelp()
   .parse();
