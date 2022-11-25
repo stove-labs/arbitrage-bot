@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/arbitrage-bot-reporter",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "console reporter for the arbitrage bot",
   "keywords": [
     "console",
@@ -32,7 +32,7 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot": "^1.1.0",
+    "@stove-labs/arbitrage-bot": "^1.1.1",
     "@topcli/spinner": "^1.1.0",
     "@types/ora": "^3.2.0",
     "bignumber.js": "^9.1.0",

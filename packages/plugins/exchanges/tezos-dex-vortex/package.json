@@ -1,6 +1,6 @@
 {
   "name": "@stove-labs/tezos-dex-vortex",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "plugin for the tezos DEX Vortex",
   "keywords": [
     "DEX",
@@ -34,7 +34,7 @@
     "url": "https://github.com/stove-labs/arbitrage-bot/issues"
   },
   "dependencies": {
-    "@stove-labs/arbitrage-bot-exchange-utils": "^1.1.0",
+    "@stove-labs/arbitrage-bot-exchange-utils": "^1.1.1",
     "@taquito/taquito": "^14.1.0"
   },
   "devDependencies": {
