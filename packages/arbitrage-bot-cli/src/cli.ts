@@ -9,6 +9,24 @@ import { hideBin } from 'yargs/helpers';
 import { asciLogo } from './asciLogo';
 import { exportConfigToFile, loadConfigFromFile } from './configToJson';
 
+const list = async () => {
+  const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
+  const config = await getConfig(configFromFile);
+  const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
+    return exchangePlugin.config.exchangeInstances;
+  });
+
+  const tickersBothExchanges =
+    getDuplicateTradingPairsFromAllExchanges(exchangeRegistry);
+
+  console.log('The config allows for arbitrage between: ');
+  tickersBothExchanges.forEach(
+    (tradingPair: { ticker1: string; ticker2: string }) => {
+      console.log(`   ${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`);
+    }
+  );
+}
+
 yargs(hideBin(process.argv))
   .usage(`${asciLogo}`)
   .usage(`\nUsage: $0 [command]`)
@@ -38,26 +56,11 @@ yargs(hideBin(process.argv))
   )
   .example('$0 start', '-h')
   .example('$0 start', 'XTZ kUSD')
-  .command('list', 'known tickers', {}, async () => {
-    const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
-    const config = await getConfig(configFromFile);
-    const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
-      return exchangePlugin.config.exchangeInstances;
-    });
-
-    const tickersBothExchanges =
-      getDuplicateTradingPairsFromAllExchanges(exchangeRegistry);
-
-    console.log('The config allows for arbitrage between: ');
-    tickersBothExchanges.forEach(
-      (tradingPair: { ticker1: string; ticker2: string }) => {
-        console.log(`   ${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`);
-      }
-    );
-  })
+  .command('list', 'known tickers', {}, list)
   .command('init', 'creates an example config file', {}, () => {
     exportConfigToFile();
     console.log('config.json initialized');
+    list()
   })
   .alias('l', 'list')
   .showHelpOnFail(false, 'Specify -h for available options')
