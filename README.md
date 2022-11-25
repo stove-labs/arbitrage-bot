@@ -11,12 +11,15 @@ Please refer to [CLI package repository](packages/arbitrage-bot-cli/) for detail
 The quickest way to get started is by running:
 
 ```bash
+# this creates a config.json in your directory
+npx @stove-labs/arbitrage-bot-cli init
+
 npx @stove-labs/arbitrage-bot-cli start XTZ kUSD
 # for verbose output
 npx @stove-labs/arbitrage-bot-cli start XTZ kUSD -vv
 # help 
 npx @stove-labs/arbitrage-bot-cli start -h 
-# list tokens in the pre-configured init
+# list tradeable tokens from config
 npx @stove-labs/arbitrage-bot-cli list
 ```
 
