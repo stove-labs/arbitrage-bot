@@ -23,27 +23,27 @@ import vortexExchangeRegistry from './exchanges/tezos/vortex';
 
 const getConfig = async (config?: any): Promise<Config> => {
   const tezosSigner = await InMemorySigner.fromSecretKey(
-    config.keys.tezos.secretKey || defaultAliceSecret
+    config?.keys?.tezos?.secretKey || defaultAliceSecret
   );
 
   const tezosKey = {
     TEZOS: {
       address: await tezosSigner.publicKeyHash(),
       signer: tezosSigner,
-      rpc: config.keys.tezos.rpc || tezosRpc,
+      rpc: config?.keys?.tezos?.rpc || tezosRpc,
     },
   };
 
   const keychains = [tezosKey];
 
-  const tokenRegistryPlugin = new TokenRegistryPlugin(config.tokenList || tokenList);
+  const tokenRegistryPlugin = new TokenRegistryPlugin(config?.tokenList || tokenList);
 
   const quipuswapExchangeConfig: ExchangePluginConfig = {
     rpc: tezosKey.TEZOS.rpc,
     identifier: 'QUIPUSWAP',
     ecosystemIdentifier: 'TEZOS',
     tokenInstances: tokenRegistryPlugin,
-    exchangeInstances: config.exchangeList.quipuswap || quipuswapExchangeRegistry,
+    exchangeInstances: config?.exchangeList?.quipuswap || quipuswapExchangeRegistry,
   };
 
   const vortexExchangeConfig: ExchangePluginConfig = {
@@ -51,7 +51,7 @@ const getConfig = async (config?: any): Promise<Config> => {
     identifier: 'VORTEX',
     ecosystemIdentifier: 'TEZOS',
     tokenInstances: tokenRegistryPlugin,
-    exchangeInstances: config.exchangeList.vortex || vortexExchangeRegistry,
+    exchangeInstances: config?.exchangeList?.vortex || vortexExchangeRegistry,
   };
 
   const exchanges: ExchangePlugin[] = [
@@ -69,7 +69,7 @@ const getConfig = async (config?: any): Promise<Config> => {
     plugins: {
       exchanges,
       token: tokenRegistryPlugin,
-      trigger: new TriggerChainPlugin({ interval: config.plugins.trigger.interval || 15000 }),
+      trigger: new TriggerChainPlugin({ interval: config?.plugins?.trigger?.interval || 15000 }),
       reporter: new ConsoleReporterPlugin(),
       profitFinder: new ProfitFinderLitePlugin({
         profitSplitForSlippage: 0,

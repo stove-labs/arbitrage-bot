@@ -51,7 +51,7 @@ export const handleTezosSwapExecution = async (
     .toNumber();
 
   const totalInflatedOpCost = batchParameters.reduce(
-    (sum, current) => (sum + current.fee ? current.fee : 0),
+    (sum, current) => sum + (current.fee || 0),
     0
   );
 
@@ -68,11 +68,11 @@ export const handleTezosSwapExecution = async (
   let profitFromOperation: string | undefined;
   // TODO: implement FA2 profit calculation and remove try catch block
   try {
-  profitFromOperation = getProfitFromOperation(
-    operation.results as OperationContentsAndResultTransaction[],
-    exchangeAddresses[0], // swap 1 exchange address
-    exchangeAddresses[1] // swap 2 exchange address
-  );
+    profitFromOperation = getProfitFromOperation(
+      operation.results as OperationContentsAndResultTransaction[],
+      exchangeAddresses[0], // swap 1 exchange address
+      exchangeAddresses[1] // swap 2 exchange address
+    );
   } catch (e) {
     profitFromOperation = undefined;
   }
