@@ -1,54 +1,37 @@
 #!/usr/bin/env node
 import { ArbitrageBotCore } from '@stove-labs/arbitrage-bot';
 import getConfig from './config.example.arbitrage-bot';
-import { getDuplicateTradingPairsFromAllExchanges } from '@stove-labs/arbitrage-bot-exchange-utils';
 import _ from 'lodash';
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { asciLogo } from './asciLogo';
 import { exportConfigToFile, loadConfigFromFile } from './configToJson';
-import { AsciiTable3, AlignmentEnum } from 'ascii-table3';
+
+import {
+  formatTokensAsAsciiTable,
+  getExchangesFromPluginConfig,
+  getExchangeTableAscii as formatExchangeAsAsciiTable,
+  getTokenPairsFromExchangeRegistry,
+} from './commands/list/utils';
 
 const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
 
 const list = async () => {
   const config = await getConfig(configFromFile);
-  const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
-    return exchangePlugin.config.exchangeInstances;
-  });
 
   console.log('The config allows for arbitrage between: ');
 
-  const exchanges: [number, string][] = config.plugins.exchanges
-    .map((exchangePlugin) => {
-      return exchangePlugin.config.identifier;
-    })
-    .map((value, i) => [i, value]);
+  const exchanges = getExchangesFromPluginConfig(config.plugins.exchanges);
+  const exchangeInfoAsTable = formatExchangeAsAsciiTable(exchanges);
+  console.log(exchangeInfoAsTable);
 
-  const tickersBothExchanges =
-    getDuplicateTradingPairsFromAllExchanges(exchangeRegistry);
-  const tokenPairs: [number, string][] = tickersBothExchanges
-    .map((tradingPair: { ticker1: string; ticker2: string }) => {
-      return `${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`;
-    })
-    .map((value, i) => [i, value]);
-
-  const exchangeTable = new AsciiTable3('Supported exchanges')
-    .setHeading('No.', 'Exchange Name')
-    .addRowMatrix(exchanges).setStyle('unicode-mix')
-    .setAlignCenter(1)
-    .setAlignCenter(2)
-    .setWidth(2, 20);
-  const tokenTable = new AsciiTable3('Supported trading pairs')
-    .setHeading('No.', 'Pair Name')
-    .addRowMatrix(tokenPairs).setStyle('unicode-mix')
-    .setAlignCenter(1)
-    .setAlignCenter(2)
-    .setWidth(2, 20);
-
-  console.log(exchangeTable.toString());
-  console.log(tokenTable.toString());
+  const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
+    return exchangePlugin.config.exchangeInstances;
+  });
+  const tokenPairs = getTokenPairsFromExchangeRegistry(exchangeRegistry);
+  const tokenPairsAsTable = formatTokensAsAsciiTable(tokenPairs);
+  console.log(tokenPairsAsTable);
 };
 
 yargs(hideBin(process.argv))
