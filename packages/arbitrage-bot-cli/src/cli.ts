@@ -1,13 +1,38 @@
 #!/usr/bin/env node
 import { ArbitrageBotCore } from '@stove-labs/arbitrage-bot';
 import getConfig from './config.example.arbitrage-bot';
-import { getDuplicateTradingPairsFromAllExchanges } from '@stove-labs/arbitrage-bot-exchange-utils';
 import _ from 'lodash';
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { asciLogo } from './asciLogo';
 import { exportConfigToFile, loadConfigFromFile } from './configToJson';
+
+import {
+  formatTokensAsAsciiTable,
+  getExchangesFromPluginConfig,
+  getExchangeTableAscii as formatExchangeAsAsciiTable,
+  getTokenPairsFromExchangeRegistry,
+} from './commands/list/utils';
+
+const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
+
+const list = async () => {
+  const config = await getConfig(configFromFile);
+
+  console.log('The config allows for arbitrage between: ');
+
+  const exchanges = getExchangesFromPluginConfig(config.plugins.exchanges);
+  const exchangeInfoAsTable = formatExchangeAsAsciiTable(exchanges);
+  console.log(exchangeInfoAsTable);
+
+  const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
+    return exchangePlugin.config.exchangeInstances;
+  });
+  const tokenPairs = getTokenPairsFromExchangeRegistry(exchangeRegistry);
+  const tokenPairsAsTable = formatTokensAsAsciiTable(tokenPairs);
+  console.log(tokenPairsAsTable);
+};
 
 yargs(hideBin(process.argv))
   .usage(`${asciLogo}`)
@@ -27,7 +52,6 @@ yargs(hideBin(process.argv))
         .option('vv', { describe: 'debugging', type: 'boolean' });
     },
     async (argv) => {
-      const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
       const config = await getConfig(configFromFile);
 
       config.baseToken.ticker = argv.b;
@@ -39,26 +63,11 @@ yargs(hideBin(process.argv))
   )
   .example('$0 start', '-h')
   .example('$0 start', 'XTZ kUSD')
-  .command('list', 'known tickers', {}, async () => {
-    const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
-    const config = await getConfig(configFromFile);
-    const exchangeRegistry = config.plugins.exchanges.map((exchangePlugin) => {
-      return exchangePlugin.config.exchangeInstances;
-    });
-
-    const tickersBothExchanges =
-      getDuplicateTradingPairsFromAllExchanges(exchangeRegistry);
-
-    console.log('The config allows for arbitrage between: ');
-    tickersBothExchanges.forEach(
-      (tradingPair: { ticker1: string; ticker2: string }) => {
-        console.log(`   ${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`);
-      }
-    );
-  })
+  .command('list', 'known tickers', {}, list)
   .command('init', 'creates an example config file', {}, () => {
     exportConfigToFile();
     console.log('config.json initialized');
+    list();
   })
   .alias('l', 'list')
   .showHelpOnFail(false, 'Specify -h for available options')

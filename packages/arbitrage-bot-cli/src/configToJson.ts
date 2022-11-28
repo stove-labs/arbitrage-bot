@@ -30,7 +30,7 @@ export const loadConfigFromFile = (path: string): JSON | undefined => {
   try {
     const configFromFile = require(path) as JSON;
 
-    console.log(`Using config.json`);
+    // console.log(`Using config.json`);
     return configFromFile;
   } catch (e) {
     console.log(
