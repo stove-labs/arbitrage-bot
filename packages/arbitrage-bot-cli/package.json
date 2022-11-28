@@ -51,6 +51,7 @@
     "@stove-labs/tezos-dex-quipuswap": "^1.1.1",
     "@stove-labs/tezos-dex-vortex": "^1.1.1",
     "@taquito/signer": "^14.0.0",
+    "ascii-table3": "^0.8.0",
     "figlet": "^1.5.2",
     "fs": "^0.0.1-security",
     "lodash": "^4.17.21",

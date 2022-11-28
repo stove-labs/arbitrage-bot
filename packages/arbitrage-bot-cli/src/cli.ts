@@ -8,6 +8,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { asciLogo } from './asciLogo';
 import { exportConfigToFile, loadConfigFromFile } from './configToJson';
+import { AsciiTable3, AlignmentEnum } from 'ascii-table3';
 
 const configFromFile = loadConfigFromFile(process.cwd() + '/config.json');
 
@@ -17,15 +18,37 @@ const list = async () => {
     return exchangePlugin.config.exchangeInstances;
   });
 
+  console.log('The config allows for arbitrage between: ');
+
+  const exchanges: [number, string][] = config.plugins.exchanges
+    .map((exchangePlugin) => {
+      return exchangePlugin.config.identifier;
+    })
+    .map((value, i) => [i, value]);
+
   const tickersBothExchanges =
     getDuplicateTradingPairsFromAllExchanges(exchangeRegistry);
+  const tokenPairs: [number, string][] = tickersBothExchanges
+    .map((tradingPair: { ticker1: string; ticker2: string }) => {
+      return `${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`;
+    })
+    .map((value, i) => [i, value]);
 
-  console.log('The config allows for arbitrage between: ');
-  tickersBothExchanges.forEach(
-    (tradingPair: { ticker1: string; ticker2: string }) => {
-      console.log(`   ${tradingPair.ticker1} 🔁 ${tradingPair.ticker2}`);
-    }
-  );
+  const exchangeTable = new AsciiTable3('Supported exchanges')
+    .setHeading('No.', 'Exchange Name')
+    .addRowMatrix(exchanges).setStyle('unicode-mix')
+    .setAlignCenter(1)
+    .setAlignCenter(2)
+    .setWidth(2, 20);
+  const tokenTable = new AsciiTable3('Supported trading pairs')
+    .setHeading('No.', 'Pair Name')
+    .addRowMatrix(tokenPairs).setStyle('unicode-mix')
+    .setAlignCenter(1)
+    .setAlignCenter(2)
+    .setWidth(2, 20);
+
+  console.log(exchangeTable.toString());
+  console.log(tokenTable.toString());
 };
 
 yargs(hideBin(process.argv))
