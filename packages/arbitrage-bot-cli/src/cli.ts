@@ -74,6 +74,7 @@ yargs(hideBin(process.argv))
       config.baseToken.ticker = argv.b;
       config.quoteToken.ticker = argv.q;
       const core = new ArbitrageBotCore(config);
+      console.log('CLI v' + require('../package.json').version)
       core.start();
     }
   )
